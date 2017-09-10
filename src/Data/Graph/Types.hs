@@ -1,11 +1,13 @@
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.Types where
 
+import Data.List (nub)
+import GHC.Float (float2Double)
+
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
-import           Data.List         (nub)
 
 -- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
 data Edge v e = Edge v v e
@@ -31,28 +33,33 @@ instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
 
 
--- | Edges Attribute types migh expose a Weight (useful for computing some
--- | algorithms on graphs) and a Label (useful for graph plotting)
-class EdgeAttr a where
-    edgeWeight :: a -> Maybe Double
-    edgeLabel :: a -> Maybe String
+-- | Weighted Edge attributes
+-- | Useful for computing some algorithms on graphs
+class Weighted a where
+    weight :: a -> Double
 
--- | Unit Edge Attribute. Useful when no attribute is neded
-instance EdgeAttr () where
-    edgeWeight _ = Nothing
-    edgeLabel _ = Nothing
+-- | Labeled Edge attributes
+-- | Useful for graph plotting
+class Labeled a where
+    label :: a -> String
 
-instance EdgeAttr Double where
-    edgeWeight v = Just v
-    edgeLabel _ = Nothing
+instance Weighted Int where
+    weight = fromIntegral
 
-instance EdgeAttr String where
-    edgeWeight _ = Nothing
-    edgeLabel l = Just l
+instance Weighted Float where
+    weight = float2Double
 
-instance EdgeAttr (Double, String) where
-    edgeWeight = Just . fst
-    edgeLabel = Just . snd
+instance Weighted Double where
+    weight = id
+
+instance Labeled String where
+    label = id
+
+instance Weighted (Double, String) where
+    weight = fst
+
+instance Labeled (Double, String) where
+    label = snd
 
 -- | Construct an undirected 'Edge' between two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
@@ -70,7 +77,7 @@ linksToArcs ls = concat $ fmap toArc ls
         toArc (fromV, links) = fmap (\(v, a) -> Arc fromV v a) (HM.toList links)
 
 -- | Get 'Edge's from an association list of vertices and their links
-linksToEdges :: (Eq v, Eq a)  =>  [(v, Links v a)] -> [Edge v a]
+linksToEdges :: (Eq v, Eq a) => [(v, Links v a)] -> [Edge v a]
 linksToEdges ls = nub $ concat $ fmap toEdge ls
     where
         toEdge :: (v, Links v a) -> [Edge v a]
