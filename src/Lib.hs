@@ -7,8 +7,7 @@ import Data.Hashable
 type VertexHash = Int
 
 class Edge e where
-    vertex1 :: e -> VertexHash
-    vertex2 :: e -> VertexHash
+    vertices :: e  -> (VertexHash, VertexHash)
 
 class Edge a => Arc a where
     fromVertex :: a -> VertexHash
@@ -18,9 +17,8 @@ class Edge e => WeightedEdge e where
     edgeWeight :: e -> Double
 
 instance Hashable v => Edge (v, v) where
-    vertex1 = hash . fst
-    vertex2 = hash . snd
+    vertices (v1, v2) = (hash v1, hash v2)
 
 instance Hashable v => Arc (v, v) where
-    fromVertex = vertex1
-    toVertex = vertex2
+    fromVertex = fst . vertices
+    toVertex = snd . vertices
