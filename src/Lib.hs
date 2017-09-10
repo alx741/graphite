@@ -58,6 +58,10 @@ insertArc :: (Hashable v, Eq v) => Arc v a -> DiGraph v a -> DiGraph v a
 insertArc (Arc fromV toV attr) g = HM.adjust (insertLink toV attr) fromV g'
     where g' = insertVertices [fromV, toV] g
 
+insertArcs :: (Hashable v, Eq v) => [Arc v a] -> DiGraph v a -> DiGraph v a
+insertArcs [] g     = g
+insertArcs (a:as) g = insertArcs as $ insertArc a g
+
 -- | Retrieve the vertices of a 'DiGraph'
 vertices :: DiGraph v a -> [v]
 vertices = HM.keys
