@@ -8,19 +8,29 @@ import qualified Data.HashMap.Lazy as HM
 
 data Edge v a
     = Edge v v a
-    | WeightedEdge Double v v a
+    -- | WeightedEdge Double v v a
     deriving (Eq, Show)
 
 data Arc v a
     = Arc v v a
-    | WeightedArc Double v v a
+    -- | WeightedArc Double v v a
     deriving (Eq, Show)
 
--- -- | Simple, Unweighted Edge with no attributes
--- type SimpleEdge v = Edge v ()
+class EdgeAttr a where
+    edgeWeight :: a -> Maybe Double
+    edgeLabel :: a -> Maybe String
 
--- -- | Simple, Unweighted Arc with no attributes
--- type SimpleArc v = Arc v ()
+instance EdgeAttr Double where
+    edgeWeight v = Just v
+    edgeLabel _ = Nothing
+
+instance EdgeAttr String where
+    edgeWeight _ = Nothing
+    edgeLabel l = Just l
+
+instance EdgeAttr (Double, String) where
+    edgeWeight = Just . fst
+    edgeLabel = Just . snd
 
 -- | Construct a 'SimpleEdge' for two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
@@ -56,25 +66,11 @@ insertLink v attr m = HM.insert v attr m
 getLinks :: (Hashable v, Eq v) => v -> DiGraph v a -> Links v a
 getLinks = HM.lookupDefault HM.empty
 
-myGraph :: DiGraph Int ()
-myGraph = empty
+myGraph :: DiGraph Int (Double, String)
+myGraph = insertArc (Arc 1 2 (55.5, "label")) empty
 
 -- | O(log n) Associate the specified value with the specified key in this map.
 -- | If this map previously contained a mapping for the key, leave the map
 -- | intact.
 hashMapInsert :: (Eq k, Hashable k) => k -> v -> HM.HashMap k v -> HM.HashMap k v
 hashMapInsert k v m = if not (HM.member k m) then HM.insert k v m else m
-
-
--- insertArc :: (Vertex v, Arc a) => a -> DiGraph v e -> DiGraph v e
--- insertArc a g =
---     if HM.member from g
---     then undefined
---     else g
---     where
---         from = fromVertex a
---         to = toVertex a
-
-
--- -- mymap :: HM.HashMap Int String
--- -- mymap = HM.insert 1 "hola" HM.empty
