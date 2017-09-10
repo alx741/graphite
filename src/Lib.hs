@@ -75,6 +75,10 @@ arcs g = linksToArcs $ zip vs links
         links :: [Links v a]
         links = fmap (\v -> getLinks v g) vs
 
+-- | Retrieve the 'Arc's of a 'DiGraph' as tuples, ignoring its attributes
+arcs' :: (Hashable v, Eq v) => DiGraph v a -> [(v, v)]
+arcs' g = fmap arcToTuple $ arcs g
+
 -- | Insert a link directed to *v* with attribute *a*
 -- | If the connnection already exists, the attribute is replaced
 insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
@@ -90,6 +94,10 @@ linksToArcs ls = concat $ fmap toArc ls
     where
         toArc :: (v, Links v a) -> [Arc v a]
         toArc (fromV, links) = fmap (\(v, a) -> Arc fromV v a) (HM.toList links)
+
+-- | Get the vertices of an 'Arc' ignoring its attributes
+arcToTuple :: Arc v a -> (v, v)
+arcToTuple (Arc fromV toV _) = (fromV, toV)
 
 
 myGraph :: DiGraph Int (Double, String)
