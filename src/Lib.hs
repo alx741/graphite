@@ -1,24 +1,36 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Lib where
 
-import Data.Hashable
+import           Data.Hashable
+import qualified Data.HashMap.Lazy as HM
 
-type VertexHash = Int
+data Edge v a
+    = Edge v v a
+    | WeightedEdge Double v v a
 
-class Edge e where
-    vertices :: e  -> (VertexHash, VertexHash)
+data Arc v a
+    = Arc v v a
+    | WeightedArc Double v v a
 
-class Edge a => Arc a where
-    fromVertex :: a -> VertexHash
-    toVertex :: a -> VertexHash
+type DiGraph v a = HM.HashMap v (HM.HashMap v a)
 
-class Edge e => WeightedEdge e where
-    edgeWeight :: e -> Double
+empty :: (Hashable v) => DiGraph v (Arc v ())
+empty = HM.empty
 
-instance Hashable v => Edge (v, v) where
-    vertices (v1, v2) = (hash v1, hash v2)
+-- insertVertex :: (Vertex v, Edge e) => v -> DiGraph v e -> DiGraph v e
+-- insertVertex v = HM.insert v HM.empty
 
-instance Hashable v => Arc (v, v) where
-    fromVertex = fst . vertices
-    toVertex = snd . vertices
+-- insertArc :: (Vertex v, Arc a) => a -> DiGraph v e -> DiGraph v e
+-- insertArc a g =
+--     if HM.member from g
+--     then undefined
+--     else g
+--     where
+--         from = fromVertex a
+--         to = toVertex a
+
+
+-- -- mymap :: HM.HashMap Int String
+-- -- mymap = HM.insert 1 "hola" HM.empty
