@@ -15,7 +15,8 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Data.Graph.Types
+                     , Data.Graph.DiGraph
   build-depends:       base >= 4.7 && < 5
                      , hashable
                      , unordered-containers
