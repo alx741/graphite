@@ -9,33 +9,53 @@ import qualified Data.HashMap.Lazy as HM
 data Edge v a
     = Edge v v a
     | WeightedEdge Double v v a
+    deriving (Eq, Show)
 
 data Arc v a
     = Arc v v a
     | WeightedArc Double v v a
+    deriving (Eq, Show)
 
--- | Simple Edge with no attributes
-type SimpleEdge v = Edge v ()
+-- -- | Simple, Unweighted Edge with no attributes
+-- type SimpleEdge v = Edge v ()
 
--- | Simple Arc with no attributes
-type SimpleArc v = Arc v ()
+-- -- | Simple, Unweighted Arc with no attributes
+-- type SimpleArc v = Arc v ()
 
 -- | Construct a 'SimpleEdge' for two vertices
-(<->) :: (Hashable v) => v -> v -> SimpleEdge v
+(<->) :: (Hashable v) => v -> v -> Edge v ()
 (<->) v1 v2 = Edge v1 v2 ()
 
 -- | Construct a 'SimpleArc' for two vertices
-(-->) :: (Hashable v) => v -> v -> SimpleArc v
+(-->) :: (Hashable v) => v -> v -> Arc v ()
 (-->) v1 v2 = Arc v1 v2 ()
 
-
-type DiGraph v e = HM.HashMap v (HM.HashMap v e)
+type DiGraph v a = HM.HashMap v (HM.HashMap v a)
 
 empty :: (Hashable v) => DiGraph v e
 empty = HM.empty
 
--- insertVertex :: (Vertex v, Edge e) => v -> DiGraph v e -> DiGraph v e
--- insertVertex v = HM.insert v HM.empty
+insertVertex :: (Hashable v, Eq v) => v -> DiGraph v a -> DiGraph v a
+insertVertex v = hashMapInsert v HM.empty
+
+-- insertArc :: (Hashable v) => Arc v a -> DiGraph v a -> DiGraph v a
+-- insertArc (Arc fromV toV a) g =
+--     if HM.member fromV g
+--     then undefined
+--     else g
+--     where
+--         from = fromVertex a
+--         to = toVertex a
+
+myGraph :: DiGraph Int ()
+myGraph = empty
+
+-- | O(log n) Associate the specified value with the specified key in this map.
+-- | If this map previously contained a mapping for the key, leave the map
+-- | intact.
+hashMapInsert :: (Eq k, Hashable k) => k -> v -> HM.HashMap k v -> HM.HashMap k v
+hashMapInsert k v m = if not (HM.member k m) then HM.insert k v m else m
+
 
 -- insertArc :: (Vertex v, Arc a) => a -> DiGraph v e -> DiGraph v e
 -- insertArc a g =
