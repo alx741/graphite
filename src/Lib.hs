@@ -30,7 +30,8 @@ data Arc v a
 (-->) :: (Hashable v) => v -> v -> Arc v ()
 (-->) v1 v2 = Arc v1 v2 ()
 
-type DiGraph v a = HM.HashMap v (HM.HashMap v a)
+type DiGraph v a = HM.HashMap v (Links v a)
+type Links v a = HM.HashMap v a
 
 empty :: (Hashable v) => DiGraph v e
 empty = HM.empty
@@ -38,14 +39,22 @@ empty = HM.empty
 insertVertex :: (Hashable v, Eq v) => v -> DiGraph v a -> DiGraph v a
 insertVertex v = hashMapInsert v HM.empty
 
--- insertArc :: (Hashable v) => Arc v a -> DiGraph v a -> DiGraph v a
--- insertArc (Arc fromV toV a) g =
---     if HM.member fromV g
---     then undefined
---     else g
---     where
---         from = fromVertex a
---         to = toVertex a
+insertVertices :: (Hashable v, Eq v) => [v] -> DiGraph v a -> DiGraph v a
+insertVertices [] g     = g
+insertVertices (v:vs) g = insertVertices vs $ insertVertex v g
+
+insertArc :: (Hashable v, Eq v) => Arc v a -> DiGraph v a -> DiGraph v a
+insertArc (Arc fromV toV attr) g = HM.adjust (insertLink toV attr) fromV g'
+    where g' = insertVertices [fromV, toV] g
+
+-- | Insert a link directed to *v* with attribute *a*
+-- | If the connnection already exists, the attribute is replaced
+insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
+insertLink v attr m = HM.insert v attr m
+
+-- | Get the links for a given vertex
+getLinks :: (Hashable v, Eq v) => v -> DiGraph v a -> Links v a
+getLinks = HM.lookupDefault HM.empty
 
 myGraph :: DiGraph Int ()
 myGraph = empty
