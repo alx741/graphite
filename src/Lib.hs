@@ -14,9 +14,24 @@ data Arc v a
     = Arc v v a
     | WeightedArc Double v v a
 
-type DiGraph v a = HM.HashMap v (HM.HashMap v a)
+-- | Simple Edge with no attributes
+type SimpleEdge v = Edge v ()
 
-empty :: (Hashable v) => DiGraph v (Arc v ())
+-- | Simple Arc with no attributes
+type SimpleArc v = Arc v ()
+
+-- | Construct a 'SimpleEdge' for two vertices
+(<->) :: (Hashable v) => v -> v -> SimpleEdge v
+(<->) v1 v2 = Edge v1 v2 ()
+
+-- | Construct a 'SimpleArc' for two vertices
+(-->) :: (Hashable v) => v -> v -> SimpleArc v
+(-->) v1 v2 = Arc v1 v2 ()
+
+
+type DiGraph v e = HM.HashMap v (HM.HashMap v e)
+
+empty :: (Hashable v) => DiGraph v e
 empty = HM.empty
 
 -- insertVertex :: (Vertex v, Edge e) => v -> DiGraph v e -> DiGraph v e
