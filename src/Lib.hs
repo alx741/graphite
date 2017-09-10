@@ -1,5 +1,6 @@
-{-# LANGUAGE FlexibleInstances   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 
 module Lib where
 
@@ -61,6 +62,15 @@ insertArc (Arc fromV toV attr) g = HM.adjust (insertLink toV attr) fromV g'
 vertices :: DiGraph v a -> [v]
 vertices = HM.keys
 
+-- | Retrieve the 'Arc's of a 'DiGraph'
+arcs :: forall v a . (Hashable v, Eq v) => DiGraph v a -> [Arc v a]
+arcs g = linksToArcs $ zip vs links
+    where
+        vs :: [v]
+        vs = vertices g
+        links :: [Links v a]
+        links = fmap (\v -> getLinks v g) vs
+
 -- | Insert a link directed to *v* with attribute *a*
 -- | If the connnection already exists, the attribute is replaced
 insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
@@ -69,6 +79,14 @@ insertLink v attr m = HM.insert v attr m
 -- | Get the links for a given vertex
 getLinks :: (Hashable v, Eq v) => v -> DiGraph v a -> Links v a
 getLinks = HM.lookupDefault HM.empty
+
+-- | Get 'Arc's from an association list of vertices and their links
+linksToArcs :: [(v, Links v a)] -> [Arc v a]
+linksToArcs ls = concat $ fmap toArc ls
+    where
+        toArc :: (v, Links v a) -> [Arc v a]
+        toArc (fromV, links) = fmap (\(v, a) -> Arc fromV v a) (HM.toList links)
+
 
 myGraph :: DiGraph Int (Double, String)
 myGraph = insertArc (Arc 1 2 (55.5, "label")) empty
