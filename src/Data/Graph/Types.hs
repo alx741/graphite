@@ -7,12 +7,12 @@ import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Data.List         (nub)
 
--- | Undirected Edge between to Vertices
-data Edge v a = Edge v v a
+-- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
+data Edge v e = Edge v v e
     deriving (Show)
 
--- | Directed Arc between to Vertices
-data Arc v a = Arc v v a
+-- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
+data Arc v e = Arc v v e
     deriving (Show)
 
 type Links v e = HM.HashMap v e
