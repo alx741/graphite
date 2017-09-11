@@ -76,6 +76,11 @@ isSymmetric = undefined
 isOriented :: DiGraph v e -> Bool
 isOriented = undefined
 
+-- | Tell if a 'DiGraph' is edgeless
+-- | A graph is @edgeless@ if it has no edges
+isEdgeless :: DiGraph v e -> Bool
+isEdgeless = undefined
+
 -- | Indegree of a vertex
 -- | The number of inbounding adjacent 'Arc's to a vertex
 vertexIndegree :: DiGraph v e -> v -> Int

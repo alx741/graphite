@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Data.Graph.Types
                      , Data.Graph.DiGraph
+                     , Data.Graph.Connectivity
   build-depends:       base >= 4.7 && < 5
                      , hashable
                      , unordered-containers
