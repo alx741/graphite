@@ -22,6 +22,7 @@ library
   build-depends:       base >= 4.7 && < 5
                      , hashable
                      , unordered-containers
+                     , QuickCheck
   ghc-options:         -Wall
   default-language:    Haskell2010
 

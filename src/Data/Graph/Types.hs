@@ -8,6 +8,7 @@ import GHC.Float (float2Double)
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
+import           Test.QuickCheck
 
 -- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
 data Edge v e = Edge v v e
@@ -33,6 +34,18 @@ instance (Eq v, Eq a) => Eq (Edge v a) where
 instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
 
+instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
+    arbitrary = arbitraryEdge Edge
+
+instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
+    arbitrary = arbitraryEdge Arc
+
+-- | Edges generator
+arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
+    => (v -> v -> e -> edge)
+    -> Gen edge
+arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
+    where vert = getPositive <$> arbitrary
 
 -- | Weighted Edge attributes
 -- | Useful for computing some algorithms on graphs
