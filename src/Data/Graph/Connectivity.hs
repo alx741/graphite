@@ -1,3 +1,6 @@
+-- | For Connectivity analisis purposes a 'DiGraph' can be converted into a
+-- | 'Graph' using 'toUndirected'
+
 module Data.Graph.Connectivity where
 
 import Data.Graph.DiGraph

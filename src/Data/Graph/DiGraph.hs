@@ -14,6 +14,9 @@ myGraph = insertArc (Arc 1 2 (55.5, "label")) empty
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 type DiGraph v e = HM.HashMap v (Links v e)
 
+-- | The Degree Sequence un a 'DiGraph' is a list of pairs (Indegree, Outdegree)
+type DegreeSequence = [(Int, Int)]
+
 -- | The Empty (order-zero) 'DiGraph' with no vertices and no arcs
 empty :: (Hashable v) => DiGraph v e
 empty = HM.empty
@@ -120,6 +123,12 @@ isSink g v = vertexOutdegree g v == 0
 -- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
 isInternal :: DiGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
+
+-- | Tell if a 'DegreeSequence' is a Directed Graphic
+-- | A @Directed Graphic@ is a Degree Sequence for wich a 'DiGraph' exists
+-- TODO: Kleitman–Wang | Fulkerson–Chen–Anstee theorem algorithms
+isDirectedGraphic :: DegreeSequence -> Bool
+isDirectedGraphic = undefined
 
 
 -- | Insert a link directed to *v* with attribute *a*
