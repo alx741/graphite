@@ -16,8 +16,8 @@ import Data.Graph.Types
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 type DGraph v e = HM.HashMap v (Links v e)
 
-instance (Arbitrary v, Arbitrary e) => Arbitrary (DGraph v e) where
-    arbitrary = undefined
+instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (DGraph v e) where
+    arbitrary = insertArcs <$> arbitrary <*> pure empty
 
 -- | The Degree Sequence un a 'DGraph' is a list of pairs (Indegree, Outdegree)
 type DegreeSequence = [(Int, Int)]
@@ -91,6 +91,10 @@ arcs' g = arcToTuple <$> arcs g
 -- | The @size@ of a directed graph is its number of 'Arc's
 size :: (Hashable v, Eq v, Eq e) => DGraph v e -> Int
 size = length . arcs
+
+-- | @O(log n)@ Tell if a vertex exists in the graph
+containsVertex :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
+containsVertex = flip HM.member
 
 -- | Retrieve the incident 'Arc's of a Vertex
 incidentArcs :: DGraph v e -> v -> [Arc v e]
