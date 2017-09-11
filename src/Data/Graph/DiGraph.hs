@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.DiGraph where
 
@@ -59,10 +59,70 @@ arcs g = linksToArcs $ zip vs links
 arcs' :: (Hashable v, Eq v, Eq e) => DiGraph v e -> [(v, v)]
 arcs' g = fmap arcToTuple $ arcs g
 
+-- | Retrieve the incident 'Arc's of a Vertex
+incidentArcs :: DiGraph v e -> v -> [Arc v e]
+incidentArcs = undefined
+
+-- | Retrieve the adjacent vertices of a vertex
+adjacentVertices :: DiGraph v e -> v -> [v]
+adjacentVertices = undefined
+
+-- | Tell if a 'DiGraph' is symmetric
+-- | All of its 'Arc's are bidirected
+isSymmetric :: DiGraph v e -> Bool
+isSymmetric = undefined
+
+-- | Tell if a 'DiGraph' is oriented
+-- | There are none bidirected 'Arc's
+-- | Note: This is /not/ the opposite of 'isSymmetric'
+isOriented :: DiGraph v e -> Bool
+isOriented = undefined
+
+-- | Indegree of a vertex
+-- | The number of inbounding adjacent 'Arc's to a vertex
+vertexIndegree :: DiGraph v e -> v -> Int
+vertexIndegree = undefined
+
+-- | Outdegree of a vertex
+-- | The number of outbounding adjacent 'Arc's from a vertex
+vertexOutdegree :: DiGraph v e -> v -> Int
+vertexOutdegree = undefined
+
+-- | Indegree of a 'DiGraph'
+-- | The total indegree of all the vertices in a 'DiGraph'
+indegree :: DiGraph v e -> Int
+indegree = undefined
+
+-- | Outdegree of a 'DiGraph'
+-- | The total outdegree of all the vertices in a 'DiGraph'
+outdegree :: DiGraph v e -> Int
+outdegree = undefined
+
+-- | Tell if a 'DiGraph' is balanced
+-- | A Directed Graph is @balanced@ when its @indegree = outdegree@
+isBalanced :: DiGraph v e -> Bool
+isBalanced g = indegree g == outdegree g
+
+-- | Tell if a vertex is a source
+-- | A vertex is a @source@ when its @indegree = 0@
+isSource :: DiGraph v e -> v -> Bool
+isSource g v = vertexIndegree g v == 0
+
+-- | Tell if a vertex is a sink
+-- | A vertex is a @sink@ when its @outdegree = 0@
+isSink :: DiGraph v e -> v -> Bool
+isSink g v = vertexOutdegree g v == 0
+
+-- | Tell if a vertex is internal
+-- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
+isInternal :: DiGraph v e -> v -> Bool
+isInternal g v = not $ isSource g v || isSink g v
+
+
 -- | Insert a link directed to *v* with attribute *a*
 -- | If the connnection already exists, the attribute is replaced
 insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
-insertLink v edgeAttr m = HM.insert v edgeAttr m
+insertLink = HM.insert
 
 -- | Get the links for a given vertex
 getLinks :: (Hashable v, Eq v) => v -> DiGraph v e -> Links v e
