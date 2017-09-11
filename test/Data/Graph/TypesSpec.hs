@@ -9,10 +9,10 @@ spec :: Spec
 spec = do
     describe "Undirected Edge" $ do
         it "Satisfies equality for two vertices regardless of their order" $ property $
-            \(v1, v2) -> (v1 <-> v2) == ((v2 <-> v1) :: Edge Int ())
+            \(Edge v1 v2 ()) -> (v1 <-> v2) == ((v2 <-> v1) :: Edge Int ())
 
     describe "Directed Arc" $ do
         it "Satisfies equality for two vertices when order is preserved" $ property $
-            \(v1, v2) -> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
+            \(Arc v1 v2 ()) -> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
         it "Fails equality for two vertices when order is reversed" $ property $
-            \(v1, v2) -> (v1 /= v2) ==> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
+            \(Arc v1 v2 ()) -> (v1 /= v2) ==> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
