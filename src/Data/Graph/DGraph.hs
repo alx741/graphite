@@ -2,14 +2,12 @@
 
 module Data.Graph.DGraph where
 
+import Data.List (foldl')
+
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 
 import Data.Graph.Types
-
-myGraph :: DGraph Int (Double, String)
-myGraph = insertArc (Arc 1 2 (55.5, "label")) empty
-
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 type DGraph v e = HM.HashMap v (Links v e)
@@ -26,12 +24,15 @@ empty = HM.empty
 insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
-removeVertex = undefined
+-- | @O(log n)@ Remove a vertex from a 'DGraph' if present
+-- | Every 'Arc' adjacent to this vertex is also removed
+removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
+removeVertex = HM.delete -- FIXME: Remove arcs to this vertex
 
 -- | @O(m*log n)@ Insert a many vertices into a 'DGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
 insertVertices :: (Hashable v, Eq v) => [v] -> DGraph v e -> DGraph v e
-insertVertices vs g = foldl (flip insertVertex) g vs
+insertVertices vs g = foldl' (flip insertVertex) g vs
 
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
 -- | The implied vertices are inserted if don't exist. If the graph already
@@ -40,12 +41,21 @@ insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = insertVertices [fromV, toV] g
 
+-- | @O(log n)@ Remove the directed Arc from a 'DGraph' if present
+-- | The implied vertices are left untouched
+removeArc :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArc = undefined
+
+-- | @O(log n)@ Remove the directed Arc from a 'DGraph' if present
+-- | The implied vertices are also removed
+removeArcAndVertices :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
+removeArcAndVertices (v1, v2) g =
+    removeVertex v2 $ removeVertex v1 $ removeArc (v1, v2) g
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied
 insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
-insertArcs as g = foldl (flip insertArc) g as
+insertArcs as g = foldl' (flip insertArc) g as
 
 -- | @O(n)@ Retrieve the vertices of a 'DGraph'
 vertices :: DGraph v e -> [v]

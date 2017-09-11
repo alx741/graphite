@@ -15,11 +15,4 @@ spec = do
         it "Satisfies equality for two vertices when order is preserved" $ property $
             \(v1, v2) -> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
         it "Fails equality for two vertices when order is reversed" $ property $
-            prop_ArcInequality
-
-
-prop_ArcInequality :: Int -> Bool
-prop_ArcInequality v = (v1 --> v2) /= ((v2 --> v1) :: Arc Int ())
-    where
-        v1 = v
-        v2 = v+1
+            \(v1, v2) -> (v1 /= v2) ==> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
