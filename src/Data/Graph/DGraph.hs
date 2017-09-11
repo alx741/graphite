@@ -96,6 +96,12 @@ size = length . arcs
 containsVertex :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 containsVertex = flip HM.member
 
+-- | @O(log n)@ Tell if a directed Arc exists in the graph
+containsArc :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
+containsArc g (v1, v2) =
+    containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
+    where v1Links = getLinks v1 g
+
 -- | Retrieve the incident 'Arc's of a Vertex
 incidentArcs :: DGraph v e -> v -> [Arc v e]
 incidentArcs = undefined
