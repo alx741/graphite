@@ -96,9 +96,14 @@ size = length . arcs
 containsVertex :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 containsVertex = flip HM.member
 
+-- | @O(log n)@ Tell if a directed 'Arc' exists in the graph
+containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
+containsArc g (Arc v1 v2 _) = containsArc' g (v1, v2)
+
 -- | @O(log n)@ Tell if a directed Arc exists in the graph
-containsArc :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
-containsArc g (v1, v2) =
+-- | The Arc is an ordered tuple
+containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
+containsArc' g (v1, v2) =
     containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 

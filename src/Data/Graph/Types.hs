@@ -42,8 +42,8 @@ instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
 
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
-    => (v -> v -> e -> edge)
-    -> Gen edge
+ => (v -> v -> e -> edge)
+ -> Gen edge
 arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
     where vert = getPositive <$> arbitrary
 
