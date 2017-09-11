@@ -1,4 +1,7 @@
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Data.Graph.DGraph where
 
@@ -6,11 +9,15 @@ import Data.List (foldl')
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
+import           Test.QuickCheck
 
 import Data.Graph.Types
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 type DGraph v e = HM.HashMap v (Links v e)
+
+instance (Arbitrary v, Arbitrary e) => Arbitrary (DGraph v e) where
+    arbitrary = undefined
 
 -- | The Degree Sequence un a 'DGraph' is a list of pairs (Indegree, Outdegree)
 type DegreeSequence = [(Int, Int)]
@@ -20,7 +27,7 @@ empty :: (Hashable v) => DGraph v e
 empty = HM.empty
 
 -- | @O(log n)@ Insert a vertex into a 'DGraph'
--- | If the graph already contains the vertex, leave the graph untouched
+-- | If the graph already contains the vertex it's left untouched
 insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
@@ -41,6 +48,11 @@ insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = insertVertices [fromV, toV] g
 
+-- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
+-- | Same rules as 'insertArc' are applied
+insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
+insertArcs as g = foldl' (flip insertArc) g as
+
 -- | @O(log n)@ Remove the directed Arc from a 'DGraph' if present
 -- | The implied vertices are left untouched
 removeArc :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
@@ -52,18 +64,14 @@ removeArcAndVertices :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArcAndVertices (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc (v1, v2) g
 
--- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
--- | Same rules as 'insertArc' are applied
-insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
-insertArcs as g = foldl' (flip insertArc) g as
-
 -- | @O(n)@ Retrieve the vertices of a 'DGraph'
 vertices :: DGraph v e -> [v]
 vertices = HM.keys
 
--- | @O(n)@ Retrieve the number of vertices of a 'DGraph'
-nVertices :: DGraph v e -> Int
-nVertices = HM.size
+-- | @O(n)@ Retrieve the order of a 'DGraph'
+-- | The @order@ of a graph is its number of vertices
+order :: DGraph v e -> Int
+order = HM.size
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v, Eq e) => DGraph v e -> [Arc v e]
@@ -79,9 +87,10 @@ arcs g = linksToArcs $ zip vs links
 arcs' :: (Hashable v, Eq v, Eq e) => DGraph v e -> [(v, v)]
 arcs' g = arcToTuple <$> arcs g
 
--- | @O(n*m)@ Retrieve the number of 'Arc's of a 'DGraph'
-nArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> Int
-nArcs = length . arcs
+-- | @O(n*m)@ Retrieve the size of a 'DGraph'
+-- | The @size@ of a directed graph is its number of 'Arc's
+size :: (Hashable v, Eq v, Eq e) => DGraph v e -> Int
+size = length . arcs
 
 -- | Retrieve the incident 'Arc's of a Vertex
 incidentArcs :: DGraph v e -> v -> [Arc v e]
