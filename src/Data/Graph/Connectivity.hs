@@ -1,10 +1,10 @@
--- | For Connectivity analisis purposes a 'DiGraph' can be converted into a
+-- | For Connectivity analisis purposes a 'DGraph' can be converted into a
 -- | 'Graph' using 'toUndirected'
 
 module Data.Graph.Connectivity where
 
 import Data.Graph.Graph
-import Data.Graph.DiGraph
+import Data.Graph.DGraph
 
 -- | Tell if a 'Graph' is connected
 -- | An Undirected Graph is @connected@ when there is a path between every pair
@@ -34,10 +34,10 @@ areDisconnected = undefined
 unreachableVertices :: Graph v e -> [v]
 unreachableVertices = undefined
 
--- | Tell if a 'DiGraph' is weakly connected
+-- | Tell if a 'DGraph' is weakly connected
 -- | A Directed Graph is @weakly connected@ if the equivalent undirected graph
 -- | is @connected@
-isWeaklyConnected :: DiGraph v e -> Bool
+isWeaklyConnected :: DGraph v e -> Bool
 isWeaklyConnected = undefined -- isConnected . toUndirected
 
 -- TODO

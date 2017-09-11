@@ -1,62 +1,62 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.Graph.DiGraph where
+module Data.Graph.DGraph where
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 
 import Data.Graph.Types
 
-myGraph :: DiGraph Int (Double, String)
+myGraph :: DGraph Int (Double, String)
 myGraph = insertArc (Arc 1 2 (55.5, "label")) empty
 
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
-type DiGraph v e = HM.HashMap v (Links v e)
+type DGraph v e = HM.HashMap v (Links v e)
 
--- | The Degree Sequence un a 'DiGraph' is a list of pairs (Indegree, Outdegree)
+-- | The Degree Sequence un a 'DGraph' is a list of pairs (Indegree, Outdegree)
 type DegreeSequence = [(Int, Int)]
 
--- | The Empty (order-zero) 'DiGraph' with no vertices and no arcs
-empty :: (Hashable v) => DiGraph v e
+-- | The Empty (order-zero) 'DGraph' with no vertices and no arcs
+empty :: (Hashable v) => DGraph v e
 empty = HM.empty
 
--- | @O(log n)@ Insert a vertex into a 'DiGraph'
+-- | @O(log n)@ Insert a vertex into a 'DGraph'
 -- | If the graph already contains the vertex, leave the graph untouched
-insertVertex :: (Hashable v, Eq v) => v -> DiGraph v e -> DiGraph v e
+insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
 removeVertex = undefined
 
--- | @O(m*log n)@ Insert a many vertices into a 'DiGraph'
+-- | @O(m*log n)@ Insert a many vertices into a 'DGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
-insertVertices :: (Hashable v, Eq v) => [v] -> DiGraph v e -> DiGraph v e
+insertVertices :: (Hashable v, Eq v) => [v] -> DGraph v e -> DGraph v e
 insertVertices vs g = foldl (flip insertVertex) g vs
 
--- | @O(log n)@ Insert a directed 'Arc' into a 'DiGraph'
+-- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
 -- | The implied vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
-insertArc :: (Hashable v, Eq v) => Arc v e -> DiGraph v e -> DiGraph v e
+insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = insertVertices [fromV, toV] g
 
 removeArc = undefined
 
--- | @O(m*log n)@ Insert many directed 'Arc's into a 'DiGraph'
+-- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied
-insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DiGraph v e -> DiGraph v e
+insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
 insertArcs as g = foldl (flip insertArc) g as
 
--- | @O(n)@ Retrieve the vertices of a 'DiGraph'
-vertices :: DiGraph v e -> [v]
+-- | @O(n)@ Retrieve the vertices of a 'DGraph'
+vertices :: DGraph v e -> [v]
 vertices = HM.keys
 
--- | @O(n)@ Retrieve the number of vertices of a 'DiGraph'
-nVertices :: DiGraph v e -> Int
+-- | @O(n)@ Retrieve the number of vertices of a 'DGraph'
+nVertices :: DGraph v e -> Int
 nVertices = HM.size
 
--- | @O(n*m)@ Retrieve the 'Arc's of a 'DiGraph'
-arcs :: forall v e . (Hashable v, Eq v, Eq e) => DiGraph v e -> [Arc v e]
+-- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
+arcs :: forall v e . (Hashable v, Eq v, Eq e) => DGraph v e -> [Arc v e]
 arcs g = linksToArcs $ zip vs links
     where
         vs :: [v]
@@ -64,81 +64,81 @@ arcs g = linksToArcs $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | @O(n*m)@ Retrieve the 'Arc's of a 'DiGraph' as tuples, ignoring its
+-- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph' as tuples, ignoring its
 -- | attribute values
-arcs' :: (Hashable v, Eq v, Eq e) => DiGraph v e -> [(v, v)]
+arcs' :: (Hashable v, Eq v, Eq e) => DGraph v e -> [(v, v)]
 arcs' g = arcToTuple <$> arcs g
 
--- | @O(n*m)@ Retrieve the number of 'Arc's of a 'DiGraph'
-nArcs :: (Hashable v, Eq v, Eq e) => DiGraph v e -> Int
+-- | @O(n*m)@ Retrieve the number of 'Arc's of a 'DGraph'
+nArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> Int
 nArcs = length . arcs
 
 -- | Retrieve the incident 'Arc's of a Vertex
-incidentArcs :: DiGraph v e -> v -> [Arc v e]
+incidentArcs :: DGraph v e -> v -> [Arc v e]
 incidentArcs = undefined
 
 -- | Retrieve the adjacent vertices of a vertex
-adjacentVertices :: DiGraph v e -> v -> [v]
+adjacentVertices :: DGraph v e -> v -> [v]
 adjacentVertices = undefined
 
--- | Tell if a 'DiGraph' is symmetric
+-- | Tell if a 'DGraph' is symmetric
 -- | All of its 'Arc's are bidirected
-isSymmetric :: DiGraph v e -> Bool
+isSymmetric :: DGraph v e -> Bool
 isSymmetric = undefined
 
--- | Tell if a 'DiGraph' is oriented
+-- | Tell if a 'DGraph' is oriented
 -- | There are none bidirected 'Arc's
 -- | Note: This is /not/ the opposite of 'isSymmetric'
-isOriented :: DiGraph v e -> Bool
+isOriented :: DGraph v e -> Bool
 isOriented = undefined
 
--- | Tell if a 'DiGraph' is edgeless
+-- | Tell if a 'DGraph' is edgeless
 -- | A graph is @edgeless@ if it has no edges
-isEdgeless :: DiGraph v e -> Bool
+isEdgeless :: DGraph v e -> Bool
 isEdgeless = undefined
 
 -- | Indegree of a vertex
 -- | The number of inbounding adjacent 'Arc's to a vertex
-vertexIndegree :: DiGraph v e -> v -> Int
+vertexIndegree :: DGraph v e -> v -> Int
 vertexIndegree = undefined
 
 -- | Outdegree of a vertex
 -- | The number of outbounding adjacent 'Arc's from a vertex
-vertexOutdegree :: DiGraph v e -> v -> Int
+vertexOutdegree :: DGraph v e -> v -> Int
 vertexOutdegree = undefined
 
--- | Indegree of a 'DiGraph'
--- | The total indegree of all the vertices in a 'DiGraph'
-indegree :: DiGraph v e -> Int
+-- | Indegree of a 'DGraph'
+-- | The total indegree of all the vertices in a 'DGraph'
+indegree :: DGraph v e -> Int
 indegree = undefined
 
--- | Outdegree of a 'DiGraph'
--- | The total outdegree of all the vertices in a 'DiGraph'
-outdegree :: DiGraph v e -> Int
+-- | Outdegree of a 'DGraph'
+-- | The total outdegree of all the vertices in a 'DGraph'
+outdegree :: DGraph v e -> Int
 outdegree = undefined
 
--- | Tell if a 'DiGraph' is balanced
+-- | Tell if a 'DGraph' is balanced
 -- | A Directed Graph is @balanced@ when its @indegree = outdegree@
-isBalanced :: DiGraph v e -> Bool
+isBalanced :: DGraph v e -> Bool
 isBalanced g = indegree g == outdegree g
 
 -- | Tell if a vertex is a source
 -- | A vertex is a @source@ when its @indegree = 0@
-isSource :: DiGraph v e -> v -> Bool
+isSource :: DGraph v e -> v -> Bool
 isSource g v = vertexIndegree g v == 0
 
 -- | Tell if a vertex is a sink
 -- | A vertex is a @sink@ when its @outdegree = 0@
-isSink :: DiGraph v e -> v -> Bool
+isSink :: DGraph v e -> v -> Bool
 isSink g v = vertexOutdegree g v == 0
 
 -- | Tell if a vertex is internal
 -- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
-isInternal :: DiGraph v e -> v -> Bool
+isInternal :: DGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
 
 -- | Tell if a 'DegreeSequence' is a Directed Graphic
--- | A @Directed Graphic@ is a Degree Sequence for wich a 'DiGraph' exists
+-- | A @Directed Graphic@ is a Degree Sequence for wich a 'DGraph' exists
 -- TODO: Kleitman–Wang | Fulkerson–Chen–Anstee theorem algorithms
 isDirectedGraphic :: DegreeSequence -> Bool
 isDirectedGraphic = undefined
@@ -150,5 +150,5 @@ insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
 insertLink = HM.insert
 
 -- | Get the links for a given vertex
-getLinks :: (Hashable v, Eq v) => v -> DiGraph v e -> Links v e
+getLinks :: (Hashable v, Eq v) => v -> DGraph v e -> Links v e
 getLinks = HM.lookupDefault HM.empty

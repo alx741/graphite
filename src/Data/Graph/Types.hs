@@ -11,12 +11,13 @@ import qualified Data.HashMap.Lazy as HM
 
 -- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
 data Edge v e = Edge v v e
-    deriving (Show)
+    deriving (Show, Read, Ord)
 
 -- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
 data Arc v e = Arc v v e
-    deriving (Show)
+    deriving (Show, Read, Ord)
 
+-- | Each vertex maps to a 'Links' value so it can poit to other vertices
 type Links v e = HM.HashMap v e
 
 -- | To 'Edge's are equal if they point to the same vertices, regardless of the

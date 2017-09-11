@@ -14,7 +14,7 @@ spec = do
     describe "Directed Arc" $ do
         it "Satisfies equality for two vertices when order is preserved" $ property $
             \(v1, v2) -> (v1 --> v2) == ((v1 --> v2) :: Arc Int ())
-        it "Fails equality for two vertices when order reversed" $ property $
+        it "Fails equality for two vertices when order is reversed" $ property $
             prop_ArcInequality
 
 
