@@ -26,6 +26,8 @@ empty = HM.empty
 insertVertex :: (Hashable v, Eq v) => v -> DiGraph v e -> DiGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
+removeVertex = undefined
+
 -- | @O(m*log n)@ Insert a many vertices into a 'DiGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
 insertVertices :: (Hashable v, Eq v) => [v] -> DiGraph v e -> DiGraph v e
@@ -38,16 +40,22 @@ insertArc :: (Hashable v, Eq v) => Arc v e -> DiGraph v e -> DiGraph v e
 insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = insertVertices [fromV, toV] g
 
+removeArc = undefined
+
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DiGraph'
 -- | Same rules as 'insertArc' are applied
 insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DiGraph v e -> DiGraph v e
 insertArcs as g = foldl (flip insertArc) g as
 
--- | Retrieve the vertices of a 'DiGraph'
+-- | @O(n)@ Retrieve the vertices of a 'DiGraph'
 vertices :: DiGraph v e -> [v]
 vertices = HM.keys
 
--- | Retrieve the 'Arc's of a 'DiGraph'
+-- | @O(n)@ Retrieve the number of vertices of a 'DiGraph'
+nVertices :: DiGraph v e -> Int
+nVertices = HM.size
+
+-- | @O(n*m)@ Retrieve the 'Arc's of a 'DiGraph'
 arcs :: forall v e . (Hashable v, Eq v, Eq e) => DiGraph v e -> [Arc v e]
 arcs g = linksToArcs $ zip vs links
     where
@@ -56,9 +64,14 @@ arcs g = linksToArcs $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | Retrieve the 'Arc's of a 'DiGraph' as tuples, ignoring its attribute values
+-- | @O(n*m)@ Retrieve the 'Arc's of a 'DiGraph' as tuples, ignoring its
+-- | attribute values
 arcs' :: (Hashable v, Eq v, Eq e) => DiGraph v e -> [(v, v)]
 arcs' g = arcToTuple <$> arcs g
+
+-- | @O(n*m)@ Retrieve the number of 'Arc's of a 'DiGraph'
+nArcs :: (Hashable v, Eq v, Eq e) => DiGraph v e -> Int
+nArcs = length . arcs
 
 -- | Retrieve the incident 'Arc's of a Vertex
 incidentArcs :: DiGraph v e -> v -> [Arc v e]
