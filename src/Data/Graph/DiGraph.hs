@@ -26,8 +26,7 @@ insertVertex v = hashMapInsert v HM.empty
 -- | @O(m*log n)@ Insert a many vertices into a 'DiGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
 insertVertices :: (Hashable v, Eq v) => [v] -> DiGraph v e -> DiGraph v e
-insertVertices [] g     = g
-insertVertices (v:vs) g = insertVertices vs $ insertVertex v g
+insertVertices vs g = foldl (flip insertVertex) g vs
 
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DiGraph'
 -- | The implied vertices are inserted if don't exist. If the graph already
@@ -39,8 +38,7 @@ insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DiGraph'
 -- | Same rules as 'insertArc' are applied
 insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DiGraph v e -> DiGraph v e
-insertArcs [] g     = g
-insertArcs (a:as) g = insertArcs as $ insertArc a g
+insertArcs as g = foldl (flip insertArc) g as
 
 -- | Retrieve the vertices of a 'DiGraph'
 vertices :: DiGraph v e -> [v]
@@ -53,11 +51,11 @@ arcs g = linksToArcs $ zip vs links
         vs :: [v]
         vs = vertices g
         links :: [Links v e]
-        links = fmap (\v -> getLinks v g) vs
+        links = fmap (`getLinks` g) vs
 
 -- | Retrieve the 'Arc's of a 'DiGraph' as tuples, ignoring its attribute values
 arcs' :: (Hashable v, Eq v, Eq e) => DiGraph v e -> [(v, v)]
-arcs' g = fmap arcToTuple $ arcs g
+arcs' g = arcToTuple <$> arcs g
 
 -- | Retrieve the incident 'Arc's of a Vertex
 incidentArcs :: DiGraph v e -> v -> [Arc v e]
