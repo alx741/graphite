@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Data.Graph.Types
+                     , Data.Graph.Graph
                      , Data.Graph.DiGraph
                      , Data.Graph.Connectivity
   build-depends:       base >= 4.7 && < 5

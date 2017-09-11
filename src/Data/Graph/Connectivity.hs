@@ -3,6 +3,7 @@
 
 module Data.Graph.Connectivity where
 
+import Data.Graph.Graph
 import Data.Graph.DiGraph
 
 -- | Tell if a 'Graph' is connected
@@ -16,7 +17,7 @@ isConnected = undefined
 -- | 'isConnected'
 -- TODO: An edgeles graph with two or more vertices is disconnected
 isDisconnected :: Graph v e -> Bool
-isDisconnected = not isConnected
+isDisconnected = not . isConnected
 
 -- | Tell if two vertices of a 'Graph' are connected
 -- | Two vertices are @connected@ if it exists a path between them
