@@ -31,10 +31,14 @@ empty = HM.empty
 insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
--- | @O(log n)@ Remove a vertex from a 'DGraph' if present
+-- | @O(n)@ Remove a vertex from a 'DGraph' if present
 -- | Every 'Arc' adjacent to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
-removeVertex = HM.delete -- FIXME: Remove arcs to this vertex
+removeVertex = undefined
+-- removeVertex v g = filter (\(v1, v2) -> v2 == v) $ arcs' g
+--     where adja
+-- removeVertex v g = $ HM.delete v g
+-- FIXME: Remove arcs to this vertex
 
 -- | @O(m*log n)@ Insert a many vertices into a 'DGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
@@ -118,16 +122,16 @@ containsArc' g (v1, v2) =
     where v1Links = getLinks v1 g
 
 -- | Retrieve the inbounding 'Arc's of a Vertex
-inboundingArcs :: DGraph v e -> v -> [Arc v e]
-inboundingArcs = undefined
+inboundingArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> v -> [Arc v e]
+inboundingArcs g v = filter (\(Arc _ toV _) -> v == toV) $ arcs g
 
 -- | Retrieve the outbounding 'Arc's of a Vertex
-outboundingArcs :: DGraph v e -> v -> [Arc v e]
-outboundingArcs = undefined
+outboundingArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> v -> [Arc v e]
+outboundingArcs g v = filter (\(Arc fromV _ _) -> v == fromV) $ arcs g
 
 -- | Retrieve the incident 'Arc's of a Vertex
 -- | Both inbounding and outbounding arcs
-incidentArcs :: DGraph v e -> v -> [Arc v e]
+incidentArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> v -> [Arc v e]
 incidentArcs g v = inboundingArcs g v ++ outboundingArcs g v
 
 -- | Retrieve the adjacent vertices of a vertex
