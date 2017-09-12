@@ -34,19 +34,6 @@ instance (Eq v, Eq a) => Eq (Edge v a) where
 instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
 
-instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
-    arbitrary = arbitraryEdge Edge
-
-instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
-    arbitrary = arbitraryEdge Arc
-
--- | Edges generator
-arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
- => (v -> v -> e -> edge)
- -> Gen edge
-arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
-    where vert = getPositive <$> arbitrary
-
 -- | Weighted Edge attributes
 -- | Useful for computing some algorithms on graphs
 class Weighted a where
@@ -75,6 +62,19 @@ instance Weighted (Double, String) where
 instance Labeled (Double, String) where
     label = snd
 
+instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
+    arbitrary = arbitraryEdge Edge
+
+instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
+    arbitrary = arbitraryEdge Arc
+
+-- | Edges generator
+arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
+ => (v -> v -> e -> edge)
+ -> Gen edge
+arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
+    where vert = getPositive <$> arbitrary
+
 -- | Construct an undirected 'Edge' between two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
 (<->) v1 v2 = Edge v1 v2 ()
@@ -82,6 +82,14 @@ instance Labeled (Double, String) where
 -- | Construct a directed 'Arc' between two vertices
 (-->) :: (Hashable v) => v -> v -> Arc v ()
 (-->) v1 v2 = Arc v1 v2 ()
+
+-- | Convert an 'Arc' to an ordered pair discarding its attribute
+toOrderedPair :: Arc v a -> (v, v)
+toOrderedPair (Arc fromV toV _) = (fromV, toV)
+
+-- | Convert an 'Edge' to an unordered pair discarding its attribute
+toUnorderedPair :: Edge v a -> (v, v)
+toUnorderedPair (Edge v1 v2 _) = (v1, v2)
 
 -- | Get 'Arc's from an association list of vertices and their links
 linksToArcs :: [(v, Links v a)] -> [Arc v a]
@@ -96,14 +104,6 @@ linksToEdges ls = nub $ concat $ fmap toEdge ls
     where
         toEdge :: (v, Links v a) -> [Edge v a]
         toEdge (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
-
--- | Get the vertices of an 'Arc' ignoring its attribute
-arcToTuple :: Arc v a -> (v, v)
-arcToTuple (Arc fromV toV _) = (fromV, toV)
-
--- | Get the vertices of an 'Edge' ignoring its attribute
-edgeToTuple :: Edge v a -> (v, v)
-edgeToTuple (Edge v1 v2 _) = (v1, v2)
 
 -- | O(log n) Associate the specified value with the specified key in this map.
 -- | If this map previously contained a mapping for the key, leave the map

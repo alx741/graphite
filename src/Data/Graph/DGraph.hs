@@ -56,7 +56,7 @@ insertArcs as g = foldl' (flip insertArc) g as
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are left untouched
 removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-removeArc = removeArc' . arcToTuple
+removeArc = removeArc' . toOrderedPair
 
 -- | Same as 'removeArc' but the arc is an ordered tuple
 removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
@@ -68,7 +68,7 @@ removeArc' (v1, v2) g = case HM.lookup v1 g of
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
 removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-removeArcAndVertices = removeArcAndVertices' . arcToTuple
+removeArcAndVertices = removeArcAndVertices' . toOrderedPair
 
 -- | Same as 'removeArcAndVertices' but the arc is an ordered tuple
 removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
@@ -96,7 +96,7 @@ arcs g = linksToArcs $ zip vs links
 -- | Same as 'arcs' but the arcs are directed tuples, and their attributes are
 -- | discarded
 arcs' :: (Hashable v, Eq v, Eq e) => DGraph v e -> [(v, v)]
-arcs' g = arcToTuple <$> arcs g
+arcs' g = toOrderedPair <$> arcs g
 
 -- | @O(n*m)@ Retrieve the size of a 'DGraph'
 -- | The @size@ of a directed graph is its number of 'Arc's
@@ -109,7 +109,7 @@ containsVertex = flip HM.member
 
 -- | @O(log n)@ Tell if a directed 'Arc' exists in the graph
 containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
-containsArc g = containsArc' g . arcToTuple
+containsArc g = containsArc' g . toOrderedPair
 
 -- | Same as 'containsArc' but the arc is an ordered tuple
 containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
