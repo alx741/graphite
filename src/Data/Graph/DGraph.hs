@@ -34,11 +34,7 @@ insertVertex v = hashMapInsert v HM.empty
 -- | @O(n)@ Remove a vertex from a 'DGraph' if present
 -- | Every 'Arc' adjacent to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
-removeVertex = undefined
--- removeVertex v g = filter (\(v1, v2) -> v2 == v) $ arcs' g
---     where adja
--- removeVertex v g = $ HM.delete v g
--- FIXME: Remove arcs to this vertex
+removeVertex v g = HM.delete v $ foldl' (flip removeArc) g $ incidentArcs g v
 
 -- | @O(m*log n)@ Insert a many vertices into a 'DGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
@@ -71,11 +67,11 @@ removeArc' (v1, v2) g = case HM.lookup v1 g of
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
-removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
+removeArcAndVertices :: (Hashable v, Eq v, Eq e) => Arc v e -> DGraph v e -> DGraph v e
 removeArcAndVertices = removeArcAndVertices' . toOrderedPair
 
 -- | Same as 'removeArcAndVertices' but the arc is an ordered tuple
-removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
+removeArcAndVertices' :: (Hashable v, Eq v, Eq e) => (v, v) -> DGraph v e -> DGraph v e
 removeArcAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
 
@@ -89,7 +85,7 @@ order :: DGraph v e -> Int
 order = HM.size
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
-arcs :: forall v e . (Hashable v, Eq v, Eq e) => DGraph v e -> [Arc v e]
+arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
 arcs g = linksToArcs $ zip vs links
     where
         vs :: [v]
@@ -122,16 +118,16 @@ containsArc' g (v1, v2) =
     where v1Links = getLinks v1 g
 
 -- | Retrieve the inbounding 'Arc's of a Vertex
-inboundingArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> v -> [Arc v e]
+inboundingArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 inboundingArcs g v = filter (\(Arc _ toV _) -> v == toV) $ arcs g
 
 -- | Retrieve the outbounding 'Arc's of a Vertex
-outboundingArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> v -> [Arc v e]
+outboundingArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 outboundingArcs g v = filter (\(Arc fromV _ _) -> v == fromV) $ arcs g
 
 -- | Retrieve the incident 'Arc's of a Vertex
 -- | Both inbounding and outbounding arcs
-incidentArcs :: (Hashable v, Eq v, Eq e) => DGraph v e -> v -> [Arc v e]
+incidentArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 incidentArcs g v = inboundingArcs g v ++ outboundingArcs g v
 
 -- | Retrieve the adjacent vertices of a vertex
