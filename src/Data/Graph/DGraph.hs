@@ -145,30 +145,25 @@ isSymmetric = undefined
 isOriented :: DGraph v e -> Bool
 isOriented = undefined
 
--- | Tell if a 'DGraph' is edgeless
--- | A graph is @edgeless@ if it has no edges
-isEdgeless :: DGraph v e -> Bool
-isEdgeless = undefined
+-- | Tell if a 'DGraph' is isolated
+-- | A graph is @isolated@ if it has no edges, that is, it has a degree of 0
+isIsolated :: DGraph v e -> Bool
+isIsolated = undefined
+
+-- | Degree of a vertex
+-- | The total number of inbounding and outbounding 'Arc's of a vertex
+vertexDegree :: DGraph v e -> v -> Int
+vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
 -- | Indegree of a vertex
--- | The number of inbounding adjacent 'Arc's to a vertex
+-- | The number of inbounding 'Arc's to a vertex
 vertexIndegree :: DGraph v e -> v -> Int
 vertexIndegree = undefined
 
 -- | Outdegree of a vertex
--- | The number of outbounding adjacent 'Arc's from a vertex
+-- | The number of outbounding 'Arc's from a vertex
 vertexOutdegree :: DGraph v e -> v -> Int
 vertexOutdegree = undefined
-
--- | Indegree of a 'DGraph'
--- | The total indegree of all the vertices in a 'DGraph'
-indegree :: DGraph v e -> Int
-indegree = undefined
-
--- | Outdegree of a 'DGraph'
--- | The total outdegree of all the vertices in a 'DGraph'
-outdegree :: DGraph v e -> Int
-outdegree = undefined
 
 -- | Tell if a 'DGraph' is balanced
 -- | A Directed Graph is @balanced@ when its @indegree = outdegree@
