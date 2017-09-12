@@ -67,11 +67,11 @@ removeArc' (v1, v2) g = case HM.lookup v1 g of
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
-removeArcAndVertices :: (Hashable v, Eq v, Eq e) => Arc v e -> DGraph v e -> DGraph v e
+removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArcAndVertices = removeArcAndVertices' . toOrderedPair
 
 -- | Same as 'removeArcAndVertices' but the arc is an ordered tuple
-removeArcAndVertices' :: (Hashable v, Eq v, Eq e) => (v, v) -> DGraph v e -> DGraph v e
+removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArcAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
 
@@ -95,12 +95,12 @@ arcs g = linksToArcs $ zip vs links
 
 -- | Same as 'arcs' but the arcs are directed tuples, and their attributes are
 -- | discarded
-arcs' :: (Hashable v, Eq v, Eq e) => DGraph v e -> [(v, v)]
+arcs' :: (Hashable v, Eq v) => DGraph v e -> [(v, v)]
 arcs' g = toOrderedPair <$> arcs g
 
 -- | @O(n*m)@ Retrieve the size of a 'DGraph'
 -- | The @size@ of a directed graph is its number of 'Arc's
-size :: (Hashable v, Eq v, Eq e) => DGraph v e -> Int
+size :: (Hashable v, Eq v) => DGraph v e -> Int
 size = length . arcs
 
 -- | @O(log n)@ Tell if a vertex exists in the graph
