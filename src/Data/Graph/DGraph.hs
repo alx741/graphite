@@ -42,7 +42,7 @@ insertVertices :: (Hashable v, Eq v) => [v] -> DGraph v e -> DGraph v e
 insertVertices vs g = foldl' (flip insertVertex) g vs
 
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
--- | The implied vertices are inserted if don't exist. If the graph already
+-- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV g'
@@ -54,7 +54,7 @@ insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
 insertArcs as g = foldl' (flip insertArc) g as
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
--- | The implied vertices are left untouched
+-- | The involved vertices are left untouched
 removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArc = removeArc' . arcToTuple
 
@@ -66,7 +66,7 @@ removeArc' (v1, v2) g = case HM.lookup v1 g of
         where v1Links' = HM.delete v2 v1Links
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
--- | The implied vertices are also removed
+-- | The involved vertices are also removed
 removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArcAndVertices = removeArcAndVertices' . arcToTuple
 
