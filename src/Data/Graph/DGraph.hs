@@ -62,7 +62,7 @@ removeArc = removeArc' . arcToTuple
 removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArc' (v1, v2) g = case HM.lookup v1 g of
     Nothing -> g
-    Just v1Links -> HM.adjust (\_ -> v1Links') v1 g
+    Just v1Links -> HM.adjust (const v1Links') v1 g
         where v1Links' = HM.delete v2 v1Links
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
@@ -117,9 +117,18 @@ containsArc' g (v1, v2) =
     containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
+-- | Retrieve the inbounding 'Arc's of a Vertex
+inboundingArcs :: DGraph v e -> v -> [Arc v e]
+inboundingArcs = undefined
+
+-- | Retrieve the outbounding 'Arc's of a Vertex
+outboundingArcs :: DGraph v e -> v -> [Arc v e]
+outboundingArcs = undefined
+
 -- | Retrieve the incident 'Arc's of a Vertex
+-- | Both inbounding and outbounding arcs
 incidentArcs :: DGraph v e -> v -> [Arc v e]
-incidentArcs = undefined
+incidentArcs g v = inboundingArcs g v ++ outboundingArcs g v
 
 -- | Retrieve the adjacent vertices of a vertex
 adjacentVertices :: DGraph v e -> v -> [v]
