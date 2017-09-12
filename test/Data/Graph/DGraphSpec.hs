@@ -25,3 +25,6 @@ spec = do
             \g v -> (not $ g `containsVertex` v) ==> order g + 1 == order (insertVertex v (g :: DGraph Int ()))
         it "Increments its size when a new arc is inserted" $ property $
             \g arc -> (not $ g `containsArc` arc) ==> size g + 1 == size (insertArc arc (g :: DGraph Int ()))
+
+        it "Is id when inserting and removing a new vertex" $ property $
+            \g v -> (not $ g `containsVertex` v) ==> ((removeVertex v . insertVertex v) g) == (g :: DGraph Int ())

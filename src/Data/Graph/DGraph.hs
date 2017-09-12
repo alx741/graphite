@@ -53,16 +53,27 @@ insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV
 insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
 insertArcs as g = foldl' (flip insertArc) g as
 
--- | @O(log n)@ Remove the directed Arc from a 'DGraph' if present
+-- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The implied vertices are left untouched
-removeArc :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
-removeArc = undefined
+removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
+removeArc = removeArc' . arcToTuple
 
--- | @O(log n)@ Remove the directed Arc from a 'DGraph' if present
+-- | Same as 'removeArc' but the arc is an ordered tuple
+removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
+removeArc' (v1, v2) g = case HM.lookup v1 g of
+    Nothing -> g
+    Just v1Links -> HM.adjust (\_ -> v1Links') v1 g
+        where v1Links' = HM.delete v2 v1Links
+
+-- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The implied vertices are also removed
-removeArcAndVertices :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
-removeArcAndVertices (v1, v2) g =
-    removeVertex v2 $ removeVertex v1 $ removeArc (v1, v2) g
+removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
+removeArcAndVertices = removeArcAndVertices' . arcToTuple
+
+-- | Same as 'removeArcAndVertices' but the arc is an ordered tuple
+removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
+removeArcAndVertices' (v1, v2) g =
+    removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
 
 -- | @O(n)@ Retrieve the vertices of a 'DGraph'
 vertices :: DGraph v e -> [v]
@@ -82,8 +93,8 @@ arcs g = linksToArcs $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph' as tuples, ignoring its
--- | attribute values
+-- | Same as 'arcs' but the arcs are directed tuples, and their attributes are
+-- | discarded
 arcs' :: (Hashable v, Eq v, Eq e) => DGraph v e -> [(v, v)]
 arcs' g = arcToTuple <$> arcs g
 
@@ -98,10 +109,9 @@ containsVertex = flip HM.member
 
 -- | @O(log n)@ Tell if a directed 'Arc' exists in the graph
 containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
-containsArc g (Arc v1 v2 _) = containsArc' g (v1, v2)
+containsArc g = containsArc' g . arcToTuple
 
--- | @O(log n)@ Tell if a directed Arc exists in the graph
--- | The Arc is an ordered tuple
+-- | Same as 'containsArc' but the arc is an ordered tuple
 containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
 containsArc' g (v1, v2) =
     containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
