@@ -91,6 +91,15 @@ toOrderedPair (Arc fromV toV _) = (fromV, toV)
 toUnorderedPair :: Edge v a -> (v, v)
 toUnorderedPair (Edge v1 v2 _) = (v1, v2)
 
+-- | Insert a link directed to *v* with attribute *a*
+-- | If the connnection already exists, the attribute is replaced
+insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
+insertLink = HM.insert
+
+-- | Get the links for a given vertex
+getLinks :: (Hashable v, Eq v) => v -> HM.HashMap v (Links v e) -> Links v e
+getLinks = HM.lookupDefault HM.empty
+
 -- | Get 'Arc's from an association list of vertices and their links
 linksToArcs :: [(v, Links v a)] -> [Arc v a]
 linksToArcs ls = concat $ fmap toArc ls

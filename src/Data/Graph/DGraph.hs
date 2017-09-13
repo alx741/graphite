@@ -200,13 +200,3 @@ isInternal g v = not $ isSource g v || isSink g v
 -- TODO: Kleitman–Wang | Fulkerson–Chen–Anstee theorem algorithms
 isDirectedGraphic :: DegreeSequence -> Bool
 isDirectedGraphic = undefined
-
-
--- | Insert a link directed to *v* with attribute *a*
--- | If the connnection already exists, the attribute is replaced
-insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
-insertLink = HM.insert
-
--- | Get the links for a given vertex
-getLinks :: (Hashable v, Eq v) => v -> DGraph v e -> Links v e
-getLinks = HM.lookupDefault HM.empty
