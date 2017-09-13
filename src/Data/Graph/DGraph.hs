@@ -27,7 +27,7 @@ empty :: (Hashable v) => DGraph v e
 empty = HM.empty
 
 -- | @O(log n)@ Insert a vertex into a 'DGraph'
--- | If the graph already contains the vertex it's left untouched
+-- | If the graph already contains the vertex leave the graph untouched
 insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
@@ -164,6 +164,16 @@ vertexIndegree = undefined
 -- | The number of outbounding 'Arc's from a vertex
 vertexOutdegree :: DGraph v e -> v -> Int
 vertexOutdegree = undefined
+
+-- | Indegree of a 'DGraph'
+-- | The total indegree of all the vertices in a 'DGraph'
+indegree :: DGraph v e -> Int
+indegree = undefined
+
+-- | Outdegree of a 'DGraph'
+-- | The total outdegree of all the vertices in a 'DGraph'
+outdegree :: DGraph v e -> Int
+outdegree = undefined
 
 -- | Tell if a 'DGraph' is balanced
 -- | A Directed Graph is @balanced@ when its @indegree = outdegree@
