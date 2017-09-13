@@ -113,7 +113,9 @@ linksToEdges ls = nubBy shallowEdgeEq $ concat $ fmap toEdge ls
     where
         toEdge :: (v, Links v a) -> [Edge v a]
         toEdge (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
-        shallowEdgeEq (Edge v1 v2 _) (Edge v1' v2' _) = v1 == v1' && v2 == v2'
+        shallowEdgeEq (Edge v1 v2 _) (Edge v1' v2' _) =
+               (v1 == v1' && v2 == v2')
+            || (v1 == v2' && v2 == v1')
 
 -- | O(log n) Associate the specified value with the specified key in this map.
 -- | If this map previously contained a mapping for the key, leave the map
