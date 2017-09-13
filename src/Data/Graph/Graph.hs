@@ -16,7 +16,7 @@ import Data.Graph.Types
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/
 type Graph v e = HM.HashMap v (Links v e)
 
--- instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (Graph v e) where
+-- instance {-# OVERLAPS #-} (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (Graph v e) where
 --     arbitrary = insertEdges <$> arbitrary <*> pure empty
 
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges

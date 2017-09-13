@@ -14,7 +14,8 @@ import           Test.QuickCheck
 import Data.Graph.Types
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
-type DGraph v e = HM.HashMap v (Links v e)
+newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
+    deriving (Eq, Show)
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (DGraph v e) where
     arbitrary = insertArcs <$> arbitrary <*> pure empty
@@ -24,17 +25,19 @@ type DegreeSequence = [(Int, Int)]
 
 -- | The Empty (order-zero) 'DGraph' with no vertices and no arcs
 empty :: (Hashable v) => DGraph v e
-empty = HM.empty
+empty = DGraph HM.empty
 
 -- | @O(log n)@ Insert a vertex into a 'DGraph'
 -- | If the graph already contains the vertex leave the graph untouched
 insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
-insertVertex v = hashMapInsert v HM.empty
+insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
 
 -- | @O(n)@ Remove a vertex from a 'DGraph' if present
 -- | Every 'Arc' incident to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
-removeVertex v g = HM.delete v $ foldl' (flip removeArc) g $ incidentArcs g v
+removeVertex v g = DGraph
+    $ (\(DGraph g') -> HM.delete v g')
+    $ foldl' (flip removeArc) g $ incidentArcs g v
 
 -- | @O(m*log n)@ Insert a many vertices into a 'DGraph'
 -- | New vertices are inserted and already contained vertices are left untouched
@@ -45,8 +48,8 @@ insertVertices vs g = foldl' (flip insertVertex) g vs
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-insertArc (Arc fromV toV edgeAttr) g = HM.adjust (insertLink toV edgeAttr) fromV g'
-    where g' = insertVertices [fromV, toV] g
+insertArc (Arc fromV toV edgeAttr) g = DGraph $ HM.adjust (insertLink toV edgeAttr) fromV g'
+    where g' = unDGraph $ insertVertices [fromV, toV] g
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied
@@ -60,9 +63,9 @@ removeArc = removeArc' . toOrderedPair
 
 -- | Same as 'removeArc' but the arc is an ordered tuple
 removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
-removeArc' (v1, v2) g = case HM.lookup v1 g of
-    Nothing -> g
-    Just v1Links -> HM.adjust (const v1Links') v1 g
+removeArc' (v1, v2) (DGraph g) = case HM.lookup v1 g of
+    Nothing -> DGraph g
+    Just v1Links -> DGraph $ HM.adjust (const v1Links') v1 g
         where v1Links' = HM.delete v2 v1Links
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
@@ -77,12 +80,12 @@ removeArcAndVertices' (v1, v2) g =
 
 -- | @O(n)@ Retrieve the vertices of a 'DGraph'
 vertices :: DGraph v e -> [v]
-vertices = HM.keys
+vertices (DGraph g) = HM.keys g
 
 -- | @O(n)@ Retrieve the order of a 'DGraph'
 -- | The @order@ of a graph is its number of vertices
 order :: DGraph v e -> Int
-order = HM.size
+order (DGraph g) = HM.size g
 
 -- | @O(n*m)@ Retrieve the size of a 'DGraph'
 -- | The @size@ of a directed graph is its number of 'Arc's
@@ -91,10 +94,10 @@ size = length . arcs
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
-arcs g = linksToArcs $ zip vs links
+arcs (DGraph g) = linksToArcs $ zip vs links
     where
         vs :: [v]
-        vs = vertices g
+        vs = vertices $ DGraph g
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
@@ -105,7 +108,7 @@ arcs' g = toOrderedPair <$> arcs g
 
 -- | @O(log n)@ Tell if a vertex exists in the graph
 containsVertex :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
-containsVertex = flip HM.member
+containsVertex (DGraph g) = flip HM.member g
 
 -- | @O(log n)@ Tell if a directed 'Arc' exists in the graph
 containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
@@ -113,8 +116,8 @@ containsArc g = containsArc' g . toOrderedPair
 
 -- | Same as 'containsArc' but the arc is an ordered tuple
 containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
-containsArc' g (v1, v2) =
-    containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
+containsArc' graph@(DGraph g) (v1, v2) =
+    containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
 -- | Retrieve the inbounding 'Arc's of a Vertex
