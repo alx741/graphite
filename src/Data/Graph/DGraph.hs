@@ -169,20 +169,18 @@ vertexIndegree = undefined
 vertexOutdegree :: DGraph v e -> v -> Int
 vertexOutdegree = undefined
 
--- | Indegree of a 'DGraph'
--- | The total indegree of all the vertices in a 'DGraph'
-indegree :: DGraph v e -> Int
-indegree = undefined
+-- | Indegrees of all the vertices in a 'DGraph'
+indegrees :: DGraph v e -> [Int]
+indegrees = undefined
 
--- | Outdegree of a 'DGraph'
--- | The total outdegree of all the vertices in a 'DGraph'
-outdegree :: DGraph v e -> Int
-outdegree = undefined
+-- | Outdegree of all the vertices in a 'DGraph'
+outdegrees :: DGraph v e -> [Int]
+outdegrees = undefined
 
 -- | Tell if a 'DGraph' is balanced
 -- | A Directed Graph is @balanced@ when its @indegree = outdegree@
 isBalanced :: DGraph v e -> Bool
-isBalanced g = indegree g == outdegree g
+isBalanced g = sum (indegrees g) == sum (outdegrees g)
 
 -- | Tell if a vertex is a source
 -- | A vertex is a @source@ when its @indegree = 0@
