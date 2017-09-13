@@ -113,3 +113,7 @@ containsEdge' :: (Hashable v, Eq v) => Graph v e -> (v, v) -> Bool
 containsEdge' g (v1, v2) =
     containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
+
+-- | Retrieve the incident 'Edge's of a Vertex
+incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
+incidentEdges g v = filter (\(Edge v1 v2 _) -> v == v1 || v == v2) $ edges g
