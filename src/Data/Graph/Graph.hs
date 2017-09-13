@@ -45,3 +45,19 @@ insertEdge (Edge v1 v2 edgeAttr) g = link v2 v1 $ link v1 v2 g'
 -- | Same rules as 'insertEdge' are applied
 insertEdges :: (Hashable v, Eq v) => [Edge v e] -> Graph v e -> Graph v e
 insertEdges as g = foldl' (flip insertEdge) g as
+
+-- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
+-- | The involved vertices are left untouched
+removeEdge :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
+removeEdge = removeEdge' . toUnorderedPair
+
+-- | Same as 'removeEdge' but the edge is an unordered tuple
+-- TODO: use containsVertex instead of HM.member
+removeEdge' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
+removeEdge' (v1, v2) g
+    | HM.member v1 g && HM.member v2 g = update v2Links v2 $ update v1Links v1 g
+    | otherwise = g
+    where
+        v1Links = HM.delete v2 $ getLinks v1 g
+        v2Links = HM.delete v1 $ getLinks v2 g
+        update = HM.adjust . const
