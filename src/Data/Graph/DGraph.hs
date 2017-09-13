@@ -84,6 +84,11 @@ vertices = HM.keys
 order :: DGraph v e -> Int
 order = HM.size
 
+-- | @O(n*m)@ Retrieve the size of a 'DGraph'
+-- | The @size@ of a directed graph is its number of 'Arc's
+size :: (Hashable v, Eq v) => DGraph v e -> Int
+size = length . arcs
+
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
 arcs g = linksToArcs $ zip vs links
@@ -97,11 +102,6 @@ arcs g = linksToArcs $ zip vs links
 -- | discarded
 arcs' :: (Hashable v, Eq v) => DGraph v e -> [(v, v)]
 arcs' g = toOrderedPair <$> arcs g
-
--- | @O(n*m)@ Retrieve the size of a 'DGraph'
--- | The @size@ of a directed graph is its number of 'Arc's
-size :: (Hashable v, Eq v) => DGraph v e -> Int
-size = length . arcs
 
 -- | @O(log n)@ Tell if a vertex exists in the graph
 containsVertex :: (Hashable v, Eq v) => DGraph v e -> v -> Bool

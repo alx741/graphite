@@ -82,6 +82,11 @@ vertices = HM.keys
 order :: Graph v e -> Int
 order = HM.size
 
+-- | @O(n*m)@ Retrieve the size of a 'Graph'
+-- | The @size@ of an undirected graph is its number of 'Edge's
+size :: (Hashable v, Eq v) => Graph v e -> Int
+size = length . edges
+
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'Graph'
 edges :: forall v e . (Hashable v, Eq v) => Graph v e -> [Edge v e]
 edges g = linksToEdges $ zip vs links
