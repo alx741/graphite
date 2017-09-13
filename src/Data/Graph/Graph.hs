@@ -43,5 +43,5 @@ insertEdge (Edge v1 v2 edgeAttr) g = link v2 v1 $ link v1 v2 g'
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
 -- | Same rules as 'insertEdge' are applied
--- insertEdges :: (Hashable v, Eq v) => [Edge v e] -> Graph v e -> Graph v e
--- insertEdges as g = foldl' (flip insertEdge) g as
+insertEdges :: (Hashable v, Eq v) => [Edge v e] -> Graph v e -> Graph v e
+insertEdges as g = foldl' (flip insertEdge) g as
