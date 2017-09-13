@@ -147,6 +147,7 @@ isOriented = undefined
 
 -- | Tell if a 'DGraph' is isolated
 -- | A graph is @isolated@ if it has no edges, that is, it has a degree of 0
+-- | TODO: What if it has a loop?
 isIsolated :: DGraph v e -> Bool
 isIsolated = undefined
 
