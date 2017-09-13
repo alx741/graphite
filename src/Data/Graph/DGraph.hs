@@ -1,7 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE ScopedTypeVariables  #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.DGraph where
 
@@ -17,7 +15,8 @@ import Data.Graph.Types
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
-instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (DGraph v e) where
+instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
+ => Arbitrary (DGraph v e) where
     arbitrary = insertArcs <$> arbitrary <*> pure empty
 
 -- | The Degree Sequence un a 'DGraph' is a list of pairs (Indegree, Outdegree)
@@ -48,7 +47,8 @@ insertVertices vs g = foldl' (flip insertVertex) g vs
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-insertArc (Arc fromV toV edgeAttr) g = DGraph $ HM.adjust (insertLink toV edgeAttr) fromV g'
+insertArc (Arc fromV toV edgeAttr) g = DGraph
+    $ HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = unDGraph $ insertVertices [fromV, toV] g
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'

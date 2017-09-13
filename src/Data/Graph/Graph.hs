@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE ScopedTypeVariables  #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE DeriveFunctor       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.Graph where
 
@@ -17,7 +16,8 @@ import Data.Graph.Types
 newtype Graph v e = Graph { unGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
-instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (Graph v e) where
+instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
+ => Arbitrary (Graph v e) where
     arbitrary = insertEdges <$> arbitrary <*> pure empty
 
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges
