@@ -53,10 +53,9 @@ removeEdge :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
 removeEdge = removeEdge' . toUnorderedPair
 
 -- | Same as 'removeEdge' but the edge is an unordered tuple
--- TODO: use containsVertex instead of HM.member
 removeEdge' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
 removeEdge' (v1, v2) g
-    | HM.member v1 g && HM.member v2 g = update v2Links v2 $ update v1Links v1 g
+    | containsVertex g v1 && containsVertex g v2 = update v2Links v2 $ update v1Links v1 g
     | otherwise = g
     where
         v1Links = HM.delete v2 $ getLinks v1 g
@@ -100,3 +99,17 @@ edges g = linksToEdges $ zip vs links
 -- | are discarded
 edges' :: (Hashable v, Eq v) => Graph v e -> [(v, v)]
 edges' g = toUnorderedPair <$> edges g
+
+-- | @O(log n)@ Tell if a vertex exists in the graph
+containsVertex :: (Hashable v, Eq v) => Graph v e -> v -> Bool
+containsVertex = flip HM.member
+
+-- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
+containsEdge :: (Hashable v, Eq v) => Graph v e -> Edge v e -> Bool
+containsEdge g = containsEdge' g . toUnorderedPair
+
+-- | Same as 'containsEdge' but the edge is an unordered tuple
+containsEdge' :: (Hashable v, Eq v) => Graph v e -> (v, v) -> Bool
+containsEdge' g (v1, v2) =
+    containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
+    where v1Links = getLinks v1 g
