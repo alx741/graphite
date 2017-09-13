@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.Graph where
 
@@ -61,3 +62,36 @@ removeEdge' (v1, v2) g
         v1Links = HM.delete v2 $ getLinks v1 g
         v2Links = HM.delete v1 $ getLinks v2 g
         update = HM.adjust . const
+
+-- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
+-- | The involved vertices are also removed
+-- removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
+-- removeEdgeAndVertices = removeEdgeAndVertices' . toOrderedPair
+
+-- | Same as 'removeEdgeAndVertices' but the edge is an unordered tuple
+-- removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
+-- removeEdgeAndVertices' (v1, v2) g =
+--     removeVertex v2 $ removeVertex v1 $ removeEdge' (v1, v2) g
+
+-- | @O(n)@ Retrieve the vertices of a 'Graph'
+vertices :: Graph v e -> [v]
+vertices = HM.keys
+
+-- | @O(n)@ Retrieve the order of a 'Graph'
+-- | The @order@ of a graph is its number of vertices
+order :: Graph v e -> Int
+order = HM.size
+
+-- | @O(n*m)@ Retrieve the 'Edge's of a 'Graph'
+edges :: forall v e . (Hashable v, Eq v) => Graph v e -> [Edge v e]
+edges g = linksToEdges $ zip vs links
+    where
+        vs :: [v]
+        vs = vertices g
+        links :: [Links v e]
+        links = fmap (`getLinks` g) vs
+
+-- | Same as 'edges' but the edges are unordered tuples, and their attributes
+-- | are discarded
+edges' :: (Hashable v, Eq v) => Graph v e -> [(v, v)]
+edges' g = toUnorderedPair <$> edges g

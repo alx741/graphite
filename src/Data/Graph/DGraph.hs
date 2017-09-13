@@ -93,7 +93,7 @@ arcs g = linksToArcs $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | Same as 'arcs' but the arcs are directed tuples, and their attributes are
+-- | Same as 'arcs' but the arcs are ordered tuples, and their attributes are
 -- | discarded
 arcs' :: (Hashable v, Eq v) => DGraph v e -> [(v, v)]
 arcs' g = toOrderedPair <$> arcs g
