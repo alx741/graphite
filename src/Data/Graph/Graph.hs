@@ -116,3 +116,13 @@ containsEdge' g (v1, v2) =
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
 incidentEdges g v = filter (\(Edge v1 v2 _) -> v == v1 || v == v2) $ edges g
+
+-- | Tell if an 'Edge' forms a loop
+-- | An 'Edge' forms a loop with both of its ends point to the same vertex
+isLoop :: (Eq v) => Edge v e -> Bool
+isLoop (Edge v1 v2 _) = v1 == v2
+
+-- | Tell if a 'Graph' is simple
+-- | A 'Graph' is @simple@ if it has no multiple edges nor loops
+isSimple :: (Hashable v, Eq v) => Graph v e -> Bool
+isSimple = not . or . (map isLoop) . edges
