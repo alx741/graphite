@@ -127,6 +127,23 @@ containsEdge' graph@(Graph g) (v1, v2) =
 incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
 incidentEdges g v = filter (\(Edge v1 v2 _) -> v == v1 || v == v2) $ edges g
 
+-- | Degree of a vertex
+-- | The total number incident 'Edge's of a vertex
+vertexDegree :: (Hashable v, Eq v) => Graph v e -> v -> Int
+vertexDegree g = length . incidentEdges g
+
+-- | Degrees of a all the vertices in a 'Graph'
+degrees :: (Hashable v, Eq v) => Graph v e -> [Int]
+degrees g = fmap (vertexDegree g) $ vertices g
+
+-- | Maximum degree of a 'Graph'
+maxDegree :: (Hashable v, Eq v) => Graph v e -> Int
+maxDegree = maximum . degrees
+
+-- | Minimum degree of a 'Graph'
+minDegree :: (Hashable v, Eq v) => Graph v e -> Int
+minDegree = minimum . degrees
+
 -- | Tell if an 'Edge' forms a loop
 -- | An 'Edge' forms a loop with both of its ends point to the same vertex
 isLoop :: (Eq v) => Edge v e -> Bool
@@ -140,6 +157,5 @@ isSimple = not . or . (map isLoop) . edges
 -- | Tell if a 'Graph' is regular
 -- | An Undirected Graph is @regular@ when all of its vertices have the same
 -- | number of adjacent vertices
-isRegular :: DGraph v e -> Bool
-isRegular g = undefined
-
+isRegular :: Graph v e -> Bool
+isRegular = undefined
