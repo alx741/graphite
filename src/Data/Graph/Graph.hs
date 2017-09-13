@@ -23,10 +23,9 @@ insertVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
 insertVertex v = hashMapInsert v HM.empty
 
 -- | @O(n)@ Remove a vertex from a 'Graph' if present
--- | Every 'Edge' adjacent to this vertex is also removed
--- FIXME
--- removeVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
--- removeVertex v g = HM.delete v $ foldl' (flip removeEdge) g $ incidentEdges g v
+-- | Every 'Edge' incident to this vertex is also removed
+removeVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
+removeVertex v g = HM.delete v $ foldl' (flip removeEdge) g $ incidentEdges g v
 
 -- | @O(m*log n)@ Insert a many vertices into a 'Graph'
 -- | New vertices are inserted and already contained vertices are left untouched
@@ -64,13 +63,13 @@ removeEdge' (v1, v2) g
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
 -- | The involved vertices are also removed
--- removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
--- removeEdgeAndVertices = removeEdgeAndVertices' . toOrderedPair
+removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
+removeEdgeAndVertices = removeEdgeAndVertices' . toUnorderedPair
 
 -- | Same as 'removeEdgeAndVertices' but the edge is an unordered tuple
--- removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
--- removeEdgeAndVertices' (v1, v2) g =
---     removeVertex v2 $ removeVertex v1 $ removeEdge' (v1, v2) g
+removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
+removeEdgeAndVertices' (v1, v2) g =
+    removeVertex v2 $ removeVertex v1 $ removeEdge' (v1, v2) g
 
 -- | @O(n)@ Retrieve the vertices of a 'Graph'
 vertices :: Graph v e -> [v]

@@ -32,7 +32,7 @@ insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 insertVertex v = hashMapInsert v HM.empty
 
 -- | @O(n)@ Remove a vertex from a 'DGraph' if present
--- | Every 'Arc' adjacent to this vertex is also removed
+-- | Every 'Arc' incident to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 removeVertex v g = HM.delete v $ foldl' (flip removeArc) g $ incidentArcs g v
 
