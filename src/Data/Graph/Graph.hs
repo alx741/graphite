@@ -14,24 +14,27 @@ import           Test.QuickCheck
 import Data.Graph.Types
 
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/
-type Graph v e = HM.HashMap v (Links v e)
+newtype Graph v e = Graph { unGraph :: HM.HashMap v (Links v e) }
+    deriving (Eq, Show)
 
--- instance {-# OVERLAPS #-} (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (Graph v e) where
---     arbitrary = insertEdges <$> arbitrary <*> pure empty
+instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v) => Arbitrary (Graph v e) where
+    arbitrary = insertEdges <$> arbitrary <*> pure empty
 
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges
 empty :: (Hashable v) => Graph v e
-empty = HM.empty
+empty = Graph HM.empty
 
 -- | @O(log n)@ Insert a vertex into a 'Graph'
 -- | If the graph already contains the vertex leave the graph untouched
 insertVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
-insertVertex v = hashMapInsert v HM.empty
+insertVertex v (Graph g) = Graph $ hashMapInsert v HM.empty g
 
 -- | @O(n)@ Remove a vertex from a 'Graph' if present
 -- | Every 'Edge' incident to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
-removeVertex v g = HM.delete v $ foldl' (flip removeEdge) g $ incidentEdges g v
+removeVertex v g = Graph
+    $ (\(Graph g') -> HM.delete v g')
+    $ foldl' (flip removeEdge) g $ incidentEdges g v
 
 -- | @O(m*log n)@ Insert a many vertices into a 'Graph'
 -- | New vertices are inserted and already contained vertices are left untouched
@@ -42,9 +45,9 @@ insertVertices vs g = foldl' (flip insertVertex) g vs
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Edge, its attribute is updated
 insertEdge :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
-insertEdge (Edge v1 v2 edgeAttr) g = link v2 v1 $ link v1 v2 g'
+insertEdge (Edge v1 v2 edgeAttr) g = Graph $ link v2 v1 $ link v1 v2 g'
     where
-        g' = insertVertices [v1, v2] g
+        g' = unGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
@@ -59,9 +62,10 @@ removeEdge = removeEdge' . toUnorderedPair
 
 -- | Same as 'removeEdge' but the edge is an unordered tuple
 removeEdge' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
-removeEdge' (v1, v2) g
-    | containsVertex g v1 && containsVertex g v2 = update v2Links v2 $ update v1Links v1 g
-    | otherwise = g
+removeEdge' (v1, v2) graph@(Graph g)
+    | containsVertex graph v1 && containsVertex graph v2 =
+        Graph $ update v2Links v2 $ update v1Links v1 g
+    | otherwise = Graph g
     where
         v1Links = HM.delete v2 $ getLinks v1 g
         v2Links = HM.delete v1 $ getLinks v2 g
@@ -79,12 +83,12 @@ removeEdgeAndVertices' (v1, v2) g =
 
 -- | @O(n)@ Retrieve the vertices of a 'Graph'
 vertices :: Graph v e -> [v]
-vertices = HM.keys
+vertices (Graph g) = HM.keys g
 
 -- | @O(n)@ Retrieve the order of a 'Graph'
 -- | The @order@ of a graph is its number of vertices
 order :: Graph v e -> Int
-order = HM.size
+order (Graph g) = HM.size g
 
 -- | @O(n*m)@ Retrieve the size of a 'Graph'
 -- | The @size@ of an undirected graph is its number of 'Edge's
@@ -93,10 +97,10 @@ size = length . edges
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'Graph'
 edges :: forall v e . (Hashable v, Eq v) => Graph v e -> [Edge v e]
-edges g = linksToEdges $ zip vs links
+edges (Graph g) = linksToEdges $ zip vs links
     where
         vs :: [v]
-        vs = vertices g
+        vs = vertices $ Graph g
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
@@ -107,7 +111,7 @@ edges' g = toUnorderedPair <$> edges g
 
 -- | @O(log n)@ Tell if a vertex exists in the graph
 containsVertex :: (Hashable v, Eq v) => Graph v e -> v -> Bool
-containsVertex = flip HM.member
+containsVertex (Graph g) = flip HM.member g
 
 -- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => Graph v e -> Edge v e -> Bool
@@ -115,8 +119,8 @@ containsEdge g = containsEdge' g . toUnorderedPair
 
 -- | Same as 'containsEdge' but the edge is an unordered tuple
 containsEdge' :: (Hashable v, Eq v) => Graph v e -> (v, v) -> Bool
-containsEdge' g (v1, v2) =
-    containsVertex g v1 && containsVertex g v2 && v2 `HM.member` v1Links
+containsEdge' graph@(Graph g) (v1, v2) =
+    containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
 -- | Retrieve the incident 'Edge's of a Vertex
