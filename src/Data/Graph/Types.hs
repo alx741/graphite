@@ -3,7 +3,7 @@
 
 module Data.Graph.Types where
 
-import Data.List (nub)
+import Data.List (nubBy)
 import GHC.Float (float2Double)
 
 import           Data.Hashable
@@ -108,11 +108,12 @@ linksToArcs ls = concat $ fmap toArc ls
         toArc (fromV, links) = fmap (\(v, a) -> Arc fromV v a) (HM.toList links)
 
 -- | Get 'Edge's from an association list of vertices and their links
-linksToEdges :: (Eq v, Eq a) => [(v, Links v a)] -> [Edge v a]
-linksToEdges ls = nub $ concat $ fmap toEdge ls
+linksToEdges :: (Eq v) => [(v, Links v a)] -> [Edge v a]
+linksToEdges ls = nubBy shallowEdgeEq $ concat $ fmap toEdge ls
     where
         toEdge :: (v, Links v a) -> [Edge v a]
         toEdge (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
+        shallowEdgeEq (Edge v1 v2 _) (Edge v1' v2' _) = v1 == v1' && v2 == v2'
 
 -- | O(log n) Associate the specified value with the specified key in this map.
 -- | If this map previously contained a mapping for the key, leave the map
