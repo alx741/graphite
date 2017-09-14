@@ -4,8 +4,10 @@
 
 module Data.Graph.Graph where
 
+import Control.Monad (replicateM)
 import Data.List     (foldl')
--- import System.Random
+import Data.Maybe    (fromMaybe)
+import System.Random
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
@@ -21,17 +23,10 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (Graph v e) where
     arbitrary = insertEdges <$> arbitrary <*> pure empty
 
--- randomGraph :: (Hashable v, Enum v, Eq v, RandomGen g)
---  => (v, v)
---  -> g
---  -> (Graph v (), g)
--- randomGraph (lo, hi) gen = (insertVertices vs empty, gen)
---     where vs = enumFromTo lo hi
-
--- randomGraphIO :: (Hashable v, Enum v, Eq v) => (v, v) -> IO (Graph v ())
--- randomGraphIO (lo, hi) = do
---     gen <- getStdGen
---     return $ fst $ randomGraph (lo, hi) gen
+-- | Generate a random 'Graph' of @n@ vertices
+randomGraphIO :: Int -> IO (Graph Int ())
+randomGraphIO n = replicateM n randRow >>= (\m -> return $ fromMaybe empty (fromAdjacencyMatrix m))
+    where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
 
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges
 empty :: (Hashable v) => Graph v e
