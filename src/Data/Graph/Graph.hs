@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE DeriveFunctor       #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
@@ -50,7 +49,7 @@ fromAdjacencyMatrix m
 
             genEdges :: [Edge Int ()] -> (Int, [(Int, Int)]) -> [Edge Int ()]
             genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
-                where connected = fmap fst $ filter (\(_, v) -> v /= 0) vs
+                where connected = fst <$> filter (\(_, v) -> v /= 0) vs
 
 -- | @O(log n)@ Insert a vertex into a 'Graph'
 -- | If the graph already contains the vertex leave the graph untouched
@@ -162,7 +161,7 @@ vertexDegree g = length . incidentEdges g
 
 -- | Degrees of a all the vertices in a 'Graph'
 degrees :: (Hashable v, Eq v) => Graph v e -> [Int]
-degrees g = fmap (vertexDegree g) $ vertices g
+degrees g = vertexDegree g <$> vertices g
 
 -- | Maximum degree of a 'Graph'
 maxDegree :: (Hashable v, Eq v) => Graph v e -> Int
@@ -180,7 +179,7 @@ isLoop (Edge v1 v2 _) = v1 == v2
 -- | Tell if a 'Graph' is simple
 -- | A 'Graph' is @simple@ if it has no multiple edges nor loops
 isSimple :: (Hashable v, Eq v) => Graph v e -> Bool
-isSimple = not . or . (map isLoop) . edges
+isSimple = not . any isLoop . edges
 
 -- | Tell if a 'Graph' is regular
 -- | An Undirected Graph is @regular@ when all of its vertices have the same
