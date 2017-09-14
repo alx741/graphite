@@ -25,7 +25,8 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
 
 -- | Generate a random 'Graph' of @n@ vertices
 randomGraphIO :: Int -> IO (Graph Int ())
-randomGraphIO n = replicateM n randRow >>= (\m -> return $ fromMaybe empty (fromAdjacencyMatrix m))
+randomGraphIO n = replicateM n randRow
+    >>= (\m -> return $ fromMaybe empty (fromAdjacencyMatrix m))
     where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
 
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges

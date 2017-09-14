@@ -18,10 +18,13 @@ library
   exposed-modules:     Data.Graph.Types
                      , Data.Graph.Graph
                      , Data.Graph.DGraph
+                     , Data.Graph.Visualize
                      , Data.Graph.Connectivity
   build-depends:       base >= 4.7 && < 5
                      , hashable
                      , random
+                     , process
+                     , graphviz
                      , unordered-containers
                      , QuickCheck
   ghc-options:         -Wall

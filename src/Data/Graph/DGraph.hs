@@ -187,7 +187,7 @@ isBalanced g = sum (indegrees g) == sum (outdegrees g)
 -- | of adjacent vertices AND when the @indegree@ and @outdegree@ of each vertex
 -- | are equal to each toher.
 isRegular :: DGraph v e -> Bool
-isRegular g = undefined
+isRegular _ = undefined
 
 -- | Tell if a vertex is a source
 -- | A vertex is a @source@ when its @indegree = 0@
