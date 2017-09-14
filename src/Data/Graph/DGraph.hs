@@ -61,7 +61,7 @@ insertArcs as g = foldl' (flip insertArc) g as
 removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArc = removeArc' . toOrderedPair
 
--- | Same as 'removeArc' but the arc is an ordered tuple
+-- | Same as 'removeArc' but the arc is an ordered pair
 removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArc' (v1, v2) (DGraph g) = case HM.lookup v1 g of
     Nothing -> DGraph g
@@ -73,7 +73,7 @@ removeArc' (v1, v2) (DGraph g) = case HM.lookup v1 g of
 removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArcAndVertices = removeArcAndVertices' . toOrderedPair
 
--- | Same as 'removeArcAndVertices' but the arc is an ordered tuple
+-- | Same as 'removeArcAndVertices' but the arc is an ordered pair
 removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArcAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
@@ -101,7 +101,7 @@ arcs (DGraph g) = linksToArcs $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | Same as 'arcs' but the arcs are ordered tuples, and their attributes are
+-- | Same as 'arcs' but the arcs are ordered pairs, and their attributes are
 -- | discarded
 arcs' :: (Hashable v, Eq v) => DGraph v e -> [(v, v)]
 arcs' g = toOrderedPair <$> arcs g
@@ -114,7 +114,7 @@ containsVertex (DGraph g) = flip HM.member g
 containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
 containsArc g = containsArc' g . toOrderedPair
 
--- | Same as 'containsArc' but the arc is an ordered tuple
+-- | Same as 'containsArc' but the arc is an ordered pair
 containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
 containsArc' graph@(DGraph g) (v1, v2) =
     containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links

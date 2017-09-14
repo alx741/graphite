@@ -83,7 +83,7 @@ insertEdges as g = foldl' (flip insertEdge) g as
 removeEdge :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
 removeEdge = removeEdge' . toUnorderedPair
 
--- | Same as 'removeEdge' but the edge is an unordered tuple
+-- | Same as 'removeEdge' but the edge is an unordered pair
 removeEdge' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
 removeEdge' (v1, v2) graph@(Graph g)
     | containsVertex graph v1 && containsVertex graph v2 =
@@ -99,7 +99,7 @@ removeEdge' (v1, v2) graph@(Graph g)
 removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
 removeEdgeAndVertices = removeEdgeAndVertices' . toUnorderedPair
 
--- | Same as 'removeEdgeAndVertices' but the edge is an unordered tuple
+-- | Same as 'removeEdgeAndVertices' but the edge is an unordered pair
 removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
 removeEdgeAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeEdge' (v1, v2) g
@@ -127,7 +127,7 @@ edges (Graph g) = linksToEdges $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | Same as 'edges' but the edges are unordered tuples, and their attributes
+-- | Same as 'edges' but the edges are unordered pairs, and their attributes
 -- | are discarded
 edges' :: (Hashable v, Eq v) => Graph v e -> [(v, v)]
 edges' g = toUnorderedPair <$> edges g
@@ -140,7 +140,7 @@ containsVertex (Graph g) = flip HM.member g
 containsEdge :: (Hashable v, Eq v) => Graph v e -> Edge v e -> Bool
 containsEdge g = containsEdge' g . toUnorderedPair
 
--- | Same as 'containsEdge' but the edge is an unordered tuple
+-- | Same as 'containsEdge' but the edge is an unordered pair
 containsEdge' :: (Hashable v, Eq v) => Graph v e -> (v, v) -> Bool
 containsEdge' graph@(Graph g) (v1, v2) =
     containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
