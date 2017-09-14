@@ -1,8 +1,9 @@
 module Data.Graph.Visualize where
 
 import Data.GraphViz
+import Data.GraphViz.Attributes.Complete
 import Data.Hashable
-import Data.Monoid    ((<>))
+import Data.Monoid                       ((<>))
 import System.Process
 
 -- import qualified Data.Graph.DGraph as DG
@@ -17,10 +18,16 @@ labeledEdges g = fmap (\(Edge v1 v2 attr) -> (v1, v2, show attr)) $ G.edges g
 
 toDot' :: (Show e) => G.Graph Int e -> DotGraph Int
 toDot' g = graphElemsToDot params (labeledNodes g) (labeledEdges g)
-    where params = nonClusteredParams { isDirected = False }
+    where params = nonClusteredParams
+            { isDirected = False
+            , globalAttributes = [GraphAttrs
+                [ NodeSep 1, Overlap ScaleOverlaps
+                , Shape Circle
+                ]]
+            }
 
 plotIO :: (Show e) => G.Graph Int e -> FilePath -> IO FilePath
-plotIO g fp = addExtension (runGraphviz $ toDot' g) Png fp
+plotIO g fp = addExtension (runGraphvizCommand Sfdp $ toDot' g) Png fp
 
 plotXdgIO :: (Show e) => G.Graph Int e -> FilePath -> IO ()
 plotXdgIO g fp = do
