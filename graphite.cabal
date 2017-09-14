@@ -1,14 +1,14 @@
 name:                graphite
 version:             0.1.0.0
--- synopsis:
--- description:
+synopsis:            Graphs and networks library
+description:         Represent, analyze and visualize graphs
 homepage:            https://github.com/alx741/graphite#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Daniel Campoverde
-maintainer:          alx741@riseup.net
+maintainer:          alx@sillybytes.net
 copyright:           2017 Daniel Campoverde
-category:            Web
+category:            Data Structures, Graphs
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
