@@ -21,6 +21,7 @@ library
                      , Data.Graph.Connectivity
   build-depends:       base >= 4.7 && < 5
                      , hashable
+                     , random
                      , unordered-containers
                      , QuickCheck
   ghc-options:         -Wall

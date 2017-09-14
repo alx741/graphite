@@ -1,10 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE DeriveFunctor       #-}
+{-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.Graph where
 
-import Data.List (foldl')
+import Data.List     (foldl')
+-- import System.Random
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
@@ -20,9 +22,35 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (Graph v e) where
     arbitrary = insertEdges <$> arbitrary <*> pure empty
 
+-- randomGraph :: (Hashable v, Enum v, Eq v, RandomGen g)
+--  => (v, v)
+--  -> g
+--  -> (Graph v (), g)
+-- randomGraph (lo, hi) gen = (insertVertices vs empty, gen)
+--     where vs = enumFromTo lo hi
+
+-- randomGraphIO :: (Hashable v, Enum v, Eq v) => (v, v) -> IO (Graph v ())
+-- randomGraphIO (lo, hi) = do
+--     gen <- getStdGen
+--     return $ fst $ randomGraph (lo, hi) gen
+
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges
 empty :: (Hashable v) => Graph v e
 empty = Graph HM.empty
+
+-- | Generate a directed 'Graph' of Int vertices from an adjacency
+-- | square matrix
+fromAdjacencyMatrix :: [[Int]] -> Maybe (Graph Int ())
+fromAdjacencyMatrix m
+    | length m /= length (head m) = Nothing
+    | otherwise = Just $ insertEdges (foldl genEdges [] labeledM) empty
+        where
+            labeledM :: [(Int, [(Int, Int)])]
+            labeledM = zip [1..] $ fmap (zip [1..]) m
+
+            genEdges :: [Edge Int ()] -> (Int, [(Int, Int)]) -> [Edge Int ()]
+            genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
+                where connected = fmap fst $ filter (\(_, v) -> v /= 0) vs
 
 -- | @O(log n)@ Insert a vertex into a 'Graph'
 -- | If the graph already contains the vertex leave the graph untouched
