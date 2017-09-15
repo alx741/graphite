@@ -15,12 +15,12 @@ import Data.Graph.Types
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
+-- | The Degree Sequence of a 'DGraph' is a list of pairs (Indegree, Outdegree)
+type DegreeSequence = [(Int, Int)]
+
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
     arbitrary = insertArcs <$> arbitrary <*> pure empty
-
--- | The Degree Sequence un a 'DGraph' is a list of pairs (Indegree, Outdegree)
-type DegreeSequence = [(Int, Int)]
 
 -- | The Empty (order-zero) 'DGraph' with no vertices and no arcs
 empty :: (Hashable v) => DGraph v e

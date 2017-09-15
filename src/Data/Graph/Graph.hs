@@ -5,7 +5,7 @@
 module Data.Graph.Graph where
 
 import Control.Monad (replicateM)
-import Data.List     (foldl')
+import Data.List     (reverse, sort, foldl')
 import Data.Maybe    (fromMaybe)
 import System.Random
 
@@ -169,6 +169,14 @@ isSimple = not . any isLoop . edges
 isRegular :: Graph v e -> Bool
 isRegular = undefined
 
+-- | Tell if two 'Graph's are isomorphic
+areIsomorphic :: Graph v e -> Graph v' e' -> Bool
+areIsomorphic = undefined
+
+isomorphism :: Graph v e -> Graph v' e' -> (v -> v')
+isomorphism = undefined
+
+
 -- | Generate a directed 'Graph' of Int vertices from an adjacency
 -- | square matrix
 fromAdjacencyMatrix :: [[Int]] -> Maybe (Graph Int ())
@@ -186,3 +194,10 @@ fromAdjacencyMatrix m
 -- | Get the adjacency matrix representation of a directed 'Graph'
 toAdjacencyMatrix :: Graph v e -> [[Int]]
 toAdjacencyMatrix = undefined
+
+
+-- | The Degree Sequence of a 'Graph' is a list of degrees
+newtype DegreeSequence = DegreeSequence [Int]
+
+degreeSequence :: [Int] -> DegreeSequence
+degreeSequence = DegreeSequence . reverse . sort
