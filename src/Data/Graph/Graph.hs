@@ -197,7 +197,8 @@ toAdjacencyMatrix = undefined
 
 
 -- | The Degree Sequence of a simple 'Graph' is a list of degrees
-newtype DegreeSequence = DegreeSequence [Int] deriving (Eq, Ord, Show)
+newtype DegreeSequence = DegreeSequence { unDegreeSequence :: [Int]}
+    deriving (Eq, Ord, Show)
 
 -- | Construct a 'DegreeSequence' from a list of degrees
 -- | Negative degree values are discarded
@@ -213,7 +214,7 @@ getDegreeSequence = undefined
 -- | A Degree Sequence is a @Graphical Sequence@ if a corresponding 'Graph' for
 -- | it exists
 isGraphicalSequence :: DegreeSequence -> Bool
-isGraphicalSequence = undefined
+isGraphicalSequence = even . length . filter odd . unDegreeSequence
 
 -- | Get the corresponding 'Graph' of a 'DegreeSequence'
 -- | If the 'DegreeSequence' is not graphical (see 'isGraphicalSequence') the
