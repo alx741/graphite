@@ -33,20 +33,6 @@ randomGraphIO n = replicateM n randRow
 empty :: (Hashable v) => Graph v e
 empty = Graph HM.empty
 
--- | Generate a directed 'Graph' of Int vertices from an adjacency
--- | square matrix
-fromAdjacencyMatrix :: [[Int]] -> Maybe (Graph Int ())
-fromAdjacencyMatrix m
-    | length m /= length (head m) = Nothing
-    | otherwise = Just $ insertEdges (foldl genEdges [] labeledM) empty
-        where
-            labeledM :: [(Int, [(Int, Int)])]
-            labeledM = zip [1..] $ fmap (zip [1..]) m
-
-            genEdges :: [Edge Int ()] -> (Int, [(Int, Int)]) -> [Edge Int ()]
-            genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
-                where connected = fst <$> filter (\(_, v) -> v /= 0) vs
-
 -- | @O(log n)@ Insert a vertex into a 'Graph'
 -- | If the graph already contains the vertex leave the graph untouched
 insertVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
@@ -182,3 +168,21 @@ isSimple = not . any isLoop . edges
 -- | number of adjacent vertices
 isRegular :: Graph v e -> Bool
 isRegular = undefined
+
+-- | Generate a directed 'Graph' of Int vertices from an adjacency
+-- | square matrix
+fromAdjacencyMatrix :: [[Int]] -> Maybe (Graph Int ())
+fromAdjacencyMatrix m
+    | length m /= length (head m) = Nothing
+    | otherwise = Just $ insertEdges (foldl genEdges [] labeledM) empty
+        where
+            labeledM :: [(Int, [(Int, Int)])]
+            labeledM = zip [1..] $ fmap (zip [1..]) m
+
+            genEdges :: [Edge Int ()] -> (Int, [(Int, Int)]) -> [Edge Int ()]
+            genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
+                where connected = fst <$> filter (\(_, v) -> v /= 0) vs
+
+-- | Get the adjacency matrix representation of a directed 'Graph'
+toAdjacencyMatrix :: Graph v e -> [[Int]]
+toAdjacencyMatrix = undefined
