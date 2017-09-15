@@ -197,7 +197,9 @@ toAdjacencyMatrix = undefined
 
 
 -- | The Degree Sequence of a 'Graph' is a list of degrees
-newtype DegreeSequence = DegreeSequence [Int]
+newtype DegreeSequence = DegreeSequence [Int] deriving (Eq, Ord, Show)
 
+-- | Construct a 'DegreeSequence' from a list of degrees
+-- | Negative degree values are discarded
 degreeSequence :: [Int] -> DegreeSequence
-degreeSequence = DegreeSequence . reverse . sort
+degreeSequence = DegreeSequence . reverse . sort . filter (>0)
