@@ -196,10 +196,27 @@ toAdjacencyMatrix :: Graph v e -> [[Int]]
 toAdjacencyMatrix = undefined
 
 
--- | The Degree Sequence of a 'Graph' is a list of degrees
+-- | The Degree Sequence of a simple 'Graph' is a list of degrees
 newtype DegreeSequence = DegreeSequence [Int] deriving (Eq, Ord, Show)
 
 -- | Construct a 'DegreeSequence' from a list of degrees
 -- | Negative degree values are discarded
 degreeSequence :: [Int] -> DegreeSequence
 degreeSequence = DegreeSequence . reverse . sort . filter (>0)
+
+-- | Get the 'DegreeSequence' of a simple 'Graph'
+-- | If the graph is not @simple@ (see 'isSimple') the result is Nothing
+getDegreeSequence :: Graph v e -> Maybe DegreeSequence
+getDegreeSequence = undefined
+
+-- | Tell if a 'DegreeSequence' is a Graphical Sequence
+-- | A Degree Sequence is a @Graphical Sequence@ if a corresponding 'Graph' for
+-- | it exists
+isGraphicalSequence :: DegreeSequence -> Bool
+isGraphicalSequence = undefined
+
+-- | Get the corresponding 'Graph' of a 'DegreeSequence'
+-- | If the 'DegreeSequence' is not graphical (see 'isGraphicalSequence') the
+-- | result is Nothing
+fromGraphicalSequence :: DegreeSequence  -> Maybe (Graph Int ())
+fromGraphicalSequence = undefined
