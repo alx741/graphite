@@ -15,16 +15,20 @@ import Data.Graph.Types
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
+instance IsGraph DGraph where
+    empty = DGraph HM.empty
+    vertices (DGraph g) = HM.keys g
+    order (DGraph g) = HM.size g
+    insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
+    removeEdgePair = removeArc'
+    removeEdgePairAndVertices = removeArcAndVertices'
+
 -- | The Degree Sequence of a 'DGraph' is a list of pairs (Indegree, Outdegree)
 type DegreeSequence = [(Int, Int)]
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
-    arbitrary = insertArcs <$> arbitrary <*> pure empty'
-
--- | The Empty (order-zero) 'DGraph' with no vertices and no arcs
-empty' :: (Hashable v) => DGraph v e
-empty' = DGraph HM.empty
+    arbitrary = insertArcs <$> arbitrary <*> pure empty
 
 -- | @O(log n)@ Insert a vertex into a 'DGraph'
 -- | If the graph already contains the vertex leave the graph untouched
@@ -78,15 +82,6 @@ removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v 
 removeArcAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
 
--- | @O(n)@ Retrieve the vertices of a 'DGraph'
-vertices' :: DGraph v e -> [v]
-vertices' (DGraph g) = HM.keys g
-
--- | @O(n)@ Retrieve the order of a 'DGraph'
--- | The @order@ of a graph is its number of vertices
-order :: DGraph v e -> Int
-order (DGraph g) = HM.size g
-
 -- | @O(n*m)@ Retrieve the size of a 'DGraph'
 -- | The @size@ of a directed graph is its number of 'Arc's
 size :: (Hashable v, Eq v) => DGraph v e -> Int
@@ -97,7 +92,7 @@ arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
 arcs (DGraph g) = linksToArcs $ zip vs links
     where
         vs :: [v]
-        vs = vertices' $ DGraph g
+        vs = vertices $ DGraph g
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 

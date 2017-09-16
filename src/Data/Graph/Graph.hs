@@ -79,7 +79,7 @@ instance IsGraph Graph where
     vertices (Graph g) = HM.keys g
     order (Graph g) = HM.size g
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
-    removeEdgePair = removeEdgePair
+    removeEdgePair = removeEdge'
     removeEdgePairAndVertices = removeEdgeAndVertices'
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
