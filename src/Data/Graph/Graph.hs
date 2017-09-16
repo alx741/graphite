@@ -18,6 +18,20 @@ import Data.Graph.Types
 newtype Graph v e = Graph { unGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
+instance IsGraph Graph where
+    empty = Graph HM.empty
+    order (Graph g) = HM.size g
+    size = length . edges
+
+    vertices (Graph g) = HM.keys g
+    insertVertex v (Graph g) = Graph $ hashMapInsert v HM.empty g
+    insertVertices vs g = foldl' (flip insertVertex) g vs
+
+    edgePairs = edges'
+    insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
+    removeEdgePair = removeEdge'
+    removeEdgePairAndVertices = removeEdgeAndVertices'
+
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (Graph v e) where
     arbitrary = insertEdges <$> arbitrary <*> pure empty
@@ -48,22 +62,12 @@ randomMatIO :: Int -> IO [[Int]]
 randomMatIO n = replicateM n randRow
     where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
 
--- | @O(log n)@ Insert a vertex into a 'Graph'
--- | If the graph already contains the vertex leave the graph untouched
-insertVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
-insertVertex v (Graph g) = Graph $ hashMapInsert v HM.empty g
-
 -- | @O(n)@ Remove a vertex from a 'Graph' if present
 -- | Every 'Edge' incident to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
 removeVertex v g = Graph
     $ (\(Graph g') -> HM.delete v g')
     $ foldl' (flip removeEdge) g $ incidentEdges g v
-
--- | @O(m*log n)@ Insert a many vertices into a 'Graph'
--- | New vertices are inserted and already contained vertices are left untouched
-insertVertices :: (Hashable v, Eq v) => [v] -> Graph v e -> Graph v e
-insertVertices vs g = foldl' (flip insertVertex) g vs
 
 -- | @O(log n)@ Insert an undirected 'Edge' into a 'Graph'
 -- | The involved vertices are inserted if don't exist. If the graph already
@@ -73,14 +77,6 @@ insertEdge (Edge v1 v2 edgeAttr) g = Graph $ link v2 v1 $ link v1 v2 g'
     where
         g' = unGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
-
-instance IsGraph Graph where
-    empty = Graph HM.empty
-    vertices (Graph g) = HM.keys g
-    order (Graph g) = HM.size g
-    insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
-    removeEdgePair = removeEdge'
-    removeEdgePairAndVertices = removeEdgeAndVertices'
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
 -- | Same rules as 'insertEdge' are applied
@@ -112,11 +108,6 @@ removeEdgeAndVertices = removeEdgePairAndVertices . toUnorderedPair
 removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
 removeEdgeAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
-
--- | @O(n*m)@ Retrieve the size of a 'Graph'
--- | The @size@ of an undirected graph is its number of 'Edge's
-size :: (Hashable v, Eq v) => Graph v e -> Int
-size = length . edges
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'Graph'
 edges :: forall v e . (Hashable v, Eq v) => Graph v e -> [Edge v e]

@@ -17,8 +17,14 @@ newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
 
 instance IsGraph DGraph where
     empty = DGraph HM.empty
-    vertices (DGraph g) = HM.keys g
     order (DGraph g) = HM.size g
+    size = length . arcs
+
+    vertices (DGraph g) = HM.keys g
+    insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
+    insertVertices vs g = foldl' (flip insertVertex) g vs
+
+    edgePairs = arcs'
     insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
@@ -30,22 +36,12 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
     arbitrary = insertArcs <$> arbitrary <*> pure empty
 
--- | @O(log n)@ Insert a vertex into a 'DGraph'
--- | If the graph already contains the vertex leave the graph untouched
-insertVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
-insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
-
 -- | @O(n)@ Remove a vertex from a 'DGraph' if present
 -- | Every 'Arc' incident to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
 removeVertex v g = DGraph
     $ (\(DGraph g') -> HM.delete v g')
     $ foldl' (flip removeArc) g $ incidentArcs g v
-
--- | @O(m*log n)@ Insert a many vertices into a 'DGraph'
--- | New vertices are inserted and already contained vertices are left untouched
-insertVertices :: (Hashable v, Eq v) => [v] -> DGraph v e -> DGraph v e
-insertVertices vs g = foldl' (flip insertVertex) g vs
 
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
@@ -81,11 +77,6 @@ removeArcAndVertices = removeArcAndVertices' . toOrderedPair
 removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
 removeArcAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
-
--- | @O(n*m)@ Retrieve the size of a 'DGraph'
--- | The @size@ of a directed graph is its number of 'Arc's
-size :: (Hashable v, Eq v) => DGraph v e -> Int
-size = length . arcs
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
