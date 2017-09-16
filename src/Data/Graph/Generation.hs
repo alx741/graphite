@@ -24,7 +24,8 @@ erdosRenyiIO n (P p) = go [1..n] p empty
         go (v:vs) pv g = do
             rnds <- randomRs (0.0, 1.0) <$> newStdGen
             let vs' = zip rnds vs
-            go vs pv $! (foldl' (putV pv v) g vs')
+            let g' = insertVertex v g
+            go vs pv $! (foldl' (putV pv v) g' vs')
 
         putV :: Graph g => Float -> Int -> g Int () -> (Float, Int) -> g Int ()
         putV pv v g (p', v') | p' < pv = insertEdgePair (v, v') g | otherwise = g
