@@ -105,11 +105,11 @@ class IsEdge e where
     isLoop :: (Eq v) => e v a -> Bool
 
 instance IsEdge Edge where
-    toPair = toUnorderedPair
+    toPair (Edge v1 v2 _) = (v1, v2)
     isLoop (Edge v1 v2 _) = v1 == v2
 
 instance IsEdge Arc where
-    toPair = toOrderedPair
+    toPair (Arc fromV toV _) = (fromV, toV)
     isLoop (Arc v1 v2 _) = v1 == v2
 
 -- | Weighted Edge attributes

@@ -1,37 +1,37 @@
 -- | For Connectivity analisis purposes a 'DGraph' can be converted into a
--- | 'Graph' using 'toUndirected'
+-- | 'UGraph using 'toUndirected'
 
 module Data.Graph.Connectivity where
 
-import Data.Graph.Graph
+import Data.Graph.UGraph
 import Data.Graph.DGraph
 
--- | Tell if a 'Graph' is connected
+-- | Tell if a 'UGraph is connected
 -- | An Undirected Graph is @connected@ when there is a path between every pair
 -- | of vertices
-isConnected :: Graph v e -> Bool
+isConnected :: UGraph v e -> Bool
 isConnected = undefined
 
--- | Tell if a 'Graph' is disconnected
+-- | Tell if a 'UGraph is disconnected
 -- | An Undirected Graph is @disconnected@ when its not @connected@. See
 -- | 'isConnected'
 -- TODO: An edgeles graph with two or more vertices is disconnected
-isDisconnected :: Graph v e -> Bool
+isDisconnected :: UGraph v e -> Bool
 isDisconnected = not . isConnected
 
--- | Tell if two vertices of a 'Graph' are connected
+-- | Tell if two vertices of a 'UGraph are connected
 -- | Two vertices are @connected@ if it exists a path between them
-areConnected :: Graph v e -> v -> v -> Bool
+areConnected :: UGraph v e -> v -> v -> Bool
 areConnected = undefined
 
--- | Tell if two vertices of a 'Graph' are disconnected
+-- | Tell if two vertices of a 'UGraph are disconnected
 -- | Two vertices are @disconnected@ if it doesn't exist a path between them
-areDisconnected :: Graph v e -> v -> v -> Bool
+areDisconnected :: UGraph v e -> v -> v -> Bool
 areDisconnected = undefined
 
--- | Retrieve all the unreachable vertices of a 'Graph'
+-- | Retrieve all the unreachable vertices of a 'UGraph
 -- | The @unreachable vertices@ are those with no adjacent 'Edge's
-unreachableVertices :: Graph v e -> [v]
+unreachableVertices :: UGraph v e -> [v]
 unreachableVertices = undefined
 
 -- | Tell if a 'DGraph' is weakly connected
