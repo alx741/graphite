@@ -162,7 +162,7 @@ incidentEdges (Graph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 -- | Degree of a vertex
 -- | The total number incident 'Edge's of a vertex
 vertexDegree :: (Hashable v, Eq v) => Graph v e -> v -> Int
-vertexDegree g = length . incidentEdges g
+vertexDegree (Graph g) v = length $ HM.keys $ getLinks v g
 
 -- | Degrees of a all the vertices in a 'Graph'
 degrees :: (Hashable v, Eq v) => Graph v e -> [Int]
