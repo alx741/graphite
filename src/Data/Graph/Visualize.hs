@@ -12,7 +12,7 @@ import System.Process
 import qualified Data.Graph.UGraph as G
 import           Data.Graph.Types
 
--- | Plot an undirected 'UGraph to a PNG image file
+-- | Plot an undirected 'UGraph' to a PNG image file
 plotIO :: (Show e) => G.UGraph Int e -> FilePath -> IO FilePath
 plotIO g fp = addExtension (runGraphvizCommand Sfdp $ toDot' g) Png fp
 
