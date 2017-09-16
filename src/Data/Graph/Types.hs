@@ -71,8 +71,14 @@ instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
 class IsGraph g where
     -- | The Empty (order-zero) graph with no vertices and no edges
     empty :: (Hashable v) => g v e
+    -- | Retrieve the vertices of a 'Graph'
+    vertices :: g v e -> [v]
+    -- | Retrieve the order of a 'Graph'
+    -- | The @order@ of a graph is its number of vertices
+    order :: g v e -> Int
     insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
     removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+    removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
 
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)

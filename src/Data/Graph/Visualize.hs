@@ -24,7 +24,7 @@ plotXdgIO g fp = do
     return ()
 
 labeledNodes :: (Show v) => G.Graph v e -> [(v, String)]
-labeledNodes g = fmap (\v -> (v, show v)) $ G.vertices g
+labeledNodes g = fmap (\v -> (v, show v)) $ vertices g
 
 labeledEdges :: (Hashable v, Eq v, Show e) => G.Graph v e -> [(v, v, String)]
 labeledEdges g = fmap (\(Edge v1 v2 attr) -> (v1, v2, show attr)) $ G.edges g

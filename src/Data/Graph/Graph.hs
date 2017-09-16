@@ -76,8 +76,11 @@ insertEdge (Edge v1 v2 edgeAttr) g = Graph $ link v2 v1 $ link v1 v2 g'
 
 instance IsGraph Graph where
     empty = Graph HM.empty
+    vertices (Graph g) = HM.keys g
+    order (Graph g) = HM.size g
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
-    removeEdgePair = removeEdge'
+    removeEdgePair = removeEdgePair
+    removeEdgePairAndVertices = removeEdgeAndVertices'
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
 -- | Same rules as 'insertEdge' are applied
@@ -103,21 +106,12 @@ removeEdge' (v1, v2) graph@(Graph g)
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
 -- | The involved vertices are also removed
 removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
-removeEdgeAndVertices = removeEdgeAndVertices' . toUnorderedPair
+removeEdgeAndVertices = removeEdgePairAndVertices . toUnorderedPair
 
 -- | Same as 'removeEdgeAndVertices' but the edge is an unordered pair
 removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
 removeEdgeAndVertices' (v1, v2) g =
-    removeVertex v2 $ removeVertex v1 $ removeEdge' (v1, v2) g
-
--- | @O(n)@ Retrieve the vertices of a 'Graph'
-vertices :: Graph v e -> [v]
-vertices (Graph g) = HM.keys g
-
--- | @O(n)@ Retrieve the order of a 'Graph'
--- | The @order@ of a graph is its number of vertices
-order :: Graph v e -> Int
-order (Graph g) = HM.size g
+    removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
 
 -- | @O(n*m)@ Retrieve the size of a 'Graph'
 -- | The @size@ of an undirected graph is its number of 'Edge's

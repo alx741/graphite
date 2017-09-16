@@ -79,8 +79,8 @@ removeArcAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeArc' (v1, v2) g
 
 -- | @O(n)@ Retrieve the vertices of a 'DGraph'
-vertices :: DGraph v e -> [v]
-vertices (DGraph g) = HM.keys g
+vertices' :: DGraph v e -> [v]
+vertices' (DGraph g) = HM.keys g
 
 -- | @O(n)@ Retrieve the order of a 'DGraph'
 -- | The @order@ of a graph is its number of vertices
@@ -97,7 +97,7 @@ arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
 arcs (DGraph g) = linksToArcs $ zip vs links
     where
         vs :: [v]
-        vs = vertices $ DGraph g
+        vs = vertices' $ DGraph g
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
