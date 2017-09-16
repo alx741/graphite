@@ -1,3 +1,11 @@
+## 0.2.1.0
+
+- Create Data.Graph.Generation module
+
+## 0.2.0.0
+
+- Rename IsGraph typeclass to Graph
+
 ## 0.1.0.0
 
 - Add type class IsGraph
