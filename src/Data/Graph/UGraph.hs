@@ -4,9 +4,7 @@
 
 module Data.Graph.UGraph where
 
-import Control.Monad (replicateM)
 import Data.List     (foldl', reverse, sort)
-import System.Random
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
@@ -17,6 +15,10 @@ import Data.Graph.Types
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/
 newtype UGraph v e = UGraph { unUGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
+
+instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
+ => Arbitrary (UGraph v e) where
+    arbitrary = insertEdges <$> arbitrary <*> pure empty
 
 instance Graph UGraph where
     empty = UGraph HM.empty
@@ -56,36 +58,6 @@ instance Graph UGraph where
     toAdjacencyMatrix = undefined
 
 
-
-instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
- => Arbitrary (UGraph v e) where
-    arbitrary = insertEdges <$> arbitrary <*> pure empty
-
--- | Probability value between 0 and 1
-newtype Probability = P Float deriving (Eq, Ord, Show)
-
--- | Construct a 'Probability' value
-probability :: Float -> Probability
-probability v | v >= 1 = P 1 | v <= 0 = P 0 | otherwise = P v
-
--- | Generate a random 'UGraph of the Erdős–Rényi G(n, p) model
-erdosRenyiIO :: Int -> Probability -> IO (UGraph Int ())
-erdosRenyiIO n (P p) = go [1..n] p empty
-    where
-        go :: [Int] -> Float -> UGraph Int () -> IO (UGraph Int ())
-        go [] _ g = return g
-        go (v:vs) pv g = do
-            rnds <- randomRs (0.0, 1.0) <$> newStdGen
-            let vs' = zip rnds vs
-            go vs pv $! (foldl' (putV pv v) g vs')
-
-        putV :: Float -> Int -> UGraph Int () -> (Float, Int) -> UGraph Int ()
-        putV pv v g (p', v') | p' < pv = insertEdge (v <-> v') g | otherwise = g
-
-
-randomMatIO :: Int -> IO [[Int]]
-randomMatIO n = replicateM n randRow
-    where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
 
 -- | @O(n)@ Remove a vertex from a 'UGraph if present
 -- | Every 'Edge' incident to this vertex is also removed

@@ -18,6 +18,7 @@ library
   exposed-modules:     Data.Graph.Types
                      , Data.Graph.UGraph
                      , Data.Graph.DGraph
+                     , Data.Graph.Generation
                      , Data.Graph.Visualize
                      , Data.Graph.Connectivity
   build-depends:       base >= 4.7 && < 5
