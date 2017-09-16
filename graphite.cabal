@@ -20,7 +20,6 @@ library
                      , Data.Graph.DGraph
                      , Data.Graph.Generation
                      , Data.Graph.Visualize
-                     , Data.Graph.Reachability
                      , Data.Graph.Connectivity
   build-depends:       base >= 4.7 && < 5
                      , hashable
