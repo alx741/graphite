@@ -10,64 +10,6 @@ import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
 
--- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
-data Edge v e = Edge v v e
-    deriving (Show, Read, Ord)
-
--- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
-data Arc v e = Arc v v e
-    deriving (Show, Read, Ord)
-
--- | Each vertex maps to a 'Links' value so it can poit to other vertices
-type Links v e = HM.HashMap v e
-
--- | To 'Edge's are equal if they point to the same vertices, regardless of the
--- | direction
-instance (Eq v, Eq a) => Eq (Edge v a) where
-    (Edge v1 v2 a) == (Edge v1' v2' a') =
-        (a == a')
-        && (v1 == v1' && v2 == v2')
-        || (v1 == v2' && v2 == v1')
-
--- | To 'Arc's are equal if they point to the same vertices, and the directions
--- | is the same
-instance (Eq v, Eq a) => Eq (Arc v a) where
-    (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
-
--- | Weighted Edge attributes
--- | Useful for computing some algorithms on graphs
-class Weighted a where
-    weight :: a -> Double
-
--- | Labeled Edge attributes
--- | Useful for graph plotting
-class Labeled a where
-    label :: a -> String
-
-instance Weighted Int where
-    weight = fromIntegral
-
-instance Weighted Float where
-    weight = float2Double
-
-instance Weighted Double where
-    weight = id
-
-instance Labeled String where
-    label = id
-
-instance Weighted (Double, String) where
-    weight = fst
-
-instance Labeled (Double, String) where
-    label = snd
-
-instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
-    arbitrary = arbitraryEdge Edge
-
-instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
-    arbitrary = arbitraryEdge Arc
-
 class IsGraph g where
     -- | The Empty (order-zero) graph with no vertices and no edges
     empty :: (Hashable v) => g v e
@@ -138,13 +80,13 @@ class IsGraph g where
     -- | Get the adjacency matrix representation of a grah
     toAdjacencyMatrix :: g v e -> [[Int]]
 
+-- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
+data Edge v e = Edge v v e
+    deriving (Show, Read, Ord)
 
--- | Edges generator
-arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
- => (v -> v -> e -> edge)
- -> Gen edge
-arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
-    where vert = getPositive <$> arbitrary
+-- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
+data Arc v e = Arc v v e
+    deriving (Show, Read, Ord)
 
 -- | Construct an undirected 'Edge' between two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
@@ -161,6 +103,72 @@ toOrderedPair (Arc fromV toV _) = (fromV, toV)
 -- | Convert an 'Edge' to an unordered pair discarding its attribute
 toUnorderedPair :: Edge v a -> (v, v)
 toUnorderedPair (Edge v1 v2 _) = (v1, v2)
+
+-- | Weighted Edge attributes
+-- | Useful for computing some algorithms on graphs
+class Weighted a where
+    weight :: a -> Double
+
+-- | Labeled Edge attributes
+-- | Useful for graph plotting
+class Labeled a where
+    label :: a -> String
+
+instance Weighted Int where
+    weight = fromIntegral
+
+instance Weighted Float where
+    weight = float2Double
+
+instance Weighted Double where
+    weight = id
+
+instance Labeled String where
+    label = id
+
+instance Weighted (Double, String) where
+    weight = fst
+
+instance Labeled (Double, String) where
+    label = snd
+
+instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
+    arbitrary = arbitraryEdge Edge
+
+instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
+    arbitrary = arbitraryEdge Arc
+
+-- | To 'Edge's are equal if they point to the same vertices, regardless of the
+-- | direction
+instance (Eq v, Eq a) => Eq (Edge v a) where
+    (Edge v1 v2 a) == (Edge v1' v2' a') =
+        (a == a')
+        && (v1 == v1' && v2 == v2')
+        || (v1 == v2' && v2 == v1')
+
+-- | To 'Arc's are equal if they point to the same vertices, and the directions
+-- | is the same
+instance (Eq v, Eq a) => Eq (Arc v a) where
+    (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
+
+-- | Edges generator
+arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
+ => (v -> v -> e -> edge)
+ -> Gen edge
+arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
+    where vert = getPositive <$> arbitrary
+
+
+
+
+
+
+-- ###########
+-- ## Internal
+-- ###########
+
+-- | Each vertex maps to a 'Links' value so it can poit to other vertices
+type Links v e = HM.HashMap v e
 
 -- | Insert a link directed to *v* with attribute *a*
 -- | If the connnection already exists, the attribute is replaced
