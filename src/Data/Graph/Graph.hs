@@ -5,7 +5,7 @@
 module Data.Graph.Graph where
 
 import Control.Monad (replicateM)
-import Data.List     (reverse, sort, foldl')
+import Data.List     (foldl', reverse, sort)
 import Data.Maybe    (fromMaybe)
 import System.Random
 
@@ -23,10 +23,29 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (Graph v e) where
     arbitrary = insertEdges <$> arbitrary <*> pure empty
 
--- | Generate a random 'Graph' of @n@ vertices
-randomGraphIO :: Int -> IO (Graph Int ())
-randomGraphIO n = replicateM n randRow
-    >>= (\m -> return $ fromMaybe empty (fromAdjacencyMatrix m))
+-- | Probability value between 0 and 1
+newtype Probability = P Float deriving (Eq, Ord, Show)
+
+-- | Construct a 'Probability' value
+probability :: Float -> Probability
+probability v | v >= 1 = P 1 | v <= 0 = P 0 | otherwise = P v
+
+erdosRenyiIO :: Int -> Probability -> IO (Graph Int ())
+erdosRenyiIO n (P p) = go [1..n] p empty
+    where
+        go :: [Int] -> Float -> Graph Int () -> IO (Graph Int ())
+        go [] _ g = return g
+        go (v:vs) p g = do
+            rnds <- newStdGen >>= return . randomRs (0.0, 1.0)
+            let vs' = zip rnds vs
+            go vs p $! (foldl' (putV p v) g vs')
+
+        putV :: Float -> Int -> Graph Int () -> (Float, Int) -> Graph Int ()
+        putV p v g (p', v') | p' < p = insertEdge (v <-> v') g | otherwise = g
+
+
+randomMatIO :: Int -> IO [[Int]]
+randomMatIO n = replicateM n randRow
     where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
 
 -- | The Empty (order-zero) 'Graph' with no vertices and no edges
@@ -62,7 +81,7 @@ insertEdge (Edge v1 v2 edgeAttr) g = Graph $ link v2 v1 $ link v1 v2 g'
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
 -- | Same rules as 'insertEdge' are applied
 insertEdges :: (Hashable v, Eq v) => [Edge v e] -> Graph v e -> Graph v e
-insertEdges as g = foldl' (flip insertEdge) g as
+insertEdges es g = foldl' (flip insertEdge) g es
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
 -- | The involved vertices are left untouched
@@ -136,6 +155,10 @@ containsEdge' graph@(Graph g) (v1, v2) =
 incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
 incidentEdges g v = filter (\(Edge v1 v2 _) -> v == v1 || v == v2) $ edges g
 
+-- | Retrieve the adjacent vertices of a vertex
+adjacentVertices :: (Hashable v, Eq v) => Graph v e -> v -> [v]
+adjacentVertices (Graph g) v = HM.keys $ getLinks v g
+
 -- | Degree of a vertex
 -- | The total number incident 'Edge's of a vertex
 vertexDegree :: (Hashable v, Eq v) => Graph v e -> v -> Int
@@ -182,7 +205,7 @@ isomorphism = undefined
 fromAdjacencyMatrix :: [[Int]] -> Maybe (Graph Int ())
 fromAdjacencyMatrix m
     | length m /= length (head m) = Nothing
-    | otherwise = Just $ insertEdges (foldl genEdges [] labeledM) empty
+    | otherwise = Just $ insertEdges (foldl' genEdges [] labeledM) empty
         where
             labeledM :: [(Int, [(Int, Int)])]
             labeledM = zip [1..] $ fmap (zip [1..]) m
@@ -221,5 +244,9 @@ isGraphicalSequence = even . length . filter odd . unDegreeSequence
 -- | Get the corresponding 'Graph' of a 'DegreeSequence'
 -- | If the 'DegreeSequence' is not graphical (see 'isGraphicalSequence') the
 -- | result is Nothing
-fromGraphicalSequence :: DegreeSequence  -> Maybe (Graph Int ())
+fromGraphicalSequence :: DegreeSequence -> Maybe (Graph Int ())
 fromGraphicalSequence = undefined
+
+rotate :: [a] -> [a]
+rotate l = (last l) : l' ++ [head l]
+    where l' = (tail . init) l
