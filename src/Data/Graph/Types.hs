@@ -82,6 +82,16 @@ class IsGraph g where
     vertices :: g v e -> [v]
     -- | Insert a vertex into a graph
     -- | If the graph already contains the vertex leave the graph untouched
+    -- | Tell if a vertex exists in the graph
+    containsVertex :: (Hashable v, Eq v) => g v e -> v -> Bool
+    -- | Retrieve the adjacent vertices of a vertex
+    adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
+    -- | Total number of incident edges of a vertex
+    vertexDegree :: (Hashable v, Eq v) => g v e -> v -> Int
+    -- | Degrees of a all the vertices in a graph
+    degrees :: (Hashable v, Eq v) => g v e -> [Int]
+    degrees g = vertexDegree g <$> vertices g
+    -- | Insert a vertex in a graph
     insertVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
     -- | Insert a many vertices into a graph
     -- | New vertices are inserted and already contained vertices are left
@@ -90,6 +100,8 @@ class IsGraph g where
 
     -- | Retrieve the edges of a graph as pairs
     edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
+    containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool
+    incidentEdgePairs :: (Hashable v, Eq v) => g v e -> v -> [(v, v)]
     insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
     removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
     removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e

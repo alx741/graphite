@@ -24,10 +24,15 @@ instance IsGraph Graph where
     size = length . edges
 
     vertices (Graph g) = HM.keys g
+    containsVertex (Graph g) = flip HM.member g
+    adjacentVertices (Graph g) v = HM.keys $ getLinks v g
+    vertexDegree (Graph g) v = length $ HM.keys $ getLinks v g
     insertVertex v (Graph g) = Graph $ hashMapInsert v HM.empty g
     insertVertices vs g = foldl' (flip insertVertex) g vs
 
     edgePairs = edges'
+    containsEdgePair = containsEdge'
+    incidentEdgePairs g v = fmap toUnorderedPair $ incidentEdges g v
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
     removeEdgePairAndVertices = removeEdgeAndVertices'
@@ -123,10 +128,6 @@ edges (Graph g) = linksToEdges $ zip vs links
 edges' :: (Hashable v, Eq v) => Graph v e -> [(v, v)]
 edges' g = toUnorderedPair <$> edges g
 
--- | @O(log n)@ Tell if a vertex exists in the graph
-containsVertex :: (Hashable v, Eq v) => Graph v e -> v -> Bool
-containsVertex (Graph g) = flip HM.member g
-
 -- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => Graph v e -> Edge v e -> Bool
 containsEdge g = containsEdge' g . toUnorderedPair
@@ -137,22 +138,9 @@ containsEdge' graph@(Graph g) (v1, v2) =
     containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
--- | Retrieve the adjacent vertices of a vertex
-adjacentVertices :: (Hashable v, Eq v) => Graph v e -> v -> [v]
-adjacentVertices (Graph g) v = HM.keys $ getLinks v g
-
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
 incidentEdges (Graph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
-
--- | Degree of a vertex
--- | The total number incident 'Edge's of a vertex
-vertexDegree :: (Hashable v, Eq v) => Graph v e -> v -> Int
-vertexDegree (Graph g) v = length $ HM.keys $ getLinks v g
-
--- | Degrees of a all the vertices in a 'Graph'
-degrees :: (Hashable v, Eq v) => Graph v e -> [Int]
-degrees g = vertexDegree g <$> vertices g
 
 -- | Maximum degree of a 'Graph'
 maxDegree :: (Hashable v, Eq v) => Graph v e -> Int
