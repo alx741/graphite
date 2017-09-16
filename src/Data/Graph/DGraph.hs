@@ -20,11 +20,11 @@ type DegreeSequence = [(Int, Int)]
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
-    arbitrary = insertArcs <$> arbitrary <*> pure empty
+    arbitrary = insertArcs <$> arbitrary <*> pure empty'
 
 -- | The Empty (order-zero) 'DGraph' with no vertices and no arcs
-empty :: (Hashable v) => DGraph v e
-empty = DGraph HM.empty
+empty' :: (Hashable v) => DGraph v e
+empty' = DGraph HM.empty
 
 -- | @O(log n)@ Insert a vertex into a 'DGraph'
 -- | If the graph already contains the vertex leave the graph untouched

@@ -48,10 +48,6 @@ randomMatIO :: Int -> IO [[Int]]
 randomMatIO n = replicateM n randRow
     where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
 
--- | The Empty (order-zero) 'Graph' with no vertices and no edges
-empty :: (Hashable v) => Graph v e
-empty = Graph HM.empty
-
 -- | @O(log n)@ Insert a vertex into a 'Graph'
 -- | If the graph already contains the vertex leave the graph untouched
 insertVertex :: (Hashable v, Eq v) => v -> Graph v e -> Graph v e
@@ -78,6 +74,11 @@ insertEdge (Edge v1 v2 edgeAttr) g = Graph $ link v2 v1 $ link v1 v2 g'
         g' = unGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
+instance IsGraph Graph where
+    empty = Graph HM.empty
+    insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
+    removeEdgePair = removeEdge'
+
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'Graph'
 -- | Same rules as 'insertEdge' are applied
 insertEdges :: (Hashable v, Eq v) => [Edge v e] -> Graph v e -> Graph v e
@@ -86,7 +87,7 @@ insertEdges es g = foldl' (flip insertEdge) g es
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
 -- | The involved vertices are left untouched
 removeEdge :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
-removeEdge = removeEdge' . toUnorderedPair
+removeEdge = removeEdgePair . toUnorderedPair
 
 -- | Same as 'removeEdge' but the edge is an unordered pair
 removeEdge' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e

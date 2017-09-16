@@ -68,6 +68,12 @@ instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
 instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
     arbitrary = arbitraryEdge Arc
 
+class IsGraph g where
+    -- | The Empty (order-zero) graph with no vertices and no edges
+    empty :: (Hashable v) => g v e
+    insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
+    removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
  => (v -> v -> e -> edge)
