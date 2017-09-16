@@ -23,7 +23,6 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
 instance Graph UGraph where
     empty = UGraph HM.empty
     order (UGraph g) = HM.size g
-    size = length . edges
     vertices (UGraph g) = HM.keys g
     edgePairs g = toPair <$> edges g
 

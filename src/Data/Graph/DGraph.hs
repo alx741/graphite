@@ -18,7 +18,6 @@ newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
 instance Graph DGraph where
     empty = DGraph HM.empty
     order (DGraph g) = HM.size g
-    size = length . arcs
     vertices (DGraph g) = HM.keys g
     edgePairs = arcs'
 

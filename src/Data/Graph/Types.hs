@@ -21,6 +21,7 @@ class Graph g where
     -- | Retrieve the size of a graph
     -- | The @size@ of a graph is its number of edges
     size :: (Hashable v, Eq v) => g v e -> Int
+    size = length . edgePairs
 
     -- | Retrieve the vertices of a graph
     vertices :: g v e -> [v]
@@ -48,6 +49,19 @@ class Graph g where
     -- | Minimum degree of a graph
     minDegree :: (Hashable v, Eq v) => g v e -> Int
     minDegree = minimum . degrees
+
+    -- | Average degree of a graph
+    avgDegree :: (Hashable v, Eq v) => g v e -> Double
+    avgDegree g = fromIntegral (2 * size g) / (fromIntegral $ order g)
+
+    -- | Density of a graph
+    -- | The ratio of the number of existing edges in the graph to the number of
+    -- | posible edges
+    density :: (Hashable v, Eq v) => g v e -> Double
+    density g = (2 * (e - n + 1)) / (n * (n - 3) + 2)
+        where
+            n = fromIntegral $ order g
+            e = fromIntegral $ size g
 
     -- | Insert a vertex into a graph
     -- | If the graph already contains the vertex leave the graph untouched
