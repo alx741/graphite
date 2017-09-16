@@ -71,40 +71,73 @@ instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
 class IsGraph g where
     -- | The Empty (order-zero) graph with no vertices and no edges
     empty :: (Hashable v) => g v e
+
     -- | Retrieve the order of a graph
     -- | The @order@ of a graph is its number of vertices
     order :: g v e -> Int
+
     -- | Retrieve the size of a graph
     -- | The @size@ of a graph is its number of edges
     size :: (Hashable v, Eq v) => g v e -> Int
 
     -- | Retrieve the vertices of a graph
     vertices :: g v e -> [v]
-    -- | Insert a vertex into a graph
-    -- | If the graph already contains the vertex leave the graph untouched
+
+    -- | Retrieve the edges of a graph as pairs
+    edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
+
     -- | Tell if a vertex exists in the graph
     containsVertex :: (Hashable v, Eq v) => g v e -> v -> Bool
+
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
+
     -- | Total number of incident edges of a vertex
     vertexDegree :: (Hashable v, Eq v) => g v e -> v -> Int
+
     -- | Degrees of a all the vertices in a graph
     degrees :: (Hashable v, Eq v) => g v e -> [Int]
     degrees g = vertexDegree g <$> vertices g
-    -- | Insert a vertex in a graph
+
+    -- | Maximum degree of a graph
+    maxDegree :: (Hashable v, Eq v) => g v e -> Int
+    maxDegree = maximum . degrees
+
+    -- | Minimum degree of a graph
+    minDegree :: (Hashable v, Eq v) => g v e -> Int
+    minDegree = minimum . degrees
+
+    -- | Insert a vertex into a graph
+    -- | If the graph already contains the vertex leave the graph untouched
     insertVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
+
     -- | Insert a many vertices into a graph
     -- | New vertices are inserted and already contained vertices are left
     -- | untouched
     insertVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
 
-    -- | Retrieve the edges of a graph as pairs
-    edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
     containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool
     incidentEdgePairs :: (Hashable v, Eq v) => g v e -> v -> [(v, v)]
     insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
     removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
     removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+
+    -- | Tell if a graph is simple
+    -- | A graph is @simple@ if it has no multiple edges nor loops
+    isSimple :: (Hashable v, Eq v) => g v e -> Bool
+
+    -- | Tell if a graph is regular
+    -- | A graph is @regular@ when all of its vertices have the same
+    -- | number of adjacent vertices
+    isRegular :: g v e -> Bool
+
+    -- | Generate a graph of Int vertices from an adjacency
+    -- | square matrix
+    fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())
+
+    -- | Get the adjacency matrix representation of a grah
+    toAdjacencyMatrix :: g v e -> [[Int]]
+
 
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)

@@ -19,15 +19,29 @@ instance IsGraph DGraph where
     empty = DGraph HM.empty
     order (DGraph g) = HM.size g
     size = length . arcs
-
     vertices (DGraph g) = HM.keys g
+    edgePairs = arcs'
+
+    containsVertex (DGraph g) = flip HM.member g
+    adjacentVertices = undefined
+
+    -- | The total number of inbounding and outbounding 'Arc's of a vertex
+    vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
+
     insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
     insertVertices vs g = foldl' (flip insertVertex) g vs
 
-    edgePairs = arcs'
+    containsEdgePair = containsArc'
+    incidentEdgePairs g v = fmap toOrderedPair $ incidentArcs g v
     insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
+
+    isSimple = undefined
+    isRegular = undefined
+
+    fromAdjacencyMatrix = undefined
+    toAdjacencyMatrix = undefined
 
 -- | The Degree Sequence of a 'DGraph' is a list of pairs (Indegree, Outdegree)
 type DegreeSequence = [(Int, Int)]
@@ -92,10 +106,6 @@ arcs (DGraph g) = linksToArcs $ zip vs links
 arcs' :: (Hashable v, Eq v) => DGraph v e -> [(v, v)]
 arcs' g = toOrderedPair <$> arcs g
 
--- | @O(log n)@ Tell if a vertex exists in the graph
-containsVertex :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
-containsVertex (DGraph g) = flip HM.member g
-
 -- | @O(log n)@ Tell if a directed 'Arc' exists in the graph
 containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
 containsArc g = containsArc' g . toOrderedPair
@@ -119,10 +129,6 @@ outboundingArcs g v = filter (\(Arc fromV _ _) -> v == fromV) $ arcs g
 incidentArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 incidentArcs g v = inboundingArcs g v ++ outboundingArcs g v
 
--- | Retrieve the adjacent vertices of a vertex
-adjacentVertices :: DGraph v e -> v -> [v]
-adjacentVertices = undefined
-
 -- | Tell if a 'DGraph' is symmetric
 -- | All of its 'Arc's are bidirected
 isSymmetric :: DGraph v e -> Bool
@@ -139,11 +145,6 @@ isOriented = undefined
 -- | TODO: What if it has a loop?
 isIsolated :: DGraph v e -> Bool
 isIsolated = undefined
-
--- | Degree of a vertex
--- | The total number of inbounding and outbounding 'Arc's of a vertex
-vertexDegree :: DGraph v e -> v -> Int
-vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
 -- | Indegree of a vertex
 -- | The number of inbounding 'Arc's to a vertex

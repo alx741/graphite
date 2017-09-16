@@ -22,20 +22,40 @@ instance IsGraph Graph where
     empty = Graph HM.empty
     order (Graph g) = HM.size g
     size = length . edges
-
     vertices (Graph g) = HM.keys g
+    edgePairs g = toUnorderedPair <$> edges g
+
     containsVertex (Graph g) = flip HM.member g
     adjacentVertices (Graph g) v = HM.keys $ getLinks v g
     vertexDegree (Graph g) v = length $ HM.keys $ getLinks v g
     insertVertex v (Graph g) = Graph $ hashMapInsert v HM.empty g
     insertVertices vs g = foldl' (flip insertVertex) g vs
 
-    edgePairs = edges'
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toUnorderedPair $ incidentEdges g v
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
     removeEdgePairAndVertices = removeEdgeAndVertices'
+
+    isSimple g = foldl' go True $ vertices g
+        where go bool v = bool && (not $ HM.member v $ getLinks v $ unGraph g)
+
+    isRegular = undefined
+
+    fromAdjacencyMatrix m
+        | length m /= length (head m) = Nothing
+        | otherwise = Just $ insertEdges (foldl' genEdges [] labeledM) empty
+            where
+                labeledM :: [(Int, [(Int, Int)])]
+                labeledM = zip [1..] $ fmap (zip [1..]) m
+
+                genEdges :: [Edge Int ()] -> (Int, [(Int, Int)]) -> [Edge Int ()]
+                genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
+                    where connected = fst <$> filter (\(_, v) -> v /= 0) vs
+
+    toAdjacencyMatrix = undefined
+
+
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (Graph v e) where
@@ -123,11 +143,6 @@ edges (Graph g) = linksToEdges $ zip vs links
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
--- | Same as 'edges' but the edges are unordered pairs, and their attributes
--- | are discarded
-edges' :: (Hashable v, Eq v) => Graph v e -> [(v, v)]
-edges' g = toUnorderedPair <$> edges g
-
 -- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => Graph v e -> Edge v e -> Bool
 containsEdge g = containsEdge' g . toUnorderedPair
@@ -142,30 +157,10 @@ containsEdge' graph@(Graph g) (v1, v2) =
 incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
 incidentEdges (Graph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 
--- | Maximum degree of a 'Graph'
-maxDegree :: (Hashable v, Eq v) => Graph v e -> Int
-maxDegree = maximum . degrees
-
--- | Minimum degree of a 'Graph'
-minDegree :: (Hashable v, Eq v) => Graph v e -> Int
-minDegree = minimum . degrees
-
 -- | Tell if an 'Edge' forms a loop
 -- | An 'Edge' forms a loop with both of its ends point to the same vertex
 isLoop :: (Eq v) => Edge v e -> Bool
 isLoop (Edge v1 v2 _) = v1 == v2
-
--- | Tell if a 'Graph' is simple
--- | A 'Graph' is @simple@ if it has no multiple edges nor loops
-isSimple :: (Hashable v, Eq v) => Graph v e -> Bool
-isSimple g = foldl' go True $ vertices g
-    where go bool v = bool && (not $ HM.member v $ getLinks v $ unGraph g)
-
--- | Tell if a 'Graph' is regular
--- | An Undirected Graph is @regular@ when all of its vertices have the same
--- | number of adjacent vertices
-isRegular :: Graph v e -> Bool
-isRegular = undefined
 
 -- | Tell if two 'Graph's are isomorphic
 areIsomorphic :: Graph v e -> Graph v' e' -> Bool
@@ -173,25 +168,6 @@ areIsomorphic = undefined
 
 isomorphism :: Graph v e -> Graph v' e' -> (v -> v')
 isomorphism = undefined
-
-
--- | Generate a directed 'Graph' of Int vertices from an adjacency
--- | square matrix
-fromAdjacencyMatrix :: [[Int]] -> Maybe (Graph Int ())
-fromAdjacencyMatrix m
-    | length m /= length (head m) = Nothing
-    | otherwise = Just $ insertEdges (foldl' genEdges [] labeledM) empty
-        where
-            labeledM :: [(Int, [(Int, Int)])]
-            labeledM = zip [1..] $ fmap (zip [1..]) m
-
-            genEdges :: [Edge Int ()] -> (Int, [(Int, Int)]) -> [Edge Int ()]
-            genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
-                where connected = fst <$> filter (\(_, v) -> v /= 0) vs
-
--- | Get the adjacency matrix representation of a directed 'Graph'
-toAdjacencyMatrix :: Graph v e -> [[Int]]
-toAdjacencyMatrix = undefined
 
 
 -- | The Degree Sequence of a simple 'Graph' is a list of degrees
