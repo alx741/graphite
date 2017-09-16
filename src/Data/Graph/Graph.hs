@@ -30,6 +30,7 @@ newtype Probability = P Float deriving (Eq, Ord, Show)
 probability :: Float -> Probability
 probability v | v >= 1 = P 1 | v <= 0 = P 0 | otherwise = P v
 
+-- | Generate a random 'Graph' of the Erdős–Rényi G(n, p) model
 erdosRenyiIO :: Int -> Probability -> IO (Graph Int ())
 erdosRenyiIO n (P p) = go [1..n] p empty
     where
