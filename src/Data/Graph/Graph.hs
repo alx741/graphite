@@ -6,7 +6,6 @@ module Data.Graph.Graph where
 
 import Control.Monad (replicateM)
 import Data.List     (foldl', reverse, sort)
-import Data.Maybe    (fromMaybe)
 import System.Random
 
 import           Data.Hashable
@@ -36,13 +35,13 @@ erdosRenyiIO n (P p) = go [1..n] p empty
     where
         go :: [Int] -> Float -> Graph Int () -> IO (Graph Int ())
         go [] _ g = return g
-        go (v:vs) p g = do
-            rnds <- newStdGen >>= return . randomRs (0.0, 1.0)
+        go (v:vs) pv g = do
+            rnds <- randomRs (0.0, 1.0) <$> newStdGen
             let vs' = zip rnds vs
-            go vs p $! (foldl' (putV p v) g vs')
+            go vs pv $! (foldl' (putV pv v) g vs')
 
         putV :: Float -> Int -> Graph Int () -> (Float, Int) -> Graph Int ()
-        putV p v g (p', v') | p' < p = insertEdge (v <-> v') g | otherwise = g
+        putV pv v g (p', v') | p' < pv = insertEdge (v <-> v') g | otherwise = g
 
 
 randomMatIO :: Int -> IO [[Int]]
@@ -152,13 +151,13 @@ containsEdge' graph@(Graph g) (v1, v2) =
     containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
--- | Retrieve the incident 'Edge's of a Vertex
-incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
-incidentEdges g v = filter (\(Edge v1 v2 _) -> v == v1 || v == v2) $ edges g
-
 -- | Retrieve the adjacent vertices of a vertex
 adjacentVertices :: (Hashable v, Eq v) => Graph v e -> v -> [v]
 adjacentVertices (Graph g) v = HM.keys $ getLinks v g
+
+-- | Retrieve the incident 'Edge's of a Vertex
+incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
+incidentEdges (Graph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 
 -- | Degree of a vertex
 -- | The total number incident 'Edge's of a vertex
