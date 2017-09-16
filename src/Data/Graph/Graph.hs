@@ -23,7 +23,7 @@ instance IsGraph Graph where
     order (Graph g) = HM.size g
     size = length . edges
     vertices (Graph g) = HM.keys g
-    edgePairs g = toUnorderedPair <$> edges g
+    edgePairs g = toPair <$> edges g
 
     containsVertex (Graph g) = flip HM.member g
     adjacentVertices (Graph g) v = HM.keys $ getLinks v g
@@ -32,7 +32,7 @@ instance IsGraph Graph where
     insertVertices vs g = foldl' (flip insertVertex) g vs
 
     containsEdgePair = containsEdge'
-    incidentEdgePairs g v = fmap toUnorderedPair $ incidentEdges g v
+    incidentEdgePairs g v = fmap toPair $ incidentEdges g v
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
     removeEdgePairAndVertices = removeEdgeAndVertices'
@@ -111,7 +111,7 @@ insertEdges es g = foldl' (flip insertEdge) g es
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
 -- | The involved vertices are left untouched
 removeEdge :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
-removeEdge = removeEdgePair . toUnorderedPair
+removeEdge = removeEdgePair . toPair
 
 -- | Same as 'removeEdge' but the edge is an unordered pair
 removeEdge' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
@@ -127,7 +127,7 @@ removeEdge' (v1, v2) graph@(Graph g)
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'Graph' if present
 -- | The involved vertices are also removed
 removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> Graph v e -> Graph v e
-removeEdgeAndVertices = removeEdgePairAndVertices . toUnorderedPair
+removeEdgeAndVertices = removeEdgePairAndVertices . toPair
 
 -- | Same as 'removeEdgeAndVertices' but the edge is an unordered pair
 removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> Graph v e -> Graph v e
@@ -145,7 +145,7 @@ edges (Graph g) = linksToEdges $ zip vs links
 
 -- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => Graph v e -> Edge v e -> Bool
-containsEdge g = containsEdge' g . toUnorderedPair
+containsEdge g = containsEdge' g . toPair
 
 -- | Same as 'containsEdge' but the edge is an unordered pair
 containsEdge' :: (Hashable v, Eq v) => Graph v e -> (v, v) -> Bool
@@ -156,11 +156,6 @@ containsEdge' graph@(Graph g) (v1, v2) =
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => Graph v e -> v -> [Edge v e]
 incidentEdges (Graph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
-
--- | Tell if an 'Edge' forms a loop
--- | An 'Edge' forms a loop with both of its ends point to the same vertex
-isLoop :: (Eq v) => Edge v e -> Bool
-isLoop (Edge v1 v2 _) = v1 == v2
 
 -- | Tell if two 'Graph's are isomorphic
 areIsomorphic :: Graph v e -> Graph v' e' -> Bool

@@ -32,7 +32,7 @@ instance IsGraph DGraph where
     insertVertices vs g = foldl' (flip insertVertex) g vs
 
     containsEdgePair = containsArc'
-    incidentEdgePairs g v = fmap toOrderedPair $ incidentArcs g v
+    incidentEdgePairs g v = fmap toPair $ incidentArcs g v
     insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
@@ -73,7 +73,7 @@ insertArcs as g = foldl' (flip insertArc) g as
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are left untouched
 removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-removeArc = removeArc' . toOrderedPair
+removeArc = removeArc' . toPair
 
 -- | Same as 'removeArc' but the arc is an ordered pair
 removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
@@ -85,7 +85,7 @@ removeArc' (v1, v2) (DGraph g) = case HM.lookup v1 g of
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
 removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-removeArcAndVertices = removeArcAndVertices' . toOrderedPair
+removeArcAndVertices = removeArcAndVertices' . toPair
 
 -- | Same as 'removeArcAndVertices' but the arc is an ordered pair
 removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
@@ -104,11 +104,11 @@ arcs (DGraph g) = linksToArcs $ zip vs links
 -- | Same as 'arcs' but the arcs are ordered pairs, and their attributes are
 -- | discarded
 arcs' :: (Hashable v, Eq v) => DGraph v e -> [(v, v)]
-arcs' g = toOrderedPair <$> arcs g
+arcs' g = toPair <$> arcs g
 
 -- | @O(log n)@ Tell if a directed 'Arc' exists in the graph
 containsArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> Bool
-containsArc g = containsArc' g . toOrderedPair
+containsArc g = containsArc' g . toPair
 
 -- | Same as 'containsArc' but the arc is an ordered pair
 containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool

@@ -96,13 +96,21 @@ data Arc v e = Arc v v e
 (-->) :: (Hashable v) => v -> v -> Arc v ()
 (-->) v1 v2 = Arc v1 v2 ()
 
--- | Convert an 'Arc' to an ordered pair discarding its attribute
-toOrderedPair :: Arc v a -> (v, v)
-toOrderedPair (Arc fromV toV _) = (fromV, toV)
+class IsEdge e where
+    -- | Convert an edge to a pair discargind its attribute
+    toPair :: e v a -> (v, v)
 
--- | Convert an 'Edge' to an unordered pair discarding its attribute
-toUnorderedPair :: Edge v a -> (v, v)
-toUnorderedPair (Edge v1 v2 _) = (v1, v2)
+    -- | Tell if an edge is a loop
+    -- | An edge forms a @loop@ if both of its ends point to the same vertex
+    isLoop :: (Eq v) => e v a -> Bool
+
+instance IsEdge Edge where
+    toPair = toUnorderedPair
+    isLoop (Edge v1 v2 _) = v1 == v2
+
+instance IsEdge Arc where
+    toPair = toOrderedPair
+    isLoop (Arc v1 v2 _) = v1 == v2
 
 -- | Weighted Edge attributes
 -- | Useful for computing some algorithms on graphs
