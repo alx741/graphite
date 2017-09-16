@@ -184,7 +184,8 @@ isLoop (Edge v1 v2 _) = v1 == v2
 -- | Tell if a 'Graph' is simple
 -- | A 'Graph' is @simple@ if it has no multiple edges nor loops
 isSimple :: (Hashable v, Eq v) => Graph v e -> Bool
-isSimple = not . any isLoop . edges
+isSimple g = foldl' go True $ vertices g
+    where go bool v = bool && (not $ HM.member v $ getLinks v $ unGraph g)
 
 -- | Tell if a 'Graph' is regular
 -- | An Undirected Graph is @regular@ when all of its vertices have the same
@@ -246,7 +247,3 @@ isGraphicalSequence = even . length . filter odd . unDegreeSequence
 -- | result is Nothing
 fromGraphicalSequence :: DegreeSequence -> Maybe (Graph Int ())
 fromGraphicalSequence = undefined
-
-rotate :: [a] -> [a]
-rotate l = (last l) : l' ++ [head l]
-    where l' = (tail . init) l
