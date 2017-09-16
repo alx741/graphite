@@ -10,7 +10,7 @@ import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
 
-class IsGraph g where
+class Graph g where
     -- | The Empty (order-zero) graph with no vertices and no edges
     empty :: (Hashable v) => g v e
 

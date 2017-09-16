@@ -15,7 +15,7 @@ import Data.Graph.Types
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
-instance IsGraph DGraph where
+instance Graph DGraph where
     empty = DGraph HM.empty
     order (DGraph g) = HM.size g
     size = length . arcs

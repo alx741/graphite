@@ -18,7 +18,7 @@ import Data.Graph.Types
 newtype UGraph v e = UGraph { unUGraph :: HM.HashMap v (Links v e) }
     deriving (Eq, Show)
 
-instance IsGraph UGraph where
+instance Graph UGraph where
     empty = UGraph HM.empty
     order (UGraph g) = HM.size g
     size = length . edges
