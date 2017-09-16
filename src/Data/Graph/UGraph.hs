@@ -58,14 +58,14 @@ instance Graph UGraph where
 
 
 
--- | @O(n)@ Remove a vertex from a 'UGraph if present
+-- | @O(n)@ Remove a vertex from a 'UGraph' if present
 -- | Every 'Edge' incident to this vertex is also removed
 removeVertex :: (Hashable v, Eq v) => v -> UGraph v e -> UGraph v e
 removeVertex v g = UGraph
     $ (\(UGraph g') -> HM.delete v g')
     $ foldl' (flip removeEdge) g $ incidentEdges g v
 
--- | @O(log n)@ Insert an undirected 'Edge' into a 'UGraph
+-- | @O(log n)@ Insert an undirected 'Edge' into a 'UGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Edge, its attribute is updated
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
@@ -74,12 +74,12 @@ insertEdge (Edge v1 v2 edgeAttr) g = UGraph $ link v2 v1 $ link v1 v2 g'
         g' = unUGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
--- | @O(m*log n)@ Insert many directed 'Edge's into a 'UGraph
+-- | @O(m*log n)@ Insert many directed 'Edge's into a 'UGraph'
 -- | Same rules as 'insertEdge' are applied
 insertEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
 insertEdges es g = foldl' (flip insertEdge) g es
 
--- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph if present
+-- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are left untouched
 removeEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 removeEdge = removeEdgePair . toPair
@@ -95,7 +95,7 @@ removeEdge' (v1, v2) graph@(UGraph g)
         v2Links = HM.delete v1 $ getLinks v2 g
         update = HM.adjust . const
 
--- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph if present
+-- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are also removed
 removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 removeEdgeAndVertices = removeEdgePairAndVertices . toPair
@@ -105,7 +105,7 @@ removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v
 removeEdgeAndVertices' (v1, v2) g =
     removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
 
--- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph
+-- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]
 edges (UGraph g) = linksToEdges $ zip vs links
     where
@@ -128,7 +128,7 @@ containsEdge' graph@(UGraph g) (v1, v2) =
 incidentEdges :: (Hashable v, Eq v) => UGraph v e -> v -> [Edge v e]
 incidentEdges (UGraph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 
--- | Tell if two 'UGraph are isomorphic
+-- | Tell if two 'UGraph' are isomorphic
 areIsomorphic :: UGraph v e -> UGraph v' e' -> Bool
 areIsomorphic = undefined
 
@@ -136,7 +136,7 @@ isomorphism :: UGraph v e -> UGraph v' e' -> (v -> v')
 isomorphism = undefined
 
 
--- | The Degree Sequence of a simple 'UGraph is a list of degrees
+-- | The Degree Sequence of a simple 'UGraph' is a list of degrees
 newtype DegreeSequence = DegreeSequence { unDegreeSequence :: [Int]}
     deriving (Eq, Ord, Show)
 
@@ -145,7 +145,7 @@ newtype DegreeSequence = DegreeSequence { unDegreeSequence :: [Int]}
 degreeSequence :: [Int] -> DegreeSequence
 degreeSequence = DegreeSequence . reverse . sort . filter (>0)
 
--- | Get the 'DegreeSequence' of a simple 'UGraph
+-- | Get the 'DegreeSequence' of a simple 'UGraph'
 -- | If the graph is not @simple@ (see 'isSimple') the result is Nothing
 getDegreeSequence :: (Hashable v, Eq v) => UGraph v e -> Maybe DegreeSequence
 getDegreeSequence g
@@ -153,12 +153,12 @@ getDegreeSequence g
     | otherwise = Just $ degreeSequence $ degrees g
 
 -- | Tell if a 'DegreeSequence' is a Graphical Sequence
--- | A Degree Sequence is a @Graphical Sequence@ if a corresponding 'UGraph for
+-- | A Degree Sequence is a @Graphical Sequence@ if a corresponding 'UGraph' for
 -- | it exists
 isGraphicalSequence :: DegreeSequence -> Bool
 isGraphicalSequence = even . length . filter odd . unDegreeSequence
 
--- | Get the corresponding 'UGraph of a 'DegreeSequence'
+-- | Get the corresponding 'UGraph' of a 'DegreeSequence'
 -- | If the 'DegreeSequence' is not graphical (see 'isGraphicalSequence') the
 -- | result is Nothing
 fromGraphicalSequence :: DegreeSequence -> Maybe (UGraph Int ())

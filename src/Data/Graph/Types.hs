@@ -26,7 +26,7 @@ class Graph g where
     -- | Retrieve the vertices of a graph
     vertices :: g v e -> [v]
 
-    -- | Retrieve the edges of a graph as pairs
+    -- | Retrieve the edges of a graph
     edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
 
     -- | Tell if a vertex exists in the graph
@@ -72,10 +72,23 @@ class Graph g where
     -- | untouched
     insertVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
 
+    -- | Tell if an edge exists in the graph
     containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool
+
+    -- | Retrieve the incident edges of a vertex
     incidentEdgePairs :: (Hashable v, Eq v) => g v e -> v -> [(v, v)]
+
+    -- | Insert an edge into a graph
+    -- | The involved vertices are inserted if don't exist. If the graph already
+    -- | contains the edge, its attribute is updated
     insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
+
+    -- | Remove the edge from a graph present
+    -- | The involved vertices are left untouched
     removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+
+    -- | Remove the edge from a graph if present
+    -- | The involved vertices are also removed
     removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
 
     -- | Tell if a graph is simple
