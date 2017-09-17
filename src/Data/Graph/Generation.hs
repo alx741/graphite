@@ -22,13 +22,17 @@ erdosRenyiIO n (P p) = go [1..n] p empty
         go :: Graph g => [Int] -> Float -> g Int () -> IO (g Int ())
         go [] _ g = return g
         go (v:vs) pv g = do
-            rnds <- randomRs (0.0, 1.0) <$> newStdGen
+            rnds <- replicateM (length vs + 1) $ randomRIO (0.0, 1.0)
+            flipDir <- randomRIO (True, False)
             let vs' = zip rnds vs
             let g' = insertVertex v g
-            go vs pv $! (foldl' (putV pv v) g' vs')
+            go vs pv $! (foldl' (putV pv v flipDir) g' vs')
 
-        putV :: Graph g => Float -> Int -> g Int () -> (Float, Int) -> g Int ()
-        putV pv v g (p', v') | p' < pv = insertEdgePair (v, v') g | otherwise = g
+        putV :: Graph g => Float -> Int -> Bool -> g Int () -> (Float, Int) -> g Int ()
+        putV pv v flipDir g (p', v')
+            | p' < pv = insertEdgePair pair g
+            | otherwise = g
+                where pair = if flipDir then (v', v) else (v, v')
 
 -- | Generate a random square binary matrix
 -- | Useful for use with 'fromAdjacencyMatrix'
