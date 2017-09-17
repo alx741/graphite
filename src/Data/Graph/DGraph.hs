@@ -25,6 +25,7 @@ instance Graph DGraph where
     adjacentVertices g v = filter
         (\v' -> containsArc' g (v, v') || containsArc' g (v', v))
         (vertices g)
+    directlyReachableVertices (DGraph g) v = HM.keys $ getLinks v g
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v

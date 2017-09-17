@@ -1,9 +1,12 @@
 -- | For Connectivity analisis purposes a 'DGraph' can be converted into a
 -- | 'UGraph' using 'toUndirected'
 
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Data.Graph.Connectivity where
 
-import Data.Hashable
+import           Data.Hashable
+import qualified Data.Set      as S
 
 import Data.Graph.DGraph
 import Data.Graph.Types
@@ -11,19 +14,24 @@ import Data.Graph.UGraph
 
 -- | Tell if two vertices of a graph are connected
 -- | Two vertices are @connected@ if it exists a path between them
-areConnected :: Graph g => g v e -> v -> v -> Bool
-areConnected = undefined
-
-someG :: UGraph Int ()
-someG = insertEdges [(1 <-> 2), (2 <-> 3), (3 <-> 4), (5 <-> 6)] empty
-
--- | All the vertices that are directly reachable from a particular vertex
--- | A vertex is @directly reachable@ to other if there is a path of exaclty one
--- | edge between them
-directlyReachableVertices :: (Graph g, Hashable v, Eq v) => g v e -> v -> [v]
-directlyReachableVertices g v = filter
-    (\v' -> containsEdgePair g (v, v'))
-    (adjacentVertices g v)
+areConnected :: forall g v e . (Graph g, Hashable v, Eq v, Ord v)
+ => g v e
+ -> v
+ -> v
+ -> Bool
+areConnected g fromV toV
+    | fromV == toV = True
+    | otherwise = search (directlyReachableVertices g fromV) S.empty toV
+    where
+        search :: [v] -> S.Set v -> v -> Bool
+        search [] _ _ = False
+        search (v:vs) banned v'
+            | v `S.member` banned = search vs banned v'
+            | v == v' = True
+            | otherwise =
+                (search (directlyReachableVertices g v) banned' v')
+                || (search vs banned' v')
+            where banned' = v `S.insert` banned
 
 -- | Tell if two vertices of a 'UGraph' are disconnected
 -- | Two vertices are @disconnected@ if it doesn't exist a path between them
