@@ -22,7 +22,9 @@ instance Graph DGraph where
     edgePairs = arcs'
 
     containsVertex (DGraph g) = flip HM.member g
-    adjacentVertices = undefined
+    adjacentVertices g v = filter
+        (\v' -> containsArc' g (v, v') || containsArc' g (v', v))
+        (vertices g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
