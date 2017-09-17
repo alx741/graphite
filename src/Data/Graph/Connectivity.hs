@@ -29,21 +29,16 @@ areConnected g fromV toV
             | v `S.member` banned = search vs banned v'
             | v == v' = True
             | otherwise =
-                (search (directlyReachableVertices g v) banned' v')
-                || (search vs banned' v')
+                search (directlyReachableVertices g v) banned' v'
+                || search vs banned' v'
             where banned' = v `S.insert` banned
 
 -- | Tell if two vertices of a 'UGraph' are disconnected
 -- | Two vertices are @disconnected@ if it doesn't exist a path between them
-areDisconnected :: UGraph v e -> v -> v -> Bool
-areDisconnected = undefined
+areDisconnected :: (Graph g, Hashable v, Eq v, Ord v) => g v e -> v -> v -> Bool
+areDisconnected g fromV toV = not $ areConnected g fromV toV
 
--- | Retrieve all the unreachable vertices of a 'UGraph'
--- | The @unreachable vertices@ are those with no adjacent 'Edge's
-unreachableVertices :: UGraph v e -> [v]
-unreachableVertices = undefined
-
--- | Tell if a 'UGraph' is connected
+-- | Tell if a graph is connected
 -- | An Undirected Graph is @connected@ when there is a path between every pair
 -- | of vertices
 isConnected :: UGraph v e -> Bool
@@ -57,10 +52,15 @@ isDisconnected :: UGraph v e -> Bool
 isDisconnected = not . isConnected
 
 -- | Tell if a 'DGraph' is weakly connected
--- | A Directed Graph is @weakly connected@ if the equivalent undirected graph
+-- | A Directed Graph is @weakly connected@ if the underlying undirected graph
 -- | is @connected@
 isWeaklyConnected :: DGraph v e -> Bool
 isWeaklyConnected = undefined -- isConnected . toUndirected
+
+-- | Retrieve all the unreachable vertices of a 'UGraph'
+-- | The @unreachable vertices@ are those with no adjacent 'Edge's
+unreachableVertices :: UGraph v e -> [v]
+unreachableVertices = undefined
 
 -- TODO
 -- * connected component
@@ -77,3 +77,5 @@ isWeaklyConnected = undefined -- isConnected . toUndirected
 -- * super-connectivity
 -- * hyper-connectivity
 -- * Menger's theorem
+
+-- Robin's Theorem: a graph is orientable if it is connected and has no bridges
