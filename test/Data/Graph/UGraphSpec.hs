@@ -10,8 +10,8 @@ spec :: Spec
 spec = do
     describe "Undirected Graph (UGraph)" $ do
         it "Can tell if a vertex exists" $ property $ do
-            let g = insertVertex 1 empty :: UGraph Int ()
-            let g' = insertVertex 2 empty :: UGraph Int ()
+            let g = insertVertex empty 1 :: UGraph Int ()
+            let g' = insertVertex empty 2 :: UGraph Int ()
             containsVertex g 1 `shouldBe` True
             containsVertex g' 1 `shouldBe` False
 
@@ -27,12 +27,12 @@ spec = do
 
         it "Increments its order when a new vertex is inserted" $ property $
             \g v -> (not $ g `containsVertex` v)
-                ==> order g + 1 == order (insertVertex v (g :: UGraph Int ()))
+                ==> order g + 1 == order (insertVertex (g :: UGraph Int ()) v)
         it "Increments its size when a new edge is inserted" $ property $
             \g edge -> (not $ g `containsEdge` edge)
                 ==> size g + 1 == size (insertEdge edge (g :: UGraph Int ()))
 
         it "Is id when inserting and removing a new vertex" $ property $
             \g v -> (not $ g `containsVertex` v)
-                ==> ((removeVertex v . insertVertex v) g)
+                ==> (removeVertex v $ insertVertex g v)
                     == (g :: UGraph Int ())

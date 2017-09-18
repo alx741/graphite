@@ -74,7 +74,7 @@ class Graph g where
 
     -- | Insert a vertex into a graph
     -- | If the graph already contains the vertex leave the graph untouched
-    insertVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
+    insertVertex :: (Hashable v, Eq v) => g v e -> v -> g v e
 
     -- | Insert a many vertices into a graph
     -- | New vertices are inserted and already contained vertices are left

@@ -33,8 +33,8 @@ instance Graph DGraph where
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
-    insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
-    insertVertices vs g = foldl' (flip insertVertex) g vs
+    insertVertex (DGraph g) v = DGraph $ hashMapInsert v HM.empty g
+    insertVertices vs g = foldl' insertVertex g vs
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v

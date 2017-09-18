@@ -25,7 +25,7 @@ erdosRenyiIO n (P p) = go [1..n] p empty
             rnds <- replicateM (length vs + 1) $ randomRIO (0.0, 1.0)
             flipDir <- randomRIO (True, False)
             let vs' = zip rnds vs
-            let g' = insertVertex v g
+            let g' = insertVertex g v
             go vs pv $! (foldl' (putV pv v flipDir) g' vs')
 
         putV :: Graph g => Float -> Int -> Bool -> g Int () -> (Float, Int) -> g Int ()
