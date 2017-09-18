@@ -61,11 +61,12 @@ isConnected g = go vs True
             go vs' $ foldl' (\b v -> b && areConnected g v v') bool vs
 
 -- | Tell if a graph is bridgeless
--- | A graph is @bridgeless@ is it has no bridges, that is, it as no edges that,
--- | when removed, split the graph in two isolated components
-isBridgeless :: (Graph g, Hashable v, Eq v) => g v e -> Bool
+-- | A graph is @bridgeless@ if it has no edges that, when removed, split the
+-- | graph in two isolated components
+isBridgeless :: (Hashable v, Eq v, Ord v) => UGraph v e -> Bool
 -- FIXME: Use a O(n) algorithm
-isBridgeless = undefined
+isBridgeless g =
+    foldl' (\b vs -> b && isConnected (removeEdgePair g vs)) True (edgePairs g)
 
 -- | Tell if a 'UGraph' is orietable
 -- | An undirected graph is @orietable@ if it can be converted into a directed
