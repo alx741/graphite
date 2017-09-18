@@ -51,7 +51,19 @@ isIsolated g v = vertexDegree g v == 0
 -- | An Undirected Graph is @connected@ when there is a path between every pair
 -- | of vertices
 isConnected :: (Hashable v, Eq v) => UGraph v e -> Bool
-isConnected g = foldl' (\b v -> b && (not $ isIsolated g v)) True $ vertices g
+isConnected g = foldl' (\b v -> b && not (isIsolated g v)) True $ vertices g
+
+-- | Tell if a graph is bridgeless
+-- | A graph is @bridgeless@ is it has no bridges, that is, it as no edges that,
+-- | when removed, split the graph in two isolated components
+isBridgeless :: (Graph g, Hashable v, Eq v) => g v e -> Bool
+isBridgeless = undefined
+
+-- | Tell if a 'UGraph' is orietable
+-- | An undirected graph is @orietable@ if it can be converted into a directed
+-- | graph that is @strongly connected@ (See 'isStronglyConnected')
+isOrientable :: (Hashable v, Eq v) => UGraph v e -> Bool
+isOrientable g = isConnected g && isBridgeless g
 
 -- | Tell if a 'DGraph' is weakly connected
 -- | A Directed Graph is @weakly connected@ if the underlying undirected graph
@@ -69,7 +81,7 @@ isStronglyConnected g = go vs True
         go _ False = False
         go [] bool = bool
         go (v':vs') bool =
-            go vs' $ foldl' (\b v -> b && (areConnected g v v')) bool vs
+            go vs' $ foldl' (\b v -> b && areConnected g v v') bool vs
 
 -- TODO
 -- * connected component
