@@ -144,12 +144,6 @@ isSymmetric = undefined
 isOriented :: DGraph v e -> Bool
 isOriented = undefined
 
--- | Tell if a 'DGraph' is isolated
--- | A graph is @isolated@ if it has no edges, that is, it has a degree of 0
--- | TODO: What if it has a loop?
-isIsolated :: DGraph v e -> Bool
-isIsolated = undefined
-
 -- | Indegree of a vertex
 -- | The number of inbounding 'Arc's to a vertex
 vertexIndegree :: DGraph v e -> v -> Int

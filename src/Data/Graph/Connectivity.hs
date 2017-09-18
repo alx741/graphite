@@ -5,6 +5,8 @@
 
 module Data.Graph.Connectivity where
 
+import Data.List (foldl')
+
 import           Data.Hashable
 import qualified Data.Set      as S
 
@@ -38,18 +40,17 @@ areConnected g fromV toV
 areDisconnected :: (Graph g, Hashable v, Eq v, Ord v) => g v e -> v -> v -> Bool
 areDisconnected g fromV toV = not $ areConnected g fromV toV
 
+-- | Tell if a vertex is isolated
+-- | A vertex is @isolated@ if it has no incidet edges, that is, it has a degree
+-- | of zero
+isIsolated :: (Graph g, Hashable v, Eq v) => g v e -> v -> Bool
+isIsolated g v = vertexDegree g v == 0
+
 -- | Tell if a graph is connected
 -- | An Undirected Graph is @connected@ when there is a path between every pair
 -- | of vertices
-isConnected :: UGraph v e -> Bool
-isConnected = undefined
-
--- | Tell if a 'UGraph' is disconnected
--- | An Undirected Graph is @disconnected@ when its not @connected@. See
--- | 'isConnected'
--- TODO: An edgeles graph with two or more vertices is disconnected
-isDisconnected :: UGraph v e -> Bool
-isDisconnected = not . isConnected
+isConnected :: (Hashable v, Eq v) => UGraph v e -> Bool
+isConnected g = foldl' (\b v -> b && (not $ isIsolated g v)) True $ vertices g
 
 -- | Tell if a 'DGraph' is weakly connected
 -- | A Directed Graph is @weakly connected@ if the underlying undirected graph
