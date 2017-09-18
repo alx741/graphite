@@ -45,7 +45,17 @@ instance Graph DGraph where
     isSimple = undefined
     isRegular = undefined
 
-    fromAdjacencyMatrix = undefined
+    fromAdjacencyMatrix m
+        | length m /= length (head m) = Nothing
+        | otherwise = Just $ insertArcs (foldl' genArcs [] labeledM) empty
+            where
+                labeledM :: [(Int, [(Int, Int)])]
+                labeledM = zip [1..] $ fmap (zip [1..]) m
+
+                genArcs :: [Arc Int ()] -> (Int, [(Int, Int)]) -> [Arc Int ()]
+                genArcs as (i, vs) = as ++ fmap (\v -> Arc i v ()) connected
+                    where connected = fst <$> filter (\(_, v) -> v /= 0) vs
+
     toAdjacencyMatrix = undefined
 
 -- | The Degree Sequence of a 'DGraph' is a list of pairs (Indegree, Outdegree)
