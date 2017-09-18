@@ -1,3 +1,9 @@
+## 0.4.0.0
+
+- Flip arguments for Edges and Arcs insertion
+- New connectivity functions
+- Define the transpose of a directed graph
+
 ## 0.3.0.0
 
 - Arguments of functions in Graph type class flipped
@@ -10,7 +16,7 @@
 
 ## 0.2.0.0
 
-- Rename IsGraph typeclass to Graph
+- Rename IsGraph type class to Graph
 
 ## 0.1.0.0
 
