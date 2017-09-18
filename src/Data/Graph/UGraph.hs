@@ -36,7 +36,7 @@ instance Graph UGraph where
 
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
-    insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
+    insertEdgePair g (v1, v2) = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
     removeEdgePairAndVertices = removeEdgeAndVertices'
 

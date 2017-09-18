@@ -30,7 +30,7 @@ erdosRenyiIO n (P p) = go [1..n] p empty
 
         putV :: Graph g => Float -> Int -> Bool -> g Int () -> (Float, Int) -> g Int ()
         putV pv v flipDir g (p', v')
-            | p' < pv = insertEdgePair pair g
+            | p' < pv = insertEdgePair g pair
             | otherwise = g
                 where pair = if flipDir then (v', v) else (v, v')
 

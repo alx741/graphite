@@ -38,7 +38,7 @@ instance Graph DGraph where
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
-    insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
+    insertEdgePair g (v1, v2) = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
 

@@ -90,7 +90,7 @@ class Graph g where
     -- | Insert an edge into a graph
     -- | The involved vertices are inserted if don't exist. If the graph already
     -- | contains the edge, its attribute is updated
-    insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
+    insertEdgePair :: (Hashable v, Eq v) => g v () -> (v, v) -> g v ()
 
     -- | Remove the edge from a graph present
     -- | The involved vertices are left untouched
