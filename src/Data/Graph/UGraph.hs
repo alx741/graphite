@@ -4,7 +4,7 @@
 
 module Data.Graph.UGraph where
 
-import Data.List     (foldl', reverse, sort)
+import Data.List (foldl', reverse, sort)
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
@@ -65,7 +65,7 @@ instance Graph UGraph where
 removeVertex :: (Hashable v, Eq v) => v -> UGraph v e -> UGraph v e
 removeVertex v g = UGraph
     $ (\(UGraph g') -> HM.delete v g')
-    $ foldl' (flip removeEdge) g $ incidentEdges g v
+    $ foldl' removeEdge g $ incidentEdges g v
 
 -- | @O(log n)@ Insert an undirected 'Edge' into a 'UGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
@@ -83,12 +83,12 @@ insertEdges es g = foldl' (flip insertEdge) g es
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are left untouched
-removeEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
-removeEdge = removeEdgePair . toPair
+removeEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> UGraph v e
+removeEdge g = removeEdgePair g . toPair
 
 -- | Same as 'removeEdge' but the edge is an unordered pair
-removeEdge' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v e
-removeEdge' (v1, v2) graph@(UGraph g)
+removeEdge' :: (Hashable v, Eq v) => UGraph v e -> (v, v) -> UGraph v e
+removeEdge' graph@(UGraph g) (v1, v2)
     | containsVertex graph v1 && containsVertex graph v2 =
         UGraph $ update v2Links v2 $ update v1Links v1 g
     | otherwise = UGraph g
@@ -105,7 +105,7 @@ removeEdgeAndVertices = removeEdgePairAndVertices . toPair
 -- | Same as 'removeEdgeAndVertices' but the edge is an unordered pair
 removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v e
 removeEdgeAndVertices' (v1, v2) g =
-    removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
+    removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]

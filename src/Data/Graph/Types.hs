@@ -94,7 +94,7 @@ class Graph g where
 
     -- | Remove the edge from a graph present
     -- | The involved vertices are left untouched
-    removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+    removeEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
 
     -- | Remove the edge from a graph if present
     -- | The involved vertices are also removed
