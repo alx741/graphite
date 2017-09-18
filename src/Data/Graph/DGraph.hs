@@ -38,7 +38,7 @@ instance Graph DGraph where
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
-    insertEdgePair g (v1, v2) = insertArc (Arc v1 v2 ()) g
+    insertEdgePair g (v1, v2) = insertArc g (Arc v1 v2 ())
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
 
@@ -47,7 +47,7 @@ instance Graph DGraph where
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
-        | otherwise = Just $ insertArcs (foldl' genArcs [] labeledM) empty
+        | otherwise = Just $ insertArcs empty (foldl' genArcs [] labeledM)
             where
                 labeledM :: [(Int, [(Int, Int)])]
                 labeledM = zip [1..] $ fmap (zip [1..]) m
@@ -63,7 +63,7 @@ type DegreeSequence = [(Int, Int)]
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
-    arbitrary = insertArcs <$> arbitrary <*> pure empty
+    arbitrary = insertArcs <$> pure empty <*> arbitrary
 
 -- | @O(n)@ Remove a vertex from a 'DGraph' if present
 -- | Every 'Arc' incident to this vertex is also removed
@@ -75,15 +75,15 @@ removeVertex v g = DGraph
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
-insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-insertArc (Arc fromV toV edgeAttr) g = DGraph
+insertArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> DGraph v e
+insertArc g (Arc fromV toV edgeAttr) = DGraph
     $ HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = unDGraph $ insertVertices g [fromV, toV]
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied
-insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
-insertArcs as g = foldl' (flip insertArc) g as
+insertArcs :: (Hashable v, Eq v) => DGraph v e -> [Arc v e] -> DGraph v e
+insertArcs g as = foldl' insertArc g as
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are left untouched
@@ -199,6 +199,13 @@ isSink g v = vertexOutdegree g v == 0
 -- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
 isInternal :: DGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
+
+-- | Get the transpose of a 'DGraph'
+-- | The @transpose@ of a directed graph is another directed graph where all of
+-- | its arcs are reversed
+transpose :: (Hashable v, Eq v) => DGraph v e -> DGraph v e
+transpose g = insertArcs empty (fmap reverseArc $ arcs g)
+    where reverseArc (Arc fromV toV attr) = Arc toV fromV attr
 
 -- | Convert a directed 'DGraph' to an undirected 'UGraph' by converting all of
 -- | its 'Arc's into 'Edge's
