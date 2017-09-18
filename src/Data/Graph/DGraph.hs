@@ -34,7 +34,7 @@ instance Graph DGraph where
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
     insertVertex (DGraph g) v = DGraph $ hashMapInsert v HM.empty g
-    insertVertices vs g = foldl' insertVertex g vs
+    insertVertices = foldl' insertVertex
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
@@ -68,7 +68,7 @@ removeVertex v g = DGraph
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g = DGraph
     $ HM.adjust (insertLink toV edgeAttr) fromV g'
-    where g' = unDGraph $ insertVertices [fromV, toV] g
+    where g' = unDGraph $ insertVertices g [fromV, toV]
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied

@@ -79,7 +79,7 @@ class Graph g where
     -- | Insert a many vertices into a graph
     -- | New vertices are inserted and already contained vertices are left
     -- | untouched
-    insertVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
+    insertVertices :: (Hashable v, Eq v) => g v e -> [v] -> g v e
 
     -- | Tell if an edge exists in the graph
     containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool

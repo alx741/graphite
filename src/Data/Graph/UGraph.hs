@@ -32,7 +32,7 @@ instance Graph UGraph where
     directlyReachableVertices = adjacentVertices
     vertexDegree (UGraph g) v = length $ HM.keys $ getLinks v g
     insertVertex (UGraph g) v = UGraph $ hashMapInsert v HM.empty g
-    insertVertices vs g = foldl' insertVertex g vs
+    insertVertices = foldl' insertVertex
 
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
@@ -73,7 +73,7 @@ removeVertex v g = UGraph
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 insertEdge (Edge v1 v2 edgeAttr) g = UGraph $ link v2 v1 $ link v1 v2 g'
     where
-        g' = unUGraph $ insertVertices [v1, v2] g
+        g' = unUGraph $ insertVertices g [v1, v2]
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'UGraph'
