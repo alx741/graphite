@@ -210,7 +210,7 @@ transpose g = insertArcs empty (fmap reverseArc $ arcs g)
 -- | Convert a directed 'DGraph' to an undirected 'UGraph' by converting all of
 -- | its 'Arc's into 'Edge's
 toUndirected :: (Hashable v, Eq v) => DGraph v e -> UG.UGraph v e
-toUndirected g = UG.insertEdges (fmap arcToEdge $ arcs g) empty
+toUndirected g = UG.insertEdges empty (fmap arcToEdge $ arcs g)
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
 
 -- | Tell if a 'DegreeSequence' is a Directed Graphic

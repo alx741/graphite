@@ -18,7 +18,7 @@ newtype UGraph v e = UGraph { unUGraph :: HM.HashMap v (Links v e) }
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (UGraph v e) where
-    arbitrary = insertEdges <$> arbitrary <*> pure empty
+    arbitrary = insertEdges <$> pure empty <*> arbitrary
 
 instance Graph UGraph where
     empty = UGraph HM.empty
@@ -36,7 +36,7 @@ instance Graph UGraph where
 
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
-    insertEdgePair g (v1, v2) = insertEdge (Edge v1 v2 ()) g
+    insertEdgePair g (v1, v2) = insertEdge g (Edge v1 v2 ())
     removeEdgePair = removeEdge'
     removeEdgePairAndVertices = removeEdgeAndVertices'
 
@@ -47,7 +47,7 @@ instance Graph UGraph where
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
-        | otherwise = Just $ insertEdges (foldl' genEdges [] labeledM) empty
+        | otherwise = Just $ insertEdges empty (foldl' genEdges [] labeledM)
             where
                 labeledM :: [(Int, [(Int, Int)])]
                 labeledM = zip [1..] $ fmap (zip [1..]) m
@@ -70,16 +70,16 @@ removeVertex v g = UGraph
 -- | @O(log n)@ Insert an undirected 'Edge' into a 'UGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Edge, its attribute is updated
-insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
-insertEdge (Edge v1 v2 edgeAttr) g = UGraph $ link v2 v1 $ link v1 v2 g'
+insertEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> UGraph v e
+insertEdge g (Edge v1 v2 edgeAttr) = UGraph $ link v2 v1 $ link v1 v2 g'
     where
         g' = unUGraph $ insertVertices g [v1, v2]
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'UGraph'
 -- | Same rules as 'insertEdge' are applied
-insertEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
-insertEdges es g = foldl' (flip insertEdge) g es
+insertEdges :: (Hashable v, Eq v) => UGraph v e -> [Edge v e] -> UGraph v e
+insertEdges = foldl' insertEdge
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are left untouched
