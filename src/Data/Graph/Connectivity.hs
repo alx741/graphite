@@ -57,6 +57,12 @@ isDisconnected = not . isConnected
 isWeaklyConnected :: DGraph v e -> Bool
 isWeaklyConnected = undefined -- isConnected . toUndirected
 
+-- | Tell if a 'DGraph' is strongly connected
+-- | A Directed Graph is @strongly connected@ if it contains a directed path
+-- | on every pair of vertices in both directions
+isStronglyConnected :: DGraph v e -> Bool
+isStronglyConnected = undefined -- isConnected . toUndirected
+
 -- | Retrieve all the unreachable vertices of a 'UGraph'
 -- | The @unreachable vertices@ are those with no adjacent 'Edge's
 unreachableVertices :: UGraph v e -> [v]

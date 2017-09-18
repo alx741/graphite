@@ -22,6 +22,8 @@ instance Graph DGraph where
     edgePairs = arcs'
 
     containsVertex (DGraph g) = flip HM.member g
+    areAdjacent (DGraph g) v1 v2 =
+        HM.member v2 (getLinks v1 g) || HM.member v1 (getLinks v2 g)
     adjacentVertices g v = filter
         (\v' -> containsArc' g (v, v') || containsArc' g (v', v))
         (vertices g)

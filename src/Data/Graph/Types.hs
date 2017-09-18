@@ -32,6 +32,9 @@ class Graph g where
     -- | Tell if a vertex exists in the graph
     containsVertex :: (Hashable v, Eq v) => g v e -> v -> Bool
 
+    -- | Tell if two vertices are adjacent
+    areAdjacent :: (Hashable v, Eq v) => g v e -> v -> v -> Bool
+
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
 

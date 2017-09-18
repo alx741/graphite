@@ -27,6 +27,7 @@ instance Graph UGraph where
     edgePairs g = toPair <$> edges g
 
     containsVertex (UGraph g) = flip HM.member g
+    areAdjacent (UGraph g) v1 v2 = HM.member v2 $ getLinks v1 g
     adjacentVertices (UGraph g) v = HM.keys $ getLinks v g
     directlyReachableVertices = adjacentVertices
     vertexDegree (UGraph g) v = length $ HM.keys $ getLinks v g
