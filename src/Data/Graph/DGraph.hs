@@ -89,12 +89,12 @@ removeArc' (DGraph g) (v1, v2) = case HM.lookup v1 g of
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
-removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-removeArcAndVertices = removeArcAndVertices' . toPair
+removeArcAndVertices :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> DGraph v e
+removeArcAndVertices g = removeEdgePairAndVertices g . toPair
 
 -- | Same as 'removeArcAndVertices' but the arc is an ordered pair
-removeArcAndVertices' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
-removeArcAndVertices' (v1, v2) g =
+removeArcAndVertices' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> DGraph v e
+removeArcAndVertices' g (v1, v2) =
     removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'

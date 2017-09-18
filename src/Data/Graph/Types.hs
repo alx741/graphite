@@ -98,7 +98,7 @@ class Graph g where
 
     -- | Remove the edge from a graph if present
     -- | The involved vertices are also removed
-    removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+    removeEdgePairAndVertices :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
 
     -- | Tell if a graph is simple
     -- | A graph is @simple@ if it has no multiple edges nor loops

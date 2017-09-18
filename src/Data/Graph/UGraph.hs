@@ -99,12 +99,12 @@ removeEdge' graph@(UGraph g) (v1, v2)
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are also removed
-removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
-removeEdgeAndVertices = removeEdgePairAndVertices . toPair
+removeEdgeAndVertices :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> UGraph v e
+removeEdgeAndVertices g = removeEdgePairAndVertices g . toPair
 
 -- | Same as 'removeEdgeAndVertices' but the edge is an unordered pair
-removeEdgeAndVertices' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v e
-removeEdgeAndVertices' (v1, v2) g =
+removeEdgeAndVertices' :: (Hashable v, Eq v) => UGraph v e -> (v, v) -> UGraph v e
+removeEdgeAndVertices' g (v1, v2) =
     removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
