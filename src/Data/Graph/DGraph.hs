@@ -9,7 +9,8 @@ import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
 
-import Data.Graph.Types
+import           Data.Graph.Types
+import qualified Data.Graph.UGraph as UG
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
@@ -188,6 +189,12 @@ isSink g v = vertexOutdegree g v == 0
 -- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
 isInternal :: DGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
+
+-- | Convert a directed 'DGraph' to an undirected 'UGraph' by converting all of
+-- | its 'Arc's into 'Edge's
+toUndirected :: (Hashable v, Eq v) => DGraph v e -> UG.UGraph v e
+toUndirected g = UG.insertEdges (fmap arcToEdge $ arcs g) empty
+    where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
 
 -- | Tell if a 'DegreeSequence' is a Directed Graphic
 -- | A @Directed Graphic@ is a Degree Sequence for wich a 'DGraph' exists
