@@ -16,6 +16,7 @@ import Data.Graph.UGraph
 
 -- | Tell if two vertices of a graph are connected
 -- | Two vertices are @connected@ if it exists a path between them
+-- | The order of the vertices is relevant when the graph is directed
 areConnected :: forall g v e . (Graph g, Hashable v, Eq v, Ord v)
  => g v e
  -> v
@@ -55,19 +56,20 @@ isConnected g = foldl' (\b v -> b && (not $ isIsolated g v)) True $ vertices g
 -- | Tell if a 'DGraph' is weakly connected
 -- | A Directed Graph is @weakly connected@ if the underlying undirected graph
 -- | is @connected@
-isWeaklyConnected :: DGraph v e -> Bool
-isWeaklyConnected = undefined -- isConnected . toUndirected
+isWeaklyConnected :: (Hashable v, Eq v) => DGraph v e -> Bool
+isWeaklyConnected = isConnected . toUndirected
 
 -- | Tell if a 'DGraph' is strongly connected
 -- | A Directed Graph is @strongly connected@ if it contains a directed path
--- | on every pair of vertices in both directions
-isStronglyConnected :: DGraph v e -> Bool
-isStronglyConnected = undefined -- isConnected . toUndirected
-
--- | Retrieve all the unreachable vertices of a 'UGraph'
--- | The @unreachable vertices@ are those with no adjacent 'Edge's
-unreachableVertices :: UGraph v e -> [v]
-unreachableVertices = undefined
+-- | on every pair of vertices
+isStronglyConnected :: (Hashable v, Eq v, Ord v) => DGraph v e -> Bool
+isStronglyConnected g = go vs True
+    where
+        vs = vertices g
+        go _ False = False
+        go [] bool = bool
+        go (v':vs') bool =
+            go vs' $ foldl' (\b v -> b && (areConnected g v v')) bool vs
 
 -- TODO
 -- * connected component

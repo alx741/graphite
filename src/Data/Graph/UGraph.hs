@@ -29,7 +29,7 @@ instance Graph UGraph where
     containsVertex (UGraph g) = flip HM.member g
     areAdjacent (UGraph g) v1 v2 = HM.member v2 $ getLinks v1 g
     adjacentVertices (UGraph g) v = HM.keys $ getLinks v g
-    directlyReachableVertices = adjacentVertices
+    directlyReachableVertices g v = v : (adjacentVertices g v)
     vertexDegree (UGraph g) v = length $ HM.keys $ getLinks v g
     insertVertex (UGraph g) v = UGraph $ hashMapInsert v HM.empty g
     insertVertices = foldl' insertVertex
