@@ -1,3 +1,9 @@
+## 0.3.0.0
+
+- Arguments of functions in Graph type class flipped
+- Basic connectivity functions
+- Allow for directed graphs plotting
+
 ## 0.2.1.0
 
 - Create Data.Graph.Generation module
