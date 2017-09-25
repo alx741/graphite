@@ -9,6 +9,7 @@ import Data.Graph.UGraph
 
 -- | The Degree Sequence of a simple 'UGraph' is a list of degrees of vertices
 -- | in a graph
+-- | Use 'degreeSequence' to construct a valid Degree Sequence
 newtype DegreeSequence = DegreeSequence { unDegreeSequence :: [Int]}
     deriving (Eq, Ord, Show)
 
@@ -29,7 +30,12 @@ getDegreeSequence g
 -- | it exists
 -- FIXME: the handshake lemma is not enough!
 isGraphicalSequence :: DegreeSequence -> Bool
-isGraphicalSequence = even . length . filter odd . unDegreeSequence
+isGraphicalSequence ds = holdsHandshakingLemma ds && undefined
+
+-- | Tell if a 'DegreeSequence' holds the Handshaking lemma, that is, if the
+-- | number of vertices with odd degree is even
+holdsHandshakingLemma :: DegreeSequence -> Bool
+holdsHandshakingLemma = even . length . filter odd . unDegreeSequence
 
 -- | Get the corresponding 'UGraph' of a 'DegreeSequence'
 -- | If the 'DegreeSequence' is not graphical (see 'isGraphicalSequence') the
