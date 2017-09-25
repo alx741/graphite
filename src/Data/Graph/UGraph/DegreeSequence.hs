@@ -27,10 +27,14 @@ getDegreeSequence g
 
 -- | Tell if a 'DegreeSequence' is a Graphical Sequence
 -- | A Degree Sequence is a @Graphical Sequence@ if a corresponding 'UGraph' for
--- | it exists
--- FIXME: the handshake lemma is not enough!
+-- | it exists.
+-- | Use the Havel-Hakimi algorithm
 isGraphicalSequence :: DegreeSequence -> Bool
-isGraphicalSequence ds = holdsHandshakingLemma ds && undefined
+isGraphicalSequence (DegreeSequence []) = True
+isGraphicalSequence (DegreeSequence (x:xs))
+    | x > length xs = False
+    | otherwise = holdsHavelHakimi $ degreeSequence seq'
+        where seq' = (map (subtract 1) $ take x xs) ++ drop x xs
 
 -- | Tell if a 'DegreeSequence' holds the Handshaking lemma, that is, if the
 -- | number of vertices with odd degree is even
