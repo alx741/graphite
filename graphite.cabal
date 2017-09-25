@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Data.Graph.Types
                      , Data.Graph.UGraph
+                     , Data.Graph.UGraph.DegreeSequence
                      , Data.Graph.DGraph
                      , Data.Graph.Generation
                      , Data.Graph.Visualize

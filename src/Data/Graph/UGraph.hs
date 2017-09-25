@@ -4,7 +4,7 @@
 
 module Data.Graph.UGraph where
 
-import Data.List (foldl', reverse, sort)
+import Data.List (foldl')
 
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
@@ -136,32 +136,3 @@ areIsomorphic = undefined
 
 isomorphism :: UGraph v e -> UGraph v' e' -> (v -> v')
 isomorphism = undefined
-
-
--- | The Degree Sequence of a simple 'UGraph' is a list of degrees
-newtype DegreeSequence = DegreeSequence { unDegreeSequence :: [Int]}
-    deriving (Eq, Ord, Show)
-
--- | Construct a 'DegreeSequence' from a list of degrees
--- | Negative degree values are discarded
-degreeSequence :: [Int] -> DegreeSequence
-degreeSequence = DegreeSequence . reverse . sort . filter (>0)
-
--- | Get the 'DegreeSequence' of a simple 'UGraph'
--- | If the graph is not @simple@ (see 'isSimple') the result is Nothing
-getDegreeSequence :: (Hashable v, Eq v) => UGraph v e -> Maybe DegreeSequence
-getDegreeSequence g
-    | (not . isSimple) g = Nothing
-    | otherwise = Just $ degreeSequence $ degrees g
-
--- | Tell if a 'DegreeSequence' is a Graphical Sequence
--- | A Degree Sequence is a @Graphical Sequence@ if a corresponding 'UGraph' for
--- | it exists
-isGraphicalSequence :: DegreeSequence -> Bool
-isGraphicalSequence = even . length . filter odd . unDegreeSequence
-
--- | Get the corresponding 'UGraph' of a 'DegreeSequence'
--- | If the 'DegreeSequence' is not graphical (see 'isGraphicalSequence') the
--- | result is Nothing
-fromGraphicalSequence :: DegreeSequence -> Maybe (UGraph Int ())
-fromGraphicalSequence = undefined
