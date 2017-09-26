@@ -33,7 +33,7 @@ isGraphicalSequence :: DegreeSequence -> Bool
 isGraphicalSequence (DegreeSequence []) = True
 isGraphicalSequence (DegreeSequence (x:xs))
     | x > length xs = False
-    | otherwise = holdsHavelHakimi $ degreeSequence seq'
+    | otherwise = isGraphicalSequence $ degreeSequence seq'
         where seq' = (map (subtract 1) $ take x xs) ++ drop x xs
 
 -- | Tell if a 'DegreeSequence' holds the Handshaking lemma, that is, if the
