@@ -105,11 +105,6 @@ class Graph g where
     -- | A graph is @simple@ if it has no multiple edges nor loops
     isSimple :: (Hashable v, Eq v) => g v e -> Bool
 
-    -- | Tell if a graph is regular
-    -- | A graph is @regular@ when all of its vertices have the same
-    -- | number of adjacent vertices
-    isRegular :: g v e -> Bool
-
     -- | Generate a graph of Int vertices from an adjacency
     -- | square matrix
     fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())

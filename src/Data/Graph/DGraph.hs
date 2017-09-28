@@ -43,7 +43,6 @@ instance Graph DGraph where
     removeEdgePairAndVertices = removeArcAndVertices'
 
     isSimple = undefined
-    isRegular = undefined
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing

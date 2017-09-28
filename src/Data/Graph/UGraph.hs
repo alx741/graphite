@@ -43,8 +43,6 @@ instance Graph UGraph where
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && (not $ HM.member v $ getLinks v $ unUGraph g)
 
-    isRegular = undefined
-
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
         | otherwise = Just $ insertEdges empty (foldl' genEdges [] labeledM)
