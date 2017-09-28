@@ -129,10 +129,3 @@ containsEdge' graph@(UGraph g) (v1, v2) =
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => UGraph v e -> v -> [Edge v e]
 incidentEdges (UGraph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
-
--- | Tell if two 'UGraph' are isomorphic
-areIsomorphic :: UGraph v e -> UGraph v' e' -> Bool
-areIsomorphic = undefined
-
-isomorphism :: UGraph v e -> UGraph v' e' -> (v -> v')
-isomorphism = undefined
