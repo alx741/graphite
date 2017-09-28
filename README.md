@@ -6,3 +6,11 @@
 # graphite
 
 Represent, analyze and visualize graphs & networks.
+
+
+# Current state
+
+Most of what you'll find here are *undefined* functions, sort of like a wish
+list to be eventually fulfilled.
+
+The basic graph types `UGraph` and `DGraph` could already be used if desired.
