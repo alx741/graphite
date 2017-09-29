@@ -127,3 +127,15 @@ containsEdge' graph@(UGraph g) (v1, v2) =
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => UGraph v e -> v -> [Edge v e]
 incidentEdges (UGraph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
+
+
+-- * Lists
+
+-- | Return a list of a graph's 'Edge's
+-- | Same as 'edges'
+toList :: (Hashable v, Eq v) => UGraph v e -> [Edge v e]
+toList = edges
+
+-- | Construct a 'UGraph' from a list of 'Edge's
+fromList :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e
+fromList = insertEdges empty
