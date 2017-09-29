@@ -8,13 +8,24 @@ import Data.List (foldl')
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
+import           Text.Read
 
 import           Data.Graph.Types
 import qualified Data.Graph.UGraph as UG
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
-    deriving (Eq, Show)
+    deriving (Eq)
+
+instance (Hashable v, Eq v, Show v, Show e) => Show (DGraph v e) where
+    showsPrec d m = showParen (d > 10) $
+        showString "fromList " . shows (toList m)
+
+instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
+    readPrec = parens $ prec 10 $ do
+        Ident "fromList" <- lexP
+        xs <- readPrec
+        return (fromList xs)
 
 instance Graph DGraph where
     empty = DGraph HM.empty
