@@ -16,13 +16,14 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Data.Graph.Types
-                     , Data.Graph.UGraph
+                     , Data.Graph.Connectivity
                      , Data.Graph.DGraph
                      , Data.Graph.Generation
-                     , Data.Graph.Visualize
-                     , Data.Graph.Connectivity
-                     , Data.Graph.UGraph.DegreeSequence
                      , Data.Graph.Morphisms
+                     , Data.Graph.Read
+                     , Data.Graph.UGraph
+                     , Data.Graph.UGraph.DegreeSequence
+                     , Data.Graph.Visualize
   build-depends:       base >= 4.7 && < 5
                      , hashable
                      , containers
@@ -31,6 +32,7 @@ library
                      , process
                      , graphviz
                      , QuickCheck
+                     , cassava
   ghc-options:         -Wall
   default-language:    Haskell2010
 
