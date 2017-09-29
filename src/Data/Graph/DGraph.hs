@@ -217,3 +217,15 @@ toUndirected g = UG.insertEdges empty (fmap arcToEdge $ arcs g)
 -- TODO: Kleitman–Wang | Fulkerson–Chen–Anstee theorem algorithms
 isDirectedGraphic :: DegreeSequence -> Bool
 isDirectedGraphic = undefined
+
+
+-- * Lists
+
+-- | Convert a 'DGraph' to a list of 'Arc's
+-- | Same as 'arcs'
+toList :: (Hashable v, Eq v) => DGraph v e -> [Arc v e]
+toList = arcs
+
+-- | Construct a 'DGraph' from a list of 'Arc's
+fromList :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e
+fromList = insertArcs empty

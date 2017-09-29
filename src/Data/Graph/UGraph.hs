@@ -142,7 +142,7 @@ incidentEdges (UGraph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 
 -- * Lists
 
--- | Return a list of a graph's 'Edge's
+-- | Convert a 'UGraph' to a list of 'Edge's
 -- | Same as 'edges'
 toList :: (Hashable v, Eq v) => UGraph v e -> [Edge v e]
 toList = edges
