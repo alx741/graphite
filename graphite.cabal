@@ -1,5 +1,5 @@
 name:                graphite
-version:             0.4.0.0
+version:             0.4.1.0
 synopsis:            Graphs and networks library
 description:         Represent, analyze and visualize graphs
 homepage:            https://github.com/alx741/graphite#readme

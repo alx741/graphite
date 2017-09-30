@@ -1,3 +1,9 @@
+## 0.4.1.0
+
+- Morphisms module
+- DegreeSequence module
+- Read module
+
 ## 0.4.0.0
 
 - Flip arguments for Edges and Arcs insertion
