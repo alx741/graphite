@@ -26,8 +26,10 @@ library
                      , Data.Graph.Visualize
   build-depends:       base >= 4.7 && < 5
                      , hashable
+                     , vector
                      , containers
                      , unordered-containers
+                     , bytestring
                      , random
                      , process
                      , graphviz
