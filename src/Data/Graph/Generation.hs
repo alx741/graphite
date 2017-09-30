@@ -9,17 +9,21 @@ import System.Random
 import Data.Graph.Types
 
 -- | Probability value between 0 and 1
-newtype Probability = P Float deriving (Eq, Ord, Show)
+newtype Probability = P Double deriving (Eq, Ord, Show)
 
 -- | Construct a 'Probability' value
-probability :: Float -> Probability
+probability :: Double -> Probability
 probability v | v >= 1 = P 1 | v <= 0 = P 0 | otherwise = P v
 
--- | Generate a random Erdős–Rényi G(n, p) model graph
-erdosRenyiIO :: Graph g => Int -> Probability -> IO (g Int ())
-erdosRenyiIO n (P p) = go [1..n] p empty
+-- | Generate a random Erdős–Rényi G(n, M) model graph
+erdosRenyiIO :: Graph g => Int -> Int -> IO (g Int ())
+erdosRenyiIO = undefined
+
+-- | Generate a random Gilbert G(n, p) model graph
+gilbertIO :: Graph g => Int -> Probability -> IO (g Int ())
+gilbertIO n (P p) = go [1..n] p empty
     where
-        go :: Graph g => [Int] -> Float -> g Int () -> IO (g Int ())
+        go :: Graph g => [Int] -> Double -> g Int () -> IO (g Int ())
         go [] _ g = return g
         go (v:vs) pv g = do
             rnds <- replicateM (length vs + 1) $ randomRIO (0.0, 1.0)
@@ -28,7 +32,7 @@ erdosRenyiIO n (P p) = go [1..n] p empty
             let g' = insertVertex g v
             go vs pv $! (foldl' (putV pv v flipDir) g' vs')
 
-        putV :: Graph g => Float -> Int -> Bool -> g Int () -> (Float, Int) -> g Int ()
+        putV :: Graph g => Double -> Int -> Bool -> g Int () -> (Double, Int) -> g Int ()
         putV pv v flipDir g (p', v')
             | p' < pv = insertEdgePair g pair
             | otherwise = g
