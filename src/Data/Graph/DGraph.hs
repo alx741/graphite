@@ -168,13 +168,13 @@ isOriented = undefined
 
 -- | Indegree of a vertex
 -- | The number of inbounding 'Arc's to a vertex
-vertexIndegree :: DGraph v e -> v -> Int
-vertexIndegree = undefined
+vertexIndegree :: (Hashable v, Eq v) => DGraph v e -> v -> Int
+vertexIndegree g v = length $ filter (\(_, v') -> v == v' ) $ arcs' g
 
 -- | Outdegree of a vertex
 -- | The number of outbounding 'Arc's from a vertex
-vertexOutdegree :: DGraph v e -> v -> Int
-vertexOutdegree = undefined
+vertexOutdegree :: (Hashable v, Eq v) => DGraph v e -> v -> Int
+vertexOutdegree g v = length $ filter (\(v', _) -> v == v' ) $ arcs' g
 
 -- | Indegrees of all the vertices in a 'DGraph'
 indegrees :: DGraph v e -> [Int]
@@ -198,18 +198,20 @@ isRegular _ = undefined
 
 -- | Tell if a vertex is a source
 -- | A vertex is a @source@ when its @indegree = 0@
-isSource :: DGraph v e -> v -> Bool
+isSource :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isSource g v = vertexIndegree g v == 0
 
 -- | Tell if a vertex is a sink
 -- | A vertex is a @sink@ when its @outdegree = 0@
-isSink :: DGraph v e -> v -> Bool
+isSink :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isSink g v = vertexOutdegree g v == 0
 
 -- | Tell if a vertex is internal
 -- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
-isInternal :: DGraph v e -> v -> Bool
+isInternal :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
+
+-- * Transformations
 
 -- | Get the transpose of a 'DGraph'
 -- | The @transpose@ of a directed graph is another directed graph where all of
@@ -223,12 +225,6 @@ transpose g = insertArcs empty (fmap reverseArc $ arcs g)
 toUndirected :: (Hashable v, Eq v) => DGraph v e -> UG.UGraph v e
 toUndirected g = UG.insertEdges empty (fmap arcToEdge $ arcs g)
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
-
--- | Tell if a 'DegreeSequence' is a Directed Graphic
--- | A @Directed Graphic@ is a Degree Sequence for wich a 'DGraph' exists
--- TODO: Kleitman–Wang | Fulkerson–Chen–Anstee theorem algorithms
-isDirectedGraphic :: DegreeSequence -> Bool
-isDirectedGraphic = undefined
 
 
 -- * Lists

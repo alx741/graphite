@@ -36,6 +36,12 @@ isGraphicalSequence (DegreeSequence (x:xs))
     | otherwise = isGraphicalSequence $ degreeSequence seq'
         where seq' = (map (subtract 1) $ take x xs) ++ drop x xs
 
+-- | Tell if a 'DegreeSequence' is a Directed Graphic
+-- | A @Directed Graphic@ is a Degree Sequence for wich a 'DGraph' exists
+-- TODO: Kleitman–Wang | Fulkerson–Chen–Anstee theorem algorithms
+isDirectedGraphic :: DegreeSequence -> Bool
+isDirectedGraphic = undefined
+
 -- | Tell if a 'DegreeSequence' holds the Handshaking lemma, that is, if the
 -- | number of vertices with odd degree is even
 holdsHandshakingLemma :: DegreeSequence -> Bool
