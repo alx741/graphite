@@ -1,41 +1,33 @@
 module Data.Graph.Visualize
     ( plotUGraph
-    , plotUGraphXdg
+    , plotUGraphPng
 
     , plotDGraph
-    , plotDGraphXdg
+    , plotDGraphPng
     ) where
 
 import Data.GraphViz
 import Data.Hashable
-import Data.Monoid    ((<>))
-import System.Process
 
 import Data.Graph.DGraph
 import Data.Graph.Types
 import Data.Graph.UGraph
 
--- | Plot an undirected 'UGraph' to a PNG image file
-plotUGraph :: (Show e) => UGraph Int e -> FilePath -> IO FilePath
-plotUGraph g fp = addExtension (runGraphvizCommand Sfdp $ toUndirectedDot g) Png fp
+-- | Plot an undirected 'UGraph'
+plotUGraph :: (Show e) => UGraph Int e -> IO ()
+plotUGraph g = runGraphvizCanvas Sfdp (toUndirectedDot g) Xlib
 
--- | Same as 'plotUGraph but open the resulting image with /xdg-open/
-plotUGraphXdg :: (Show e) => UGraph Int e -> IO ()
-plotUGraphXdg g = do
-    fp' <- plotUGraph g "graph"
-    _ <- system $ "xdg-open " <> fp'
-    return ()
+-- | Plot an undirected 'UGraph' to a PNG image file
+plotUGraphPng :: (Show e) => UGraph Int e -> FilePath -> IO FilePath
+plotUGraphPng g fp = addExtension (runGraphvizCommand Sfdp $ toUndirectedDot g) Png fp
+
+-- | Plot a directed 'DGraph'
+plotDGraph :: (Show e) => DGraph Int e -> IO ()
+plotDGraph g = runGraphvizCanvas Sfdp (toDirectedDot g) Xlib
 
 -- | Plot a directed 'DGraph' to a PNG image file
-plotDGraph :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
-plotDGraph g fp = addExtension (runGraphvizCommand Sfdp $ toDirectedDot g) Png fp
-
--- | Same as 'plotDGraph' but open the resulting image with /xdg-open/
-plotDGraphXdg :: (Show e) => DGraph Int e -> IO ()
-plotDGraphXdg g = do
-    fp' <- plotDGraph g "graph"
-    _ <- system $ "xdg-open " <> fp'
-    return ()
+plotDGraphPng :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
+plotDGraphPng g fp = addExtension (runGraphvizCommand Sfdp $ toDirectedDot g) Png fp
 
 labeledNodes :: (Graph g, Show v) => g v e -> [(v, String)]
 labeledNodes g = fmap (\v -> (v, show v)) $ vertices g
