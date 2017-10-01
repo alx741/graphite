@@ -31,9 +31,9 @@ plotDGraph :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
 plotDGraph g fp = addExtension (runGraphvizCommand Sfdp $ toDirectedDot g) Png fp
 
 -- | Same as 'plotDGraph' but open the resulting image with /xdg-open/
-plotDGraphXdg :: (Show e) => DGraph Int e -> FilePath -> IO ()
-plotDGraphXdg g fp = do
-    fp' <- plotDGraph g fp
+plotDGraphXdg :: (Show e) => DGraph Int e -> IO ()
+plotDGraphXdg g = do
+    fp' <- plotDGraph g "graph"
     _ <- system $ "xdg-open " <> fp'
     return ()
 
