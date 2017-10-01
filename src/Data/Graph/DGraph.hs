@@ -177,16 +177,16 @@ vertexOutdegree :: (Hashable v, Eq v) => DGraph v e -> v -> Int
 vertexOutdegree g v = length $ filter (\(v', _) -> v == v' ) $ arcs' g
 
 -- | Indegrees of all the vertices in a 'DGraph'
-indegrees :: DGraph v e -> [Int]
-indegrees = undefined
+indegrees :: (Hashable v, Eq v) => DGraph v e -> [Int]
+indegrees g = fmap (vertexIndegree g) $ vertices g
 
 -- | Outdegree of all the vertices in a 'DGraph'
-outdegrees :: DGraph v e -> [Int]
-outdegrees = undefined
+outdegrees :: (Hashable v, Eq v) => DGraph v e -> [Int]
+outdegrees g = fmap (vertexOutdegree g) $ vertices g
 
 -- | Tell if a 'DGraph' is balanced
 -- | A Directed Graph is @balanced@ when its @indegree = outdegree@
-isBalanced :: DGraph v e -> Bool
+isBalanced :: (Hashable v, Eq v) => DGraph v e -> Bool
 isBalanced g = sum (indegrees g) == sum (outdegrees g)
 
 -- | Tell if a 'DGraph' is regular
