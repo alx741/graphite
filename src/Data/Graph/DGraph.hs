@@ -53,7 +53,8 @@ instance Graph DGraph where
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
 
-    isSimple = undefined
+    isSimple g = foldl' go True $ vertices g
+        where go bool v = bool && (not $ HM.member v $ getLinks v $ unDGraph g)
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing

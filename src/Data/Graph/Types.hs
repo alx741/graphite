@@ -102,7 +102,7 @@ class Graph g where
     removeEdgePairAndVertices :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
 
     -- | Tell if a graph is simple
-    -- | A graph is @simple@ if it has no multiple edges nor loops
+    -- | A graph is @simple@ if it has no loops
     isSimple :: (Hashable v, Eq v) => g v e -> Bool
 
     -- | Generate a graph of Int vertices from an adjacency
