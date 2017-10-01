@@ -16,8 +16,8 @@ probability :: Double -> Probability
 probability v | v >= 1 = P 1 | v <= 0 = P 0 | otherwise = P v
 
 -- | Generate a random Erdős–Rényi  G(n, p) model graph
-erdosRenyiIO :: Graph g => Int -> Probability -> IO (g Int ())
-erdosRenyiIO n (P p) = go [1..n] p empty
+erdosRenyi :: Graph g => Int -> Probability -> IO (g Int ())
+erdosRenyi n (P p) = go [1..n] p empty
     where
         go :: Graph g => [Int] -> Double -> g Int () -> IO (g Int ())
         go [] _ g = return g
@@ -36,6 +36,6 @@ erdosRenyiIO n (P p) = go [1..n] p empty
 
 -- | Generate a random square binary matrix
 -- | Useful for use with 'fromAdjacencyMatrix'
-randomMatIO :: Int -> IO [[Int]]
-randomMatIO n = replicateM n randRow
+randomMat :: Int -> IO [[Int]]
+randomMat n = replicateM n randRow
     where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]

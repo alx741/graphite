@@ -1,9 +1,9 @@
 module Data.Graph.Visualize
-    ( plotUndirectedIO
-    , plotUndirectedXdgIO
+    ( plotUGraph
+    , plotUGraphXdg
 
-    , plotDirectedIO
-    , plotDirectedXdgIO
+    , plotDGraph
+    , plotDGraphXdg
     ) where
 
 import Data.GraphViz
@@ -16,24 +16,24 @@ import Data.Graph.Types
 import Data.Graph.UGraph
 
 -- | Plot an undirected 'UGraph' to a PNG image file
-plotUndirectedIO :: (Show e) => UGraph Int e -> FilePath -> IO FilePath
-plotUndirectedIO g fp = addExtension (runGraphvizCommand Sfdp $ toUndirectedDot g) Png fp
+plotUGraph :: (Show e) => UGraph Int e -> FilePath -> IO FilePath
+plotUGraph g fp = addExtension (runGraphvizCommand Sfdp $ toUndirectedDot g) Png fp
 
--- | Same as 'plotUndirectedIO' but open the resulting image with /xdg-open/
-plotUndirectedXdgIO :: (Show e) => UGraph Int e -> FilePath -> IO ()
-plotUndirectedXdgIO g fp = do
-    fp' <- plotUndirectedIO g fp
+-- | Same as 'plotUGraph but open the resulting image with /xdg-open/
+plotUGraphXdg :: (Show e) => UGraph Int e -> IO ()
+plotUGraphXdg g = do
+    fp' <- plotUGraph g "graph"
     _ <- system $ "xdg-open " <> fp'
     return ()
 
 -- | Plot a directed 'DGraph' to a PNG image file
-plotDirectedIO :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
-plotDirectedIO g fp = addExtension (runGraphvizCommand Sfdp $ toDirectedDot g) Png fp
+plotDGraph :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
+plotDGraph g fp = addExtension (runGraphvizCommand Sfdp $ toDirectedDot g) Png fp
 
--- | Same as 'plotDirectedIO' but open the resulting image with /xdg-open/
-plotDirectedXdgIO :: (Show e) => DGraph Int e -> FilePath -> IO ()
-plotDirectedXdgIO g fp = do
-    fp' <- plotDirectedIO g fp
+-- | Same as 'plotDGraph' but open the resulting image with /xdg-open/
+plotDGraphXdg :: (Show e) => DGraph Int e -> FilePath -> IO ()
+plotDGraphXdg g fp = do
+    fp' <- plotDGraph g fp
     _ <- system $ "xdg-open " <> fp'
     return ()
 
