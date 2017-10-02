@@ -1,3 +1,7 @@
+## 0.4.3.0
+
+- Remove Probability datatype. erdosRenyi takes a Float
+
 ## 0.4.2.0
 
 - Xlib visualization functions
