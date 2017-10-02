@@ -1,3 +1,7 @@
+## 0.4.2.0
+
+- Xlib visualization functions
+
 ## 0.4.1.0
 
 - Morphisms module
