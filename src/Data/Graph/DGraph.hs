@@ -192,7 +192,7 @@ isBalanced g = sum (indegrees g) == sum (outdegrees g)
 -- | Tell if a 'DGraph' is regular
 -- | A Directed Graph is @regular@ when all of its vertices have the same number
 -- | of adjacent vertices AND when the @indegree@ and @outdegree@ of each vertex
--- | are equal to each toher.
+-- | are equal to each other.
 isRegular :: DGraph v e -> Bool
 isRegular _ = undefined
 
