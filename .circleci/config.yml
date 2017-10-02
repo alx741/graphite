@@ -1,0 +1,18 @@
+version: 2.0
+
+dependencies:
+  cache_directories:
+    - "~/.stack"
+    - ".stack-work"
+  pre:
+    - sudo curl -sSL https://get.haskellstack.org/ | sh
+  override:
+    - stack setup
+
+compile:
+  override:
+    - stack build --fast --test --no-run-tests
+
+test:
+  override:
+    - stack test
