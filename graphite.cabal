@@ -26,6 +26,7 @@ library
                      , Data.Graph.Visualize
   build-depends:       base >= 4.7 && < 5
                      , hashable
+                     , deepseq
                      , vector
                      , containers
                      , unordered-containers

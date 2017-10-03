@@ -1,11 +1,13 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.UGraph where
 
-import Data.List (foldl')
+import Data.List    (foldl')
+import GHC.Generics (Generic)
 
+import           Control.DeepSeq
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
@@ -15,7 +17,7 @@ import Data.Graph.Types
 
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/
 newtype UGraph v e = UGraph { unUGraph :: HM.HashMap v (Links v e) }
-    deriving (Eq)
+    deriving (Eq, Generic)
 
 instance (Hashable v, Eq v, Show v, Show e) => Show (UGraph v e) where
     showsPrec d m = showParen (d > 10) $
@@ -26,6 +28,8 @@ instance (Hashable v, Eq v, Read v, Read e) => Read (UGraph v e) where
         Ident "fromList" <- lexP
         xs <- readPrec
         return (fromList xs)
+
+instance (NFData v, NFData e) => NFData (UGraph v e)
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (UGraph v e) where

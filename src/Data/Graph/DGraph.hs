@@ -1,10 +1,13 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.DGraph where
 
-import Data.List (foldl')
+import Data.List    (foldl')
+import GHC.Generics (Generic)
 
+import           Control.DeepSeq
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
@@ -15,7 +18,7 @@ import qualified Data.Graph.UGraph as UG
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
-    deriving (Eq)
+    deriving (Eq, Generic)
 
 instance (Hashable v, Eq v, Show v, Show e) => Show (DGraph v e) where
     showsPrec d m = showParen (d > 10) $
@@ -26,6 +29,8 @@ instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
         Ident "fromList" <- lexP
         xs <- readPrec
         return (fromList xs)
+
+instance (NFData v, NFData e) => NFData (DGraph v e)
 
 instance Graph DGraph where
     empty = DGraph HM.empty
