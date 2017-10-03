@@ -3,7 +3,7 @@
 
 module Data.Graph.Types where
 
-import Data.List (nubBy)
+import Data.List (foldl', nubBy)
 import GHC.Float (float2Double)
 
 import           Data.Hashable
@@ -92,6 +92,10 @@ class Graph g where
     -- | The involved vertices are inserted if don't exist. If the graph already
     -- | contains the edge, its attribute is updated
     insertEdgePair :: (Hashable v, Eq v) => g v () -> (v, v) -> g v ()
+
+    -- | Same as 'insertEdgePair' but for multiple edges
+    insertEdgePairs :: (Hashable v, Eq v) => g v () -> [(v, v)] -> g v ()
+    insertEdgePairs g es = foldl' insertEdgePair g es
 
     -- | Remove the edge from a graph present
     -- | The involved vertices are left untouched
