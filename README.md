@@ -2,6 +2,7 @@
 
 [![](https://img.shields.io/hackage/v/graphite.svg)](https://hackage.haskell.org/package/graphite)
 ![Hackage-Deps](https://img.shields.io/hackage-deps/v/graphite.svg)
+[![CircleCI](https://circleci.com/gh/alx741/graphite.svg?style=svg)](https://circleci.com/gh/alx741/graphite)
 
 # graphite
 
