@@ -22,6 +22,7 @@ library
                      , Data.Graph.Morphisms
                      , Data.Graph.Read
                      , Data.Graph.UGraph
+                     , Data.Graph.DGraph.DegreeSequence
                      , Data.Graph.UGraph.DegreeSequence
                      , Data.Graph.Visualize
   other-modules:       Scratch

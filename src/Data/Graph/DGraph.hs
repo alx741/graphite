@@ -74,9 +74,6 @@ instance Graph DGraph where
 
     toAdjacencyMatrix = undefined
 
--- | The Degree Sequence of a 'DGraph' is a list of pairs (Indegree, Outdegree)
-type DegreeSequence = [(Int, Int)]
-
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
     arbitrary = insertArcs <$> pure empty <*> arbitrary
