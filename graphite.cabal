@@ -24,18 +24,20 @@ library
                      , Data.Graph.UGraph
                      , Data.Graph.UGraph.DegreeSequence
                      , Data.Graph.Visualize
+  other-modules:       Scratch
   build-depends:       base >= 4.7 && < 5
-                     , hashable
-                     , deepseq
-                     , vector
-                     , containers
-                     , unordered-containers
-                     , bytestring
-                     , random
-                     , process
-                     , graphviz
                      , QuickCheck
+                     , bytestring
                      , cassava
+                     , containers
+                     , deepseq
+                     , dequeue
+                     , graphviz
+                     , hashable
+                     , process
+                     , random
+                     , unordered-containers
+                     , vector
   ghc-options:         -Wall
   default-language:    Haskell2010
 
