@@ -1,4 +1,4 @@
-module Data.Graph.DGraphDegreeSequence where
+module Data.Graph.DGraph.DegreeSequence where
 
 -- | The Degree Sequence of a 'DGraph' is a list of pairs (Indegree, Outdegree)
 newtype DegreeSequence = DegreeSequence { unDegreeSequence :: [(Int, Int)] }
