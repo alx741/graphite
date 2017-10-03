@@ -7,6 +7,7 @@ module Data.Graph.Visualize
     ) where
 
 import Data.GraphViz
+import Data.GraphViz.Attributes.Complete
 import Data.Hashable
 
 import Data.Graph.DGraph
@@ -40,8 +41,14 @@ labeledArcs g = fmap (\(Arc v1 v2 attr) -> (v1, v2, show attr)) $ arcs g
 
 toUndirectedDot :: (Show e) => UGraph Int e -> DotGraph Int
 toUndirectedDot g = graphElemsToDot params (labeledNodes g) (labeledEdges g)
-    where params = nonClusteredParams { isDirected = False }
+    where params = nonClusteredParams
+            { isDirected = False
+            , globalAttributes = [GraphAttrs [Overlap ScaleOverlaps]]
+            }
 
 toDirectedDot :: (Show e) => DGraph Int e -> DotGraph Int
 toDirectedDot g = graphElemsToDot params (labeledNodes g) (labeledArcs g)
-    where params = nonClusteredParams { isDirected = True }
+    where params = nonClusteredParams
+            { isDirected = True
+            , globalAttributes = [GraphAttrs [Overlap ScaleOverlaps]]
+            }
