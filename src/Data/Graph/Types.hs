@@ -1,11 +1,14 @@
+{-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.Types where
 
-import Data.List (foldl', nubBy)
-import GHC.Float (float2Double)
+import Data.List    (foldl', nubBy)
+import GHC.Float    (float2Double)
+import GHC.Generics (Generic)
 
+import           Control.DeepSeq
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
@@ -118,11 +121,11 @@ class Graph g where
 
 -- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
 data Edge v e = Edge v v e
-    deriving (Show, Read, Ord)
+    deriving (Show, Read, Ord, Generic)
 
 -- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
 data Arc v e = Arc v v e
-    deriving (Show, Read, Ord)
+    deriving (Show, Read, Ord, Generic)
 
 -- | Construct an undirected 'Edge' between two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
@@ -139,6 +142,9 @@ class IsEdge e where
     -- | Tell if an edge is a loop
     -- | An edge forms a @loop@ if both of its ends point to the same vertex
     isLoop :: (Eq v) => e v a -> Bool
+
+instance (NFData v, NFData e) => NFData (Edge v e)
+instance (NFData v, NFData e) => NFData (Arc v e)
 
 instance IsEdge Edge where
     toPair (Edge v1 v2 _) = (v1, v2)
