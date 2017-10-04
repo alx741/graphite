@@ -4,7 +4,7 @@
 
 module Data.Graph.Types where
 
-import Data.List    (foldl', nubBy)
+import Data.List    (foldl')
 import GHC.Float    (float2Double)
 import GHC.Generics (Generic)
 
@@ -236,14 +236,11 @@ linksToArcs ls = concat $ fmap toArc ls
         toArc (fromV, links) = fmap (\(v, a) -> Arc fromV v a) (HM.toList links)
 
 -- | Get 'Edge's from an association list of vertices and their links
-linksToEdges :: (Eq v) => [(v, Links v a)] -> [Edge v a]
-linksToEdges ls = nubBy shallowEdgeEq $ concat $ fmap toEdge ls
+linksToEdges :: [(v, Links v a)] -> [Edge v a]
+linksToEdges ls = concat $ fmap toEdge ls
     where
         toEdge :: (v, Links v a) -> [Edge v a]
         toEdge (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
-        shallowEdgeEq (Edge v1 v2 _) (Edge v1' v2' _) =
-               (v1 == v1' && v2 == v2')
-            || (v1 == v2' && v2 == v1')
 
 -- | Get 'Edge's from an association list of vertices and their links
 linksToEdges' :: (Eq v) => (v, Links v a) -> [Edge v a]

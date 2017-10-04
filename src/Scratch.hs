@@ -1,6 +1,6 @@
 module Scratch where
 
-import Data.List (foldl', nub)
+import Data.List (foldl')
 
 import qualified Data.Dequeue as Q
 import qualified Data.Set     as S
