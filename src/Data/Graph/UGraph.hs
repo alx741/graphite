@@ -4,12 +4,14 @@
 
 module Data.Graph.UGraph where
 
-import Data.List    (foldl')
-import GHC.Generics (Generic)
+import qualified Data.Foldable as F (toList)
+import           Data.List     (foldl')
+import           GHC.Generics  (Generic)
 
 import           Control.DeepSeq
 import           Data.Hashable
 import qualified Data.HashMap.Lazy as HM
+import qualified Data.Sequence     as S
 import           Test.QuickCheck
 import           Text.Read
 
@@ -122,12 +124,15 @@ removeEdgeAndVertices' g (v1, v2) =
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]
-edges (UGraph g) = linksToEdges $ zip vs links
+edges g = F.toList $ go g S.empty
     where
-        vs :: [v]
-        vs = vertices $ UGraph g
-        links :: [Links v e]
-        links = fmap (`getLinks` g) vs
+        go g' es
+            | order g' == 0 = es
+            | otherwise =
+                let v = head $ vertices g'
+                in go
+                    (removeVertex v g')
+                    (es S.>< (S.fromList $ incidentEdges g' v))
 
 -- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> Bool

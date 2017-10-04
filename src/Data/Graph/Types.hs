@@ -100,7 +100,7 @@ class Graph g where
     insertEdgePairs :: (Hashable v, Eq v) => g v () -> [(v, v)] -> g v ()
     insertEdgePairs g es = foldl' insertEdgePair g es
 
-    -- | Remove the edge from a graph present
+    -- | Remove an edge from a graph if present
     -- | The involved vertices are left untouched
     removeEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
 
@@ -203,8 +203,7 @@ instance (Eq v, Eq a) => Eq (Arc v a) where
 
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
- => (v -> v -> e -> edge)
- -> Gen edge
+ => (v -> v -> e -> edge) -> Gen edge
 arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
     where vert = getPositive <$> arbitrary
 
@@ -245,6 +244,10 @@ linksToEdges ls = nubBy shallowEdgeEq $ concat $ fmap toEdge ls
         shallowEdgeEq (Edge v1 v2 _) (Edge v1' v2' _) =
                (v1 == v1' && v2 == v2')
             || (v1 == v2' && v2 == v1')
+
+-- | Get 'Edge's from an association list of vertices and their links
+linksToEdges' :: (Eq v) => (v, Links v a) -> [Edge v a]
+linksToEdges' (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
 
 -- | O(log n) Associate the specified value with the specified key in this map.
 -- | If this map previously contained a mapping for the key, leave the map
