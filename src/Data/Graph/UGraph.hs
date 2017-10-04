@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns        #-}
 
 module Data.Graph.UGraph where
 
@@ -126,13 +127,12 @@ removeEdgeAndVertices' g (v1, v2) =
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]
 edges g = F.toList $ go g S.empty
     where
-        go g' es
-            | order g' == 0 = es
-            | otherwise =
-                let v = head $ vertices g'
-                in go
-                    (removeVertex v g')
-                    (es S.>< (S.fromList $ incidentEdges g' v))
+        go (order -> 0) es = es
+        go g' es =
+            let v = head $ vertices g'
+            in go
+                (removeVertex v g')
+                (es S.>< (S.fromList $ incidentEdges g' v))
 
 -- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> Bool
