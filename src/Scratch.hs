@@ -1,9 +1,9 @@
 module Scratch where
 
-import Data.List (nub)
+import Data.List (foldl', nub)
 
-import qualified Data.Set as S
 import qualified Data.Dequeue as Q
+import qualified Data.Set     as S
 
 import Data.Graph.Types
 import Data.Graph.UGraph
@@ -33,32 +33,41 @@ path g fromV toV
     | otherwise = search [fromV] S.empty []
     where
         search :: [Int] -> S.Set Int -> [Int] -> [Int]
-        search (v:vs) visited poped
-            | v == toV = poped ++ [v]
+        search (v:vs) banned popped
+            | v == toV = popped ++ [v]
             | otherwise =
-                search
-                    (vs ++ nonVisitedReachables visited v)
-                    (S.insert v visited)
-                    (nub $ poped ++ [v])
+                let reachables = nonVisitedReachables banned v
+                in search
+                    (vs ++ reachables)
+                    (setInsertMany banned $ v : reachables)
+                    (popped ++ [v])
 
-        nonVisitedReachables visited v = filter
-            (\v' -> not $ S.member v' visited) (directlyReachableVertices g v)
+        nonVisitedReachables banned v = filter
+            (\v' -> v' /= v && (not $ S.member v' banned))
+            (directlyReachableVertices g v)
 
 path' :: UGraph Int () -> Int -> Int -> [Int]
 path' g fromV toV
     | fromV == toV = [toV]
-    | otherwise = undefined
-    -- | otherwise = search (Q.fromList [fromV]) S.empty Q.empty
+    | otherwise = reverse $ search (Q.fromList [fromV]) S.empty []
     where
-        search :: Q.BankersDequeue Int -> S.Set Int -> Q.BankersDequeue Int -> Q.BankersDequeue Int
-        search = undefined
-        -- search (v:vs) visited poped
-        --     | v == toV = poped ++ [v]
-        --     | otherwise =
-        --         search
-        --             (vs ++ nonVisitedReachables visited v)
-        --             (S.insert v visited)
-        --             (nub $ poped ++ [v])
+        search :: Q.BankersDequeue Int -> S.Set Int -> [Int] -> [Int]
+        search queue banned popped = case Q.popFront queue of
+            Nothing -> popped
+            Just (v, queue') -> if v == toV then v : popped else
+                let reachables = nonVisitedReachables banned v
+                in search
+                    (queue' `pushBackMany` reachables)
+                    (setInsertMany banned $ v : reachables)
+                    (v : popped)
 
-        -- nonVisitedReachables visited v = filter
-        --     (\v' -> not $ S.member v' visited) (directlyReachableVertices g v)
+        nonVisitedReachables banned v = filter
+            (\v' -> v' /= v && (not $ S.member v' banned))
+            (directlyReachableVertices g v)
+
+
+setInsertMany :: Ord a => S.Set a -> [a] -> S.Set a
+setInsertMany = foldl' (flip S.insert)
+
+pushBackMany :: Q.BankersDequeue a  -> [a] -> Q.BankersDequeue a
+pushBackMany = foldl' Q.pushBack
