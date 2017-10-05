@@ -55,7 +55,10 @@ instance Graph UGraph where
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
     insertEdgePair g (v1, v2) = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
-    removeEdgePairAndVertices = removeEdgeAndVertices'
+
+    removeVertex v g = UGraph
+        $ (\(UGraph g') -> HM.delete v g')
+        $ foldl' removeEdge g $ incidentEdges g v
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && (not $ HM.member v $ getLinks v $ unUGraph g)
@@ -74,13 +77,6 @@ instance Graph UGraph where
     toAdjacencyMatrix = undefined
 
 
-
--- | @O(n)@ Remove a vertex from a 'UGraph' if present
--- | Every 'Edge' incident to this vertex is also removed
-removeVertex :: (Hashable v, Eq v) => v -> UGraph v e -> UGraph v e
-removeVertex v g = UGraph
-    $ (\(UGraph g') -> HM.delete v g')
-    $ foldl' removeEdge g $ incidentEdges g v
 
 -- | @O(log n)@ Insert an undirected 'Edge' into a 'UGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
@@ -116,11 +112,6 @@ removeEdge' graph@(UGraph g) (v1, v2)
 -- | The involved vertices are also removed
 removeEdgeAndVertices :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> UGraph v e
 removeEdgeAndVertices g = removeEdgePairAndVertices g . toPair
-
--- | Same as 'removeEdgeAndVertices' but the edge is an unordered pair
-removeEdgeAndVertices' :: (Hashable v, Eq v) => UGraph v e -> (v, v) -> UGraph v e
-removeEdgeAndVertices' g (v1, v2) =
-    removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]

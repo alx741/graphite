@@ -55,7 +55,10 @@ instance Graph DGraph where
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
     insertEdgePair g (v1, v2) = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
-    removeEdgePairAndVertices = removeArcAndVertices'
+
+    removeVertex v g = DGraph
+        $ (\(DGraph g') -> HM.delete v g')
+        $ foldl' removeArc g $ incidentArcs g v
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && (not $ HM.member v $ getLinks v $ unDGraph g)
@@ -76,13 +79,6 @@ instance Graph DGraph where
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where
     arbitrary = insertArcs <$> pure empty <*> arbitrary
-
--- | @O(n)@ Remove a vertex from a 'DGraph' if present
--- | Every 'Arc' incident to this vertex is also removed
-removeVertex :: (Hashable v, Eq v) => v -> DGraph v e -> DGraph v e
-removeVertex v g = DGraph
-    $ (\(DGraph g') -> HM.delete v g')
-    $ foldl' removeArc g $ incidentArcs g v
 
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
@@ -113,11 +109,6 @@ removeArc' (DGraph g) (v1, v2) = case HM.lookup v1 g of
 -- | The involved vertices are also removed
 removeArcAndVertices :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> DGraph v e
 removeArcAndVertices g = removeEdgePairAndVertices g . toPair
-
--- | Same as 'removeArcAndVertices' but the arc is an ordered pair
-removeArcAndVertices' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> DGraph v e
-removeArcAndVertices' g (v1, v2) =
-    removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]

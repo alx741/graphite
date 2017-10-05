@@ -99,7 +99,11 @@ class Graph g where
 
     -- | Same as 'insertEdgePair' but for multiple edges
     insertEdgePairs :: (Hashable v, Eq v) => g v () -> [(v, v)] -> g v ()
-    insertEdgePairs g es = foldl' insertEdgePair g es
+    insertEdgePairs = foldl' insertEdgePair
+
+    -- | Remove a vertex from a graph if present
+    -- | Every edge incident to this vertex is also removed
+    removeVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
 
     -- | Remove an edge from a graph if present
     -- | The involved vertices are left untouched
@@ -108,6 +112,8 @@ class Graph g where
     -- | Remove the edge from a graph if present
     -- | The involved vertices are also removed
     removeEdgePairAndVertices :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
+    removeEdgePairAndVertices g (v1, v2) =
+        removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
 
     -- | Tell if a graph is simple
     -- | A graph is @simple@ if it has no loops
