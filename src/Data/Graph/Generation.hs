@@ -6,7 +6,9 @@ import Control.Monad (replicateM)
 import Data.List     (foldl')
 import System.Random
 
+import Data.Graph.DGraph
 import Data.Graph.Types
+import Data.Graph.UGraph
 
 -- | Generate a random Erdős–Rényi G(n, p) model graph of /n/ vertices with a
 -- | /p/ connection probability
@@ -30,6 +32,14 @@ erdosRenyi n p = go [1..n] (probability p) empty
 
         probability :: Float -> Float
         probability v | v >= 1 = 1 | v <= 0 = 0 | otherwise = v
+
+-- | 'erdosRenyi' convinience 'UGraph' generation function
+erdosRenyiU :: Int -> Float -> IO (UGraph Int ())
+erdosRenyiU  = erdosRenyi
+
+-- | 'erdosRenyi' convinience 'DGraph' generation function
+erdosRenyiD :: Int -> Float -> IO (DGraph Int ())
+erdosRenyiD  = erdosRenyi
 
 -- | Generate a random square binary matrix
 -- | Useful for use with 'fromAdjacencyMatrix'
