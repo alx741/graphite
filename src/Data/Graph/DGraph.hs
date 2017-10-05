@@ -54,7 +54,7 @@ instance Graph DGraph where
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
-    insertEdgePair g (v1, v2) = insertArc g (Arc v1 v2 ())
+    insertEdgePair g (v1, v2) = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
     removeEdgePairAndVertices = removeArcAndVertices'
 
@@ -88,15 +88,15 @@ removeVertex v g = DGraph
 -- | @O(log n)@ Insert a directed 'Arc' into a 'DGraph'
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
-insertArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> DGraph v e
-insertArc g (Arc fromV toV edgeAttr) = DGraph
+insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
+insertArc (Arc fromV toV edgeAttr) g = DGraph
     $ HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = unDGraph $ insertVertices g [fromV, toV]
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied
 insertArcs :: (Hashable v, Eq v) => DGraph v e -> [Arc v e] -> DGraph v e
-insertArcs g as = foldl' insertArc g as
+insertArcs g as = foldl' (flip insertArc) g as
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are left untouched

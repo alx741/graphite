@@ -32,6 +32,13 @@ spec = do
             \g edge -> (not $ g `containsEdge` edge)
                 ==> size g + 1 == size (insertEdge edge (g :: UGraph Int ()))
 
+        it "order is conserved" $ property $
+            \g v -> (not $ g `containsVertex` v)
+                ==> order g == order (removeVertex v $ insertVertex (g :: UGraph Int ()) v)
+        it "size is conserved" $ property $
+            \g edge -> (not $ g `containsEdge` edge)
+                ==> size g == size ((flip removeEdge) edge $ insertEdge edge (g :: UGraph Int ()))
+
         it "Is id when inserting and removing a new vertex" $ property $
             \g v -> (not $ g `containsVertex` v)
                 ==> (removeVertex v $ insertVertex g v)

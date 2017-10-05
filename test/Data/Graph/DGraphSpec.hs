@@ -16,8 +16,8 @@ spec = do
             containsVertex g' 1 `shouldBe` False
 
         it "Can tell if an arc exists" $ property $ do
-            let g = insertArc empty (1 --> 2) :: DGraph Int ()
-            let g' = insertArc empty (2 --> 1) :: DGraph Int ()
+            let g = insertArc (1 --> 2) empty :: DGraph Int ()
+            let g' = insertArc (2 --> 1) empty :: DGraph Int ()
             containsArc g (1 --> 2) `shouldBe` True
             containsArc g' (1 --> 2) `shouldBe` False
 
@@ -26,7 +26,14 @@ spec = do
                 ==> order g + 1 == order (insertVertex (g :: DGraph Int ()) v)
         it "Increments its size when a new arc is inserted" $ property $
             \g arc -> (not $ g `containsArc` arc)
-                ==> size g + 1 == size (insertArc (g :: DGraph Int ()) arc)
+                ==> size g + 1 == size (insertArc arc (g :: DGraph Int ()))
+
+        it "order is conserved" $ property $
+            \g v -> (not $ g `containsVertex` v)
+                ==> order g == order (removeVertex v $ insertVertex (g :: DGraph Int ()) v)
+        it "size is conserved" $ property $
+            \g arc -> (not $ g `containsArc` arc)
+                ==> size g == size ((flip removeArc) arc $ insertArc arc (g :: DGraph Int ()))
 
         it "Is id when inserting and removing a new vertex" $ property $
             \g v -> (not $ g `containsVertex` v)
