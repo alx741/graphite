@@ -50,7 +50,6 @@ instance Graph UGraph where
     directlyReachableVertices g v = v : (adjacentVertices g v)
     vertexDegree (UGraph g) v = length $ HM.keys $ getLinks v g
     insertVertex (UGraph g) v = UGraph $ hashMapInsert v HM.empty g
-    insertVertices = foldl' insertVertex
 
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v

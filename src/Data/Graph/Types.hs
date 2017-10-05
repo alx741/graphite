@@ -84,6 +84,7 @@ class Graph g where
     -- | New vertices are inserted and already contained vertices are left
     -- | untouched
     insertVertices :: (Hashable v, Eq v) => g v e -> [v] -> g v e
+    insertVertices = foldl' insertVertex
 
     -- | Tell if an edge exists in the graph
     containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool

@@ -50,7 +50,6 @@ instance Graph DGraph where
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
     insertVertex (DGraph g) v = DGraph $ hashMapInsert v HM.empty g
-    insertVertices = foldl' insertVertex
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
