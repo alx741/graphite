@@ -105,9 +105,17 @@ class Graph g where
     -- | Every edge incident to this vertex is also removed
     removeVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
 
+    -- | Same as 'removeVertex' but for multiple vertices
+    removeVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
+    removeVertices vs g = foldl' (flip removeVertex) g vs
+
     -- | Remove an edge from a graph if present
     -- | The involved vertices are left untouched
     removeEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
+
+    -- | Same as 'removeEdgePair' but for multple edges
+    removeEdgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)] -> g v e
+    removeEdgePairs = foldl' removeEdgePair
 
     -- | Remove the edge from a graph if present
     -- | The involved vertices are also removed
