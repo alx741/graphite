@@ -20,7 +20,7 @@ import Data.Graph.Types
 
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/
 data UGraph v e = UGraph
-    { _size :: Int
+    { _size    :: Int
     , unUGraph :: HM.HashMap v (Links v e)
     } deriving (Eq, Generic)
 
@@ -54,10 +54,21 @@ instance Graph UGraph where
     vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g
     insertVertex v (UGraph s g) = UGraph s $ hashMapInsert v HM.empty g
 
-    containsEdgePair = containsEdge'
+    containsEdgePair graph@(UGraph _ g) (v1, v2) =
+        containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
+        where v1Links = getLinks v1 g
+
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
-    removeEdgePair = removeEdge'
+
+    removeEdgePair (v1, v2) graph@(UGraph s g)
+        | containsEdgePair graph (v1, v2) =
+            UGraph (s - 1) $ update v2Links v2 $ update v1Links v1 g
+        | otherwise = graph
+        where
+            v1Links = HM.delete v2 $ getLinks v1 g
+            v2Links = HM.delete v1 $ getLinks v2 g
+            update = HM.adjust . const
 
     removeVertex v g@(UGraph s _) = UGraph s
         $ (\(UGraph _ g') -> HM.delete v g')
@@ -81,9 +92,9 @@ instance Graph UGraph where
 
 
 
--- | @O(log n)@ Insert an undirected 'Edge' into a 'UGraph'
--- | The involved vertices are inserted if don't exist. If the graph already
--- | contains the Edge, its attribute is updated
+-- | Insert an undirected 'Edge' into a 'UGraph'
+-- | The involved vertices are inserted if they don't exist. If the graph
+-- | already contains the Edge, its attribute is updated
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 insertEdge (Edge v1 v2 edgeAttr) g@(UGraph s _)
     | containsEdgePair g (v1, v2) = g
@@ -92,33 +103,25 @@ insertEdge (Edge v1 v2 edgeAttr) g@(UGraph s _)
         g' = unUGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
--- | @O(m*log n)@ Insert many directed 'Edge's into a 'UGraph'
--- | Same rules as 'insertEdge' are applied
+-- | Same as 'insertEdge' but for a list of 'Edge's
 insertEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
 insertEdges es g = foldl' (flip insertEdge) g es
 
--- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
+-- | Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are left untouched
 removeEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 removeEdge = removeEdgePair . toPair
 
--- | Same as 'removeEdge' but the edge is an unordered pair
-removeEdge' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v e
-removeEdge' (v1, v2) graph@(UGraph s g)
-    | containsEdgePair graph (v1, v2) =
-        UGraph (s - 1) $ update v2Links v2 $ update v1Links v1 g
-    | otherwise = graph
-    where
-        v1Links = HM.delete v2 $ getLinks v1 g
-        v2Links = HM.delete v1 $ getLinks v2 g
-        update = HM.adjust . const
+-- | Same as 'removeEdge' but for a list of 'Edge's
+removeEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
+removeEdges es g = foldl' (flip removeEdge) g es
 
--- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
+-- | Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are also removed
 removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 removeEdgeAndVertices = removeEdgePairAndVertices . toPair
 
--- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
+-- | Retrieve the 'Edge's of a 'UGraph'
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]
 edges g = F.toList $ go g S.empty
     where
@@ -129,15 +132,9 @@ edges g = F.toList $ go g S.empty
                 (removeVertex v g')
                 (es S.>< (S.fromList $ incidentEdges g' v))
 
--- | @O(log n)@ Tell if an undirected 'Edge' exists in the graph
+-- | Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> Bool
-containsEdge g = containsEdge' g . toPair
-
--- | Same as 'containsEdge' but the edge is an unordered pair
-containsEdge' :: (Hashable v, Eq v) => UGraph v e -> (v, v) -> Bool
-containsEdge' graph@(UGraph _ g) (v1, v2) =
-    containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
-    where v1Links = getLinks v1 g
+containsEdge g = containsEdgePair g . toPair
 
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => UGraph v e -> v -> [Edge v e]
