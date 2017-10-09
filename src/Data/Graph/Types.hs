@@ -78,13 +78,13 @@ class Graph g where
 
     -- | Insert a vertex into a graph
     -- | If the graph already contains the vertex leave the graph untouched
-    insertVertex :: (Hashable v, Eq v) => g v e -> v -> g v e
+    insertVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
 
     -- | Insert a many vertices into a graph
     -- | New vertices are inserted and already contained vertices are left
     -- | untouched
-    insertVertices :: (Hashable v, Eq v) => g v e -> [v] -> g v e
-    insertVertices = foldl' insertVertex
+    insertVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
+    insertVertices vs g = foldl' (flip insertVertex) g vs
 
     -- | Tell if an edge exists in the graph
     containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool
@@ -95,11 +95,11 @@ class Graph g where
     -- | Insert an edge into a graph
     -- | The involved vertices are inserted if don't exist. If the graph already
     -- | contains the edge, its attribute is updated
-    insertEdgePair :: (Hashable v, Eq v) => g v () -> (v, v) -> g v ()
+    insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
 
     -- | Same as 'insertEdgePair' but for multiple edges
-    insertEdgePairs :: (Hashable v, Eq v) => g v () -> [(v, v)] -> g v ()
-    insertEdgePairs = foldl' insertEdgePair
+    insertEdgePairs :: (Hashable v, Eq v) => [(v, v)] -> g v () -> g v ()
+    insertEdgePairs es g = foldl' (flip insertEdgePair) g es
 
     -- | Remove a vertex from a graph if present
     -- | Every edge incident to this vertex is also removed
@@ -111,17 +111,17 @@ class Graph g where
 
     -- | Remove an edge from a graph if present
     -- | The involved vertices are left untouched
-    removeEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
+    removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
 
     -- | Same as 'removeEdgePair' but for multple edges
-    removeEdgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)] -> g v e
-    removeEdgePairs = foldl' removeEdgePair
+    removeEdgePairs :: (Hashable v, Eq v) => [(v, v)] -> g v e -> g v e
+    removeEdgePairs es g = foldl' (flip removeEdgePair) g es
 
     -- | Remove the edge from a graph if present
     -- | The involved vertices are also removed
-    removeEdgePairAndVertices :: (Hashable v, Eq v) => g v e -> (v, v) -> g v e
-    removeEdgePairAndVertices g (v1, v2) =
-        removeVertex v2 $ removeVertex v1 $ removeEdgePair g (v1, v2)
+    removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
+    removeEdgePairAndVertices (v1, v2) g =
+        removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
 
     -- | Tell if a graph is simple
     -- | A graph is @simple@ if it has no loops

@@ -21,12 +21,12 @@ erdosRenyi n p = go [1..n] (probability p) empty
             rnds <- replicateM (length vs + 1) $ randomRIO (0.0, 1.0)
             flipDir <- randomRIO (True, False)
             let vs' = zip rnds vs
-            let g' = insertVertex g v
+            let g' = insertVertex v g
             go vs pv $! (foldl' (putV pv v flipDir) g' vs')
 
         putV :: Graph g => Float -> Int -> Bool -> g Int () -> (Float, Int) -> g Int ()
         putV pv v flipDir g (p', v')
-            | p' < pv = insertEdgePair g pair
+            | p' < pv = insertEdgePair pair g
             | otherwise = g
                 where pair = if flipDir then (v', v) else (v, v')
 

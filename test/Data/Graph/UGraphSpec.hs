@@ -10,8 +10,8 @@ spec :: Spec
 spec = do
     describe "Undirected Graph (UGraph)" $ do
         it "Can tell if a vertex exists" $ property $ do
-            let g = insertVertex empty 1 :: UGraph Int ()
-            let g' = insertVertex empty 2 :: UGraph Int ()
+            let g = insertVertex 1 empty :: UGraph Int ()
+            let g' = insertVertex 2 empty :: UGraph Int ()
             containsVertex g 1 `shouldBe` True
             containsVertex g' 1 `shouldBe` False
 
@@ -27,19 +27,19 @@ spec = do
 
         it "Increments its order when a new vertex is inserted" $ property $
             \g v -> (not $ g `containsVertex` v)
-                ==> order g + 1 == order (insertVertex (g :: UGraph Int ()) v)
+                ==> order g + 1 == order (insertVertex v (g :: UGraph Int ()))
         it "Increments its size when a new edge is inserted" $ property $
-            \g edge -> (not $ g `containsEdge` edge)
-                ==> size g + 1 == size (insertEdge edge (g :: UGraph Int ()))
+            \g e -> (not $ g `containsEdge` e)
+                ==> size g + 1 == size (insertEdge e (g :: UGraph Int ()))
 
         it "order is conserved" $ property $
             \g v -> (not $ g `containsVertex` v)
-                ==> order g == order (removeVertex v $ insertVertex (g :: UGraph Int ()) v)
+                ==> order g == order (removeVertex v $ insertVertex v (g :: UGraph Int ()))
         it "size is conserved" $ property $
-            \g edge -> (not $ g `containsEdge` edge)
-                ==> size g == size ((flip removeEdge) edge $ insertEdge edge (g :: UGraph Int ()))
+            \g e -> (not $ g `containsEdge` e)
+                ==> size g == size (removeEdge e $ insertEdge e (g :: UGraph Int ()))
 
         it "Is id when inserting and removing a new vertex" $ property $
             \g v -> (not $ g `containsVertex` v)
-                ==> (removeVertex v $ insertVertex g v)
+                ==> (removeVertex v $ insertVertex v g)
                     == (g :: UGraph Int ())

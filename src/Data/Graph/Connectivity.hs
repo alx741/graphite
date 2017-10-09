@@ -66,7 +66,7 @@ isConnected g = go vs True
 isBridgeless :: (Hashable v, Eq v, Ord v) => UGraph v e -> Bool
 -- FIXME: Use a O(n) algorithm
 isBridgeless g =
-    foldl' (\b vs -> b && isConnected (removeEdgePair g vs)) True (edgePairs g)
+    foldl' (\b vs -> b && isConnected (removeEdgePair vs g)) True (edgePairs g)
 
 -- | Tell if a 'UGraph' is orietable
 -- | An undirected graph is @orietable@ if it can be converted into a directed

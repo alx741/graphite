@@ -49,16 +49,16 @@ instance Graph DGraph where
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
-    insertVertex (DGraph g) v = DGraph $ hashMapInsert v HM.empty g
+    insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
-    insertEdgePair g (v1, v2) = insertArc (Arc v1 v2 ()) g
+    insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
 
     removeVertex v g = DGraph
         $ (\(DGraph g') -> HM.delete v g')
-        $ foldl' removeArc g $ incidentArcs g v
+        $ foldl' (flip removeArc) g $ incidentArcs g v
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && (not $ HM.member v $ getLinks v $ unDGraph g)
@@ -86,7 +86,7 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g = DGraph
     $ HM.adjust (insertLink toV edgeAttr) fromV g'
-    where g' = unDGraph $ insertVertices g [fromV, toV]
+    where g' = unDGraph $ insertVertices [fromV, toV] g
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
 -- | Same rules as 'insertArc' are applied
@@ -95,20 +95,20 @@ insertArcs g as = foldl' (flip insertArc) g as
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are left untouched
-removeArc :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> DGraph v e
-removeArc g = removeEdgePair g . toPair
+removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
+removeArc = removeEdgePair . toPair
 
 -- | Same as 'removeArc' but the arc is an ordered pair
-removeArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> DGraph v e
-removeArc' (DGraph g) (v1, v2) = case HM.lookup v1 g of
+removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
+removeArc' (v1, v2) (DGraph g) = case HM.lookup v1 g of
     Nothing -> DGraph g
     Just v1Links -> DGraph $ HM.adjust (const v1Links') v1 g
         where v1Links' = HM.delete v2 v1Links
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
-removeArcAndVertices :: (Hashable v, Eq v) => DGraph v e -> Arc v e -> DGraph v e
-removeArcAndVertices g = removeEdgePairAndVertices g . toPair
+removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
+removeArcAndVertices = removeEdgePairAndVertices . toPair
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
@@ -215,7 +215,7 @@ transpose g = insertArcs empty (fmap reverseArc $ arcs g)
 -- | Convert a directed 'DGraph' to an undirected 'UGraph' by converting all of
 -- | its 'Arc's into 'Edge's
 toUndirected :: (Hashable v, Eq v) => DGraph v e -> UG.UGraph v e
-toUndirected g = UG.insertEdges empty (fmap arcToEdge $ arcs g)
+toUndirected g = UG.insertEdges (fmap arcToEdge $ arcs g) empty
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
 
 

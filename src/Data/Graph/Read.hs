@@ -20,7 +20,7 @@ fromCsv fp = do
     let dec = decode NoHeader content
     case dec of
         Left err -> return $ Left err
-        Right vec -> return $ Right $ insertEdgePairs empty $ toEdges $ V.toList vec
+        Right vec -> return $ Right $ (flip insertEdgePairs) empty $ toEdges $ V.toList vec
 
     where
         toEdges :: [[v]] -> [(v, v)]

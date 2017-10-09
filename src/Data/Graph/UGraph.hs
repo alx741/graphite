@@ -36,7 +36,7 @@ instance (NFData v, NFData e) => NFData (UGraph v e)
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (UGraph v e) where
-    arbitrary = insertEdges <$> pure empty <*> arbitrary
+    arbitrary = insertEdges <$> arbitrary <*> pure empty
 
 instance Graph UGraph where
     empty = UGraph HM.empty
@@ -49,23 +49,23 @@ instance Graph UGraph where
     adjacentVertices (UGraph g) v = HM.keys $ getLinks v g
     directlyReachableVertices g v = v : (adjacentVertices g v)
     vertexDegree (UGraph g) v = length $ HM.keys $ getLinks v g
-    insertVertex (UGraph g) v = UGraph $ hashMapInsert v HM.empty g
+    insertVertex v (UGraph g) = UGraph $ hashMapInsert v HM.empty g
 
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
-    insertEdgePair g (v1, v2) = insertEdge (Edge v1 v2 ()) g
+    insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
 
     removeVertex v g = UGraph
         $ (\(UGraph g') -> HM.delete v g')
-        $ foldl' removeEdge g $ incidentEdges g v
+        $ foldl' (flip removeEdge) g $ incidentEdges g v
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && (not $ HM.member v $ getLinks v $ unUGraph g)
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
-        | otherwise = Just $ insertEdges empty (foldl' genEdges [] labeledM)
+        | otherwise = Just $ insertEdges (foldl' genEdges [] labeledM) empty
             where
                 labeledM :: [(Int, [(Int, Int)])]
                 labeledM = zip [1..] $ fmap (zip [1..]) m
@@ -84,25 +84,25 @@ instance Graph UGraph where
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 insertEdge (Edge v1 v2 edgeAttr) g = UGraph $ link v2 v1 $ link v1 v2 g'
     where
-        g' = unUGraph $ insertVertices g [v1, v2]
+        g' = unUGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
 -- | @O(m*log n)@ Insert many directed 'Edge's into a 'UGraph'
 -- | Same rules as 'insertEdge' are applied
-insertEdges :: (Hashable v, Eq v) => UGraph v e -> [Edge v e] -> UGraph v e
-insertEdges = foldl' (flip insertEdge)
+insertEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
+insertEdges es g = foldl' (flip insertEdge) g es
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are left untouched
-removeEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> UGraph v e
-removeEdge g = removeEdgePair g . toPair
+removeEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
+removeEdge = removeEdgePair . toPair
 
 -- | Same as 'removeEdge' but the edge is an unordered pair
-removeEdge' :: (Hashable v, Eq v) => UGraph v e -> (v, v) -> UGraph v e
-removeEdge' graph@(UGraph g) (v1, v2)
+removeEdge' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v e
+removeEdge' (v1, v2) graph@(UGraph g)
     | containsVertex graph v1 && containsVertex graph v2 =
         UGraph $ update v2Links v2 $ update v1Links v1 g
-    | otherwise = UGraph g
+    | otherwise = graph
     where
         v1Links = HM.delete v2 $ getLinks v1 g
         v2Links = HM.delete v1 $ getLinks v2 g
@@ -110,8 +110,8 @@ removeEdge' graph@(UGraph g) (v1, v2)
 
 -- | @O(log n)@ Remove the undirected 'Edge' from a 'UGraph' if present
 -- | The involved vertices are also removed
-removeEdgeAndVertices :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> UGraph v e
-removeEdgeAndVertices g = removeEdgePairAndVertices g . toPair
+removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
+removeEdgeAndVertices = removeEdgePairAndVertices . toPair
 
 -- | @O(n*m)@ Retrieve the 'Edge's of a 'UGraph'
 edges :: forall v e . (Hashable v, Eq v) => UGraph v e -> [Edge v e]
@@ -148,4 +148,4 @@ toList = edges
 
 -- | Construct a 'UGraph' from a list of 'Edge's
 fromList :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e
-fromList = insertEdges empty
+fromList es = insertEdges es empty
