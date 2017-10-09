@@ -25,6 +25,12 @@ spec = do
             containsEdge g (2 <-> 1) `shouldBe` True
             length (edges g) `shouldBe` 1
 
+        it "Its order corresponds to the number of vertices" $ property $
+            \g -> order g == length (vertices (g :: UGraph Int ()))
+
+        it "Its size corresponds to the number of edges" $ property $
+            \g -> size g == length (edges (g :: UGraph Int ()))
+
         it "Increments its order when a new vertex is inserted" $ property $
             \g v -> (not $ g `containsVertex` v)
                 ==> order g + 1 == order (insertVertex v (g :: UGraph Int ()))

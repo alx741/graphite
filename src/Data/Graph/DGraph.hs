@@ -17,8 +17,10 @@ import           Data.Graph.Types
 import qualified Data.Graph.UGraph as UG
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
-newtype DGraph v e = DGraph { unDGraph :: HM.HashMap v (Links v e) }
-    deriving (Eq, Generic)
+data DGraph v e = DGraph
+    { _size :: Int
+    , unDGraph :: HM.HashMap v (Links v e)
+    } deriving (Eq, Generic)
 
 instance (Hashable v, Eq v, Show v, Show e) => Show (DGraph v e) where
     showsPrec d m = showParen (d > 10) $
@@ -33,31 +35,32 @@ instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
 instance (NFData v, NFData e) => NFData (DGraph v e)
 
 instance Graph DGraph where
-    empty = DGraph HM.empty
-    order (DGraph g) = HM.size g
-    vertices (DGraph g) = HM.keys g
+    empty = DGraph 0 HM.empty
+    order (DGraph _ g) = HM.size g
+    size (DGraph s _) = s
+    vertices (DGraph _ g) = HM.keys g
     edgePairs = arcs'
 
-    containsVertex (DGraph g) = flip HM.member g
-    areAdjacent (DGraph g) v1 v2 =
+    containsVertex (DGraph _ g) = flip HM.member g
+    areAdjacent (DGraph _ g) v1 v2 =
         HM.member v2 (getLinks v1 g) || HM.member v1 (getLinks v2 g)
     adjacentVertices g v = filter
         (\v' -> containsArc' g (v, v') || containsArc' g (v', v))
         (vertices g)
-    directlyReachableVertices (DGraph g) v = v : (HM.keys $ getLinks v g)
+    directlyReachableVertices (DGraph _ g) v = v : (HM.keys $ getLinks v g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 
-    insertVertex v (DGraph g) = DGraph $ hashMapInsert v HM.empty g
+    insertVertex v (DGraph s g) = DGraph s $ hashMapInsert v HM.empty g
 
     containsEdgePair = containsArc'
     incidentEdgePairs g v = fmap toPair $ incidentArcs g v
     insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
     removeEdgePair = removeArc'
 
-    removeVertex v g = DGraph
-        $ (\(DGraph g') -> HM.delete v g')
+    removeVertex v g@(DGraph s _) = DGraph s
+        $ (\(DGraph _ g') -> HM.delete v g')
         $ foldl' (flip removeArc) g $ incidentArcs g v
 
     isSimple g = foldl' go True $ vertices g
@@ -84,8 +87,9 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Arc, its attribute is updated
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
-insertArc (Arc fromV toV edgeAttr) g = DGraph
-    $ HM.adjust (insertLink toV edgeAttr) fromV g'
+insertArc (Arc fromV toV edgeAttr) g@(DGraph s _)
+    | containsEdgePair g (fromV, toV) = g
+    | otherwise = DGraph (s + 1) $ HM.adjust (insertLink toV edgeAttr) fromV g'
     where g' = unDGraph $ insertVertices [fromV, toV] g
 
 -- | @O(m*log n)@ Insert many directed 'Arc's into a 'DGraph'
@@ -100,10 +104,11 @@ removeArc = removeEdgePair . toPair
 
 -- | Same as 'removeArc' but the arc is an ordered pair
 removeArc' :: (Hashable v, Eq v) => (v, v) -> DGraph v e -> DGraph v e
-removeArc' (v1, v2) (DGraph g) = case HM.lookup v1 g of
-    Nothing -> DGraph g
-    Just v1Links -> DGraph $ HM.adjust (const v1Links') v1 g
-        where v1Links' = HM.delete v2 v1Links
+removeArc' (v1, v2) graph@(DGraph s g)
+    | containsEdgePair graph (v1, v2) =
+        DGraph (s - 1) $ HM.adjust (const v1Links') v1 g
+    | otherwise = graph
+        where v1Links' = HM.delete v2 $ getLinks v1 g
 
 -- | @O(log n)@ Remove the directed 'Arc' from a 'DGraph' if present
 -- | The involved vertices are also removed
@@ -112,10 +117,10 @@ removeArcAndVertices = removeEdgePairAndVertices . toPair
 
 -- | @O(n*m)@ Retrieve the 'Arc's of a 'DGraph'
 arcs :: forall v e . (Hashable v, Eq v) => DGraph v e -> [Arc v e]
-arcs (DGraph g) = linksToArcs $ zip vs links
+arcs (DGraph s g) = linksToArcs $ zip vs links
     where
         vs :: [v]
-        vs = vertices $ DGraph g
+        vs = vertices $ DGraph s g
         links :: [Links v e]
         links = fmap (`getLinks` g) vs
 
@@ -130,7 +135,7 @@ containsArc g = containsArc' g . toPair
 
 -- | Same as 'containsArc' but the arc is an ordered pair
 containsArc' :: (Hashable v, Eq v) => DGraph v e -> (v, v) -> Bool
-containsArc' graph@(DGraph g) (v1, v2) =
+containsArc' graph@(DGraph _ g) (v1, v2) =
     containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
