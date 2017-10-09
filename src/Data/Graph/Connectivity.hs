@@ -84,7 +84,7 @@ isWeaklyConnected = isConnected . toUndirected
 -- | A Directed Graph is @strongly connected@ if it contains a directed path
 -- | on every pair of vertices
 isStronglyConnected :: (Hashable v, Eq v, Ord v) => DGraph v e -> Bool
-isStronglyConnected g = isConnected g
+isStronglyConnected = isConnected
 
 -- TODO
 -- * connected component

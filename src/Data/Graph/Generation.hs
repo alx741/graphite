@@ -22,7 +22,7 @@ erdosRenyi n p = go [1..n] (probability p) empty
             flipDir <- randomRIO (True, False)
             let vs' = zip rnds vs
             let g' = insertVertex v g
-            go vs pv $! (foldl' (putV pv v flipDir) g' vs')
+            go vs pv $! foldl' (putV pv v flipDir) g' vs'
 
         putV :: Graph g => Float -> Int -> Bool -> g Int () -> (Float, Int) -> g Int ()
         putV pv v flipDir g (p', v')

@@ -34,7 +34,7 @@ isGraphicalSequence (DegreeSequence []) = True
 isGraphicalSequence (DegreeSequence (x:xs))
     | x > length xs = False
     | otherwise = isGraphicalSequence $ degreeSequence seq'
-        where seq' = (map (subtract 1) $ take x xs) ++ drop x xs
+        where seq' = subtract 1 <$> take x xs ++ drop x xs
 
 -- | Tell if a 'DegreeSequence' is a Directed Graphic
 -- | A @Directed Graphic@ is a Degree Sequence for wich a 'DGraph' exists
