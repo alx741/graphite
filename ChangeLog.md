@@ -1,3 +1,7 @@
+## 0.6.0.0
+
+- Remove redundant functions available in Graph type class
+
 ## 0.5.0.2
 
 - Efficient size computing for DGraph
