@@ -1,3 +1,7 @@
+## 0.5.0.2
+
+- Efficient size computing for DGraph
+
 ## 0.5.0.1
 
 - Efficient size computing for UGraph
