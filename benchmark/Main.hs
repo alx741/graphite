@@ -37,9 +37,18 @@ main = do
             ]
 
         , bgroup "properties"
-            [ bench "order_ug100" $ whnf order ug100
-            , bench "size_ug100" $ whnf size ug100
-            , bench "order_ug500" $ whnf order ug500
-            , bench "size_ug500" $ whnf size ug500
+            [ bench "order_ug100" $ nf order ug100
+            , bench "size_ug100" $ nf size ug100
+            , bench "order_ug500" $ nf order ug500
+            , bench "size_ug500" $ nf size ug500
+            , bench "order_ug1000" $ nf order ug500
+            , bench "size_ug1000" $ nf size ug500
+
+            , bench "order_dg100" $ nf order dg100
+            , bench "size_dg100" $ nf size dg100
+            , bench "order_dg500" $ nf order dg500
+            , bench "size_dg500" $ nf size dg500
+            , bench "order_dg1000" $ nf order dg500
+            , bench "size_dg1000" $ nf size dg500
             ]
         ]
