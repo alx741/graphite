@@ -65,7 +65,7 @@ class Graph g where
 
     -- | Average degree of a graph
     avgDegree :: (Hashable v, Eq v) => g v e -> Double
-    avgDegree g = fromIntegral (2 * size g) / (fromIntegral $ order g)
+    avgDegree g = fromIntegral (2 * size g) / fromIntegral (order g)
 
     -- | Density of a graph
     -- | The ratio of the number of existing edges in the graph to the number of
@@ -245,21 +245,17 @@ getLinks = HM.lookupDefault HM.empty
 
 -- | Get 'Arc's from an association list of vertices and their links
 linksToArcs :: [(v, Links v a)] -> [Arc v a]
-linksToArcs ls = concat $ fmap toArc ls
+linksToArcs = concatMap toArc
     where
         toArc :: (v, Links v a) -> [Arc v a]
-        toArc (fromV, links) = fmap (\(v, a) -> Arc fromV v a) (HM.toList links)
+        toArc (fromV, links) = fmap (uncurry (Arc fromV)) (HM.toList links)
 
 -- | Get 'Edge's from an association list of vertices and their links
 linksToEdges :: [(v, Links v a)] -> [Edge v a]
-linksToEdges ls = concat $ fmap toEdge ls
+linksToEdges = concatMap toEdge
     where
         toEdge :: (v, Links v a) -> [Edge v a]
-        toEdge (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
-
--- | Get 'Edge's from an association list of vertices and their links
-linksToEdges' :: (Eq v) => (v, Links v a) -> [Edge v a]
-linksToEdges' (fromV, links) = fmap (\(v, a) -> Edge fromV v a) (HM.toList links)
+        toEdge (fromV, links) = fmap (uncurry (Edge fromV)) (HM.toList links)
 
 -- | O(log n) Associate the specified value with the specified key in this map.
 -- | If this map previously contained a mapping for the key, leave the map
