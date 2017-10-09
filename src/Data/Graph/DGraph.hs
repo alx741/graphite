@@ -18,7 +18,7 @@ import qualified Data.Graph.UGraph as UG
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 data DGraph v e = DGraph
-    { _size :: Int
+    { _size    :: Int
     , unDGraph :: HM.HashMap v (Links v e)
     } deriving (Eq, Generic)
 
@@ -48,7 +48,7 @@ instance Graph DGraph where
     adjacentVertices g v = filter
         (\v' -> containsEdgePair g (v, v') || containsEdgePair g (v', v))
         (vertices g)
-    directlyReachableVertices (DGraph _ g) v = v : (HM.keys $ getLinks v g)
+    directlyReachableVertices (DGraph _ g) v = v : HM.keys (getLinks v g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
@@ -60,8 +60,8 @@ instance Graph DGraph where
         where v1Links = getLinks v1 g
 
 
-    incidentEdgePairs g v = fmap toPair $ incidentArcs g v
-    insertEdgePair (v1, v2) g = insertArc (Arc v1 v2 ()) g
+    incidentEdgePairs g v = toPair <$> incidentArcs g v
+    insertEdgePair (v1, v2) = insertArc (Arc v1 v2 ())
 
     removeEdgePair (v1, v2) graph@(DGraph s g)
         | containsEdgePair graph (v1, v2) =
@@ -75,7 +75,7 @@ instance Graph DGraph where
         $ foldl' (flip removeArc) g $ incidentArcs g v
 
     isSimple g = foldl' go True $ vertices g
-        where go bool v = bool && (not $ HM.member v $ getLinks v $ unDGraph g)
+        where go bool v = bool && not (HM.member v $ getLinks v $ unDGraph g)
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
@@ -170,11 +170,11 @@ vertexOutdegree g v = length $ filter (\(v', _) -> v == v' ) $ edgePairs g
 
 -- | Indegrees of all the vertices in a 'DGraph'
 indegrees :: (Hashable v, Eq v) => DGraph v e -> [Int]
-indegrees g = fmap (vertexIndegree g) $ vertices g
+indegrees g = vertexIndegree g <$> vertices g
 
 -- | Outdegree of all the vertices in a 'DGraph'
 outdegrees :: (Hashable v, Eq v) => DGraph v e -> [Int]
-outdegrees g = fmap (vertexOutdegree g) $ vertices g
+outdegrees g = vertexOutdegree g <$> vertices g
 
 -- | Tell if a 'DGraph' is balanced
 -- | A Directed Graph is @balanced@ when its @indegree = outdegree@
@@ -209,13 +209,13 @@ isInternal g v = not $ isSource g v || isSink g v
 -- | The @transpose@ of a directed graph is another directed graph where all of
 -- | its arcs are reversed
 transpose :: (Hashable v, Eq v) => DGraph v e -> DGraph v e
-transpose g = insertArcs (fmap reverseArc $ arcs g) empty
+transpose g = insertArcs (reverseArc <$> arcs g) empty
     where reverseArc (Arc fromV toV attr) = Arc toV fromV attr
 
 -- | Convert a directed 'DGraph' to an undirected 'UGraph' by converting all of
 -- | its 'Arc's into 'Edge's
 toUndirected :: (Hashable v, Eq v) => DGraph v e -> UG.UGraph v e
-toUndirected g = UG.insertEdges (fmap arcToEdge $ arcs g) empty
+toUndirected g = UG.insertEdges (arcToEdge <$> arcs g) empty
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
 
 
