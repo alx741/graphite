@@ -50,7 +50,7 @@ instance Graph UGraph where
     containsVertex (UGraph _ g) = flip HM.member g
     areAdjacent (UGraph _ g) v1 v2 = HM.member v2 $ getLinks v1 g
     adjacentVertices (UGraph _ g) v = HM.keys $ getLinks v g
-    directlyReachableVertices g v = v : (adjacentVertices g v)
+    directlyReachableVertices g v = v : adjacentVertices g v
     vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g
     insertVertex v (UGraph s g) = UGraph s $ hashMapInsert v HM.empty g
 
@@ -58,8 +58,8 @@ instance Graph UGraph where
         containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
         where v1Links = getLinks v1 g
 
-    incidentEdgePairs g v = fmap toPair $ incidentEdges g v
-    insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
+    incidentEdgePairs g v = toPair <$> incidentEdges g v
+    insertEdgePair (v1, v2) = insertEdge (Edge v1 v2 ())
 
     removeEdgePair (v1, v2) graph@(UGraph s g)
         | containsEdgePair graph (v1, v2) =
@@ -75,7 +75,7 @@ instance Graph UGraph where
         $ foldl' (flip removeEdge) g $ incidentEdges g v
 
     isSimple g = foldl' go True $ vertices g
-        where go bool v = bool && (not $ HM.member v $ getLinks v $ unUGraph g)
+        where go bool v = bool && not (HM.member v $ getLinks v $ unUGraph g)
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
@@ -130,7 +130,7 @@ edges g = F.toList $ go g S.empty
             let v = head $ vertices g'
             in go
                 (removeVertex v g')
-                (es S.>< (S.fromList $ incidentEdges g' v))
+                (es S.>< S.fromList (incidentEdges g' v))
 
 -- | Tell if an undirected 'Edge' exists in the graph
 containsEdge :: (Hashable v, Eq v) => UGraph v e -> Edge v e -> Bool
