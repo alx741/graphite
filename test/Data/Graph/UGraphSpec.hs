@@ -28,13 +28,29 @@ spec = do
         it "Increments its order when a new vertex is inserted" $ property $
             \g v -> (not $ g `containsVertex` v)
                 ==> order g + 1 == order (insertVertex v (g :: UGraph Int ()))
+
         it "Increments its size when a new edge is inserted" $ property $
             \g e -> (not $ g `containsEdge` e)
                 ==> size g + 1 == size (insertEdge e (g :: UGraph Int ()))
 
+        it "Increments its order only for new vertices" $ property $
+            \v -> order (insertVertex v $ insertVertex v (empty :: UGraph Int ())) == 1
+
+        it "Increments its size only for new edges" $ property $
+            \e -> size (insertEdge e $ insertEdge e (empty :: UGraph Int ())) == 1
+
+        it "Decrements its order only when existing vertices are removed" $ property $
+            \v1 v2 -> (v1 /= v2)
+                ==> order (removeVertex v2 $ insertVertex v1 (empty :: UGraph Int ())) == 1
+
+        it "Decrements its size only when existing edges are removed" $ property $
+            \e1 e2 -> (e1 /= e2)
+                ==> size (removeEdge e2 $ insertEdge e1 (empty :: UGraph Int ())) == 1
+
         it "order is conserved" $ property $
             \g v -> (not $ g `containsVertex` v)
                 ==> order g == order (removeVertex v $ insertVertex v (g :: UGraph Int ()))
+
         it "size is conserved" $ property $
             \g e -> (not $ g `containsEdge` e)
                 ==> size g == size (removeEdge e $ insertEdge e (g :: UGraph Int ()))

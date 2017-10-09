@@ -19,8 +19,10 @@ import           Text.Read
 import Data.Graph.Types
 
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/
-newtype UGraph v e = UGraph { unUGraph :: HM.HashMap v (Links v e) }
-    deriving (Eq, Generic)
+data UGraph v e = UGraph
+    { _size :: Int
+    , unUGraph :: HM.HashMap v (Links v e)
+    } deriving (Eq, Generic)
 
 instance (Hashable v, Eq v, Show v, Show e) => Show (UGraph v e) where
     showsPrec d m = showParen (d > 10) $
@@ -39,25 +41,26 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
     arbitrary = insertEdges <$> arbitrary <*> pure empty
 
 instance Graph UGraph where
-    empty = UGraph HM.empty
-    order (UGraph g) = HM.size g
-    vertices (UGraph g) = HM.keys g
+    empty = UGraph 0 HM.empty
+    order (UGraph _ g) = HM.size g
+    size (UGraph s _) = s
+    vertices (UGraph _ g) = HM.keys g
     edgePairs g = toPair <$> edges g
 
-    containsVertex (UGraph g) = flip HM.member g
-    areAdjacent (UGraph g) v1 v2 = HM.member v2 $ getLinks v1 g
-    adjacentVertices (UGraph g) v = HM.keys $ getLinks v g
+    containsVertex (UGraph _ g) = flip HM.member g
+    areAdjacent (UGraph _ g) v1 v2 = HM.member v2 $ getLinks v1 g
+    adjacentVertices (UGraph _ g) v = HM.keys $ getLinks v g
     directlyReachableVertices g v = v : (adjacentVertices g v)
-    vertexDegree (UGraph g) v = length $ HM.keys $ getLinks v g
-    insertVertex v (UGraph g) = UGraph $ hashMapInsert v HM.empty g
+    vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g
+    insertVertex v (UGraph s g) = UGraph s $ hashMapInsert v HM.empty g
 
     containsEdgePair = containsEdge'
     incidentEdgePairs g v = fmap toPair $ incidentEdges g v
     insertEdgePair (v1, v2) g = insertEdge (Edge v1 v2 ()) g
     removeEdgePair = removeEdge'
 
-    removeVertex v g = UGraph
-        $ (\(UGraph g') -> HM.delete v g')
+    removeVertex v g@(UGraph s _) = UGraph s
+        $ (\(UGraph _ g') -> HM.delete v g')
         $ foldl' (flip removeEdge) g $ incidentEdges g v
 
     isSimple g = foldl' go True $ vertices g
@@ -82,7 +85,9 @@ instance Graph UGraph where
 -- | The involved vertices are inserted if don't exist. If the graph already
 -- | contains the Edge, its attribute is updated
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
-insertEdge (Edge v1 v2 edgeAttr) g = UGraph $ link v2 v1 $ link v1 v2 g'
+insertEdge (Edge v1 v2 edgeAttr) g@(UGraph s _)
+    | containsEdgePair g (v1, v2) = g
+    | otherwise = UGraph (s + 1) $ link v2 v1 $ link v1 v2 g'
     where
         g' = unUGraph $ insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
@@ -99,9 +104,9 @@ removeEdge = removeEdgePair . toPair
 
 -- | Same as 'removeEdge' but the edge is an unordered pair
 removeEdge' :: (Hashable v, Eq v) => (v, v) -> UGraph v e -> UGraph v e
-removeEdge' (v1, v2) graph@(UGraph g)
-    | containsVertex graph v1 && containsVertex graph v2 =
-        UGraph $ update v2Links v2 $ update v1Links v1 g
+removeEdge' (v1, v2) graph@(UGraph s g)
+    | containsEdgePair graph (v1, v2) =
+        UGraph (s - 1) $ update v2Links v2 $ update v1Links v1 g
     | otherwise = graph
     where
         v1Links = HM.delete v2 $ getLinks v1 g
@@ -130,13 +135,13 @@ containsEdge g = containsEdge' g . toPair
 
 -- | Same as 'containsEdge' but the edge is an unordered pair
 containsEdge' :: (Hashable v, Eq v) => UGraph v e -> (v, v) -> Bool
-containsEdge' graph@(UGraph g) (v1, v2) =
+containsEdge' graph@(UGraph _ g) (v1, v2) =
     containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
     where v1Links = getLinks v1 g
 
 -- | Retrieve the incident 'Edge's of a Vertex
 incidentEdges :: (Hashable v, Eq v) => UGraph v e -> v -> [Edge v e]
-incidentEdges (UGraph g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
+incidentEdges (UGraph _ g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 
 
 -- * Lists
