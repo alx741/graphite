@@ -1,3 +1,8 @@
+## 0.5.0.0
+
+- Flip arguments for insertion and removal
+- Efficient graph size function
+
 ## 0.4.3.0
 
 - Remove Probability datatype. erdosRenyi takes a Float
