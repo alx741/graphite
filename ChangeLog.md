@@ -1,3 +1,7 @@
+## 0.5.0.1
+
+- Efficient size computing for UGraph
+
 ## 0.5.0.0
 
 - Flip arguments for insertion and removal
