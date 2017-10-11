@@ -24,7 +24,7 @@ areConnected :: forall g v e . (Graph g, Hashable v, Eq v, Ord v)
  -> Bool
 areConnected g fromV toV
     | fromV == toV = True
-    | otherwise = search (directlyReachableVertices g fromV) S.empty toV
+    | otherwise = search (fromV : reachableAdjacentVertices g fromV) S.empty toV
     where
         search :: [v] -> S.Set v -> v -> Bool
         search [] _ _ = False
@@ -32,7 +32,7 @@ areConnected g fromV toV
             | v `S.member` banned = search vs banned v'
             | v == v' = True
             | otherwise =
-                search (directlyReachableVertices g v) banned' v'
+                search (v : reachableAdjacentVertices g v) banned' v'
                 || search vs banned' v'
             where banned' = v `S.insert` banned
 

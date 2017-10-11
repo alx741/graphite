@@ -64,8 +64,6 @@ instance Graph DGraph where
             (\(fromV, _, _) -> fromV == v)
             (toTriple <$> toList g)
 
-    directlyReachableVertices (DGraph _ g) v = v : HM.keys (getLinks v g)
-
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
 

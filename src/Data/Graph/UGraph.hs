@@ -53,7 +53,6 @@ instance Graph UGraph where
     adjacentVertices' (UGraph _ g) v = HM.toList $ getLinks v g
     reachableAdjacentVertices = adjacentVertices
     reachableAdjacentVertices' = adjacentVertices'
-    directlyReachableVertices g v = v : adjacentVertices g v
     vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g
     insertVertex v (UGraph s g) = UGraph s $ hashMapInsert v HM.empty g
 

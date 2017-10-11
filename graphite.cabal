@@ -25,7 +25,6 @@ library
                      , Data.Graph.DGraph.DegreeSequence
                      , Data.Graph.UGraph.DegreeSequence
                      , Data.Graph.Visualize
-  other-modules:       Scratch
   build-depends:       base >= 4.7 && < 5
                      , QuickCheck
                      , bytestring

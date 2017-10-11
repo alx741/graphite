@@ -59,14 +59,6 @@ class Graph g where
     -- | connecting edge's attribute
     reachableAdjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, e)]
 
-    -- FIXME: Deprecated! use reachableAdjacentVertices instead
-    -- | Retrieve the vertices that are directly reachable from a particular
-    -- | vertex.
-    -- | A vertex is @directly reachable@ to other if there is an edge that
-    -- | connects @from@ one vertex @to@ the other
-    -- | Every vertex is directly reachable from itself
-    directlyReachableVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
-
     -- | Total number of incident edges of a vertex
     vertexDegree :: (Hashable v, Eq v) => g v e -> v -> Int
 
