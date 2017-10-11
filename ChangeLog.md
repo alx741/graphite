@@ -1,3 +1,8 @@
+## 0.7.0.0
+
+- Deprecate directlyReachableVertices in favor of reachableAdjacentVertices
+- Add edge-triples functions in Graph type class
+
 ## 0.6.0.0
 
 - Remove redundant functions available in Graph type class
