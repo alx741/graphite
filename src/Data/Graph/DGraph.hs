@@ -57,6 +57,13 @@ instance Graph DGraph where
             (\(fromV, toV, _) -> fromV == v || toV == v)
             (toTriple <$> toList g)
 
+    reachableAdjacentVertices (DGraph _ g) v = HM.keys (getLinks v g)
+
+    reachableAdjacentVertices' g v = fmap (\(_, toV, e) -> (toV, e)) $
+        filter
+            (\(fromV, _, _) -> fromV == v)
+            (toTriple <$> toList g)
+
     directlyReachableVertices (DGraph _ g) v = v : HM.keys (getLinks v g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex

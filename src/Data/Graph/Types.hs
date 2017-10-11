@@ -53,6 +53,7 @@ class Graph g where
     -- | for the case of a directed graph, the directed arcs will constrain the
     -- | reachability of the adjacent vertices.
     reachableAdjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
+    reachableAdjacentVertices g v = fst <$> reachableAdjacentVertices' g v
 
     -- | Same as 'reachableAdjacentVertices' but pairs the vertex with the
     -- | connecting edge's attribute
