@@ -40,6 +40,11 @@ class Graph g where
 
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
+    adjacentVertices g v = fst <$> adjacentVertices' g v
+
+    -- | Same as 'adjacentVertices' but pairs the vertex with the connecting
+    -- | edge's attribute
+    adjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, e)]
 
     -- | Same as 'adjacentVertices' but gives back only those vertices for which
     -- | the connecting edge allows the vertex to be reached.
@@ -167,6 +172,10 @@ class IsEdge e where
     -- | Convert an edge to a pair discargind its attribute
     toPair :: e v a -> (v, v)
 
+    -- | Convert an edge to a triple, where the 3rd element its the edge
+    -- | attribute
+    toTriple :: e v a -> (v, v, a)
+
     -- | Tell if an edge is a loop
     -- | An edge forms a @loop@ if both of its ends point to the same vertex
     isLoop :: (Eq v) => e v a -> Bool
@@ -176,10 +185,12 @@ instance (NFData v, NFData e) => NFData (Arc v e)
 
 instance IsEdge Edge where
     toPair (Edge v1 v2 _) = (v1, v2)
+    toTriple (Edge v1 v2 e) = (v1, v2, e)
     isLoop (Edge v1 v2 _) = v1 == v2
 
 instance IsEdge Arc where
     toPair (Arc fromV toV _) = (fromV, toV)
+    toTriple (Arc fromV toV e) = (fromV, toV, e)
     isLoop (Arc v1 v2 _) = v1 == v2
 
 -- | Weighted Edge attributes

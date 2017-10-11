@@ -50,6 +50,7 @@ instance Graph UGraph where
     containsVertex (UGraph _ g) = flip HM.member g
     areAdjacent (UGraph _ g) v1 v2 = HM.member v2 $ getLinks v1 g
     adjacentVertices (UGraph _ g) v = HM.keys $ getLinks v g
+    adjacentVertices' (UGraph _ g) v = HM.toList $ getLinks v g
     directlyReachableVertices g v = v : adjacentVertices g v
     vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g
     insertVertex v (UGraph s g) = UGraph s $ hashMapInsert v HM.empty g

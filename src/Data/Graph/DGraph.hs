@@ -43,11 +43,20 @@ instance Graph DGraph where
 
 
     containsVertex (DGraph _ g) = flip HM.member g
+
     areAdjacent (DGraph _ g) v1 v2 =
         HM.member v2 (getLinks v1 g) || HM.member v1 (getLinks v2 g)
+
     adjacentVertices g v = filter
         (\v' -> containsEdgePair g (v, v') || containsEdgePair g (v', v))
         (vertices g)
+
+    adjacentVertices' g v = fmap
+        (\(fromV, toV, e) -> if fromV == v then (toV, e) else (fromV, e)) $
+        filter
+            (\(fromV, toV, _) -> fromV == v || toV == v)
+            (toTriple <$> toList g)
+
     directlyReachableVertices (DGraph _ g) v = v : HM.keys (getLinks v g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
