@@ -41,6 +41,19 @@ class Graph g where
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
 
+    -- | Same as 'adjacentVertices' but gives back only those vertices for which
+    -- | the connecting edge allows the vertex to be reached.
+    -- |
+    -- | For an undirected graph this is equivalent to 'adjacentVertices', but
+    -- | for the case of a directed graph, the directed arcs will constrain the
+    -- | reachability of the adjacent vertices.
+    reachableAdjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
+
+    -- | Same as 'reachableAdjacentVertices' but pairs the vertex with the
+    -- | connecting edge's attribute
+    reachableAdjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, e)]
+
+    -- FIXME: Deprecated! use reachableAdjacentVertices instead
     -- | Retrieve the vertices that are directly reachable from a particular
     -- | vertex.
     -- | A vertex is @directly reachable@ to other if there is an edge that
