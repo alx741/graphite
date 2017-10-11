@@ -45,7 +45,7 @@ instance Graph UGraph where
     order (UGraph _ g) = HM.size g
     size (UGraph s _) = s
     vertices (UGraph _ g) = HM.keys g
-    edgePairs g = toPair <$> edges g
+    edgeTriples g = toTriple <$> edges g
 
     containsVertex (UGraph _ g) = flip HM.member g
     areAdjacent (UGraph _ g) v1 v2 = HM.member v2 $ getLinks v1 g
@@ -60,8 +60,8 @@ instance Graph UGraph where
         containsVertex graph v1 && containsVertex graph v2 && v2 `HM.member` v1Links
         where v1Links = getLinks v1 g
 
-    incidentEdgePairs g v = toPair <$> incidentEdges g v
-    insertEdgePair (v1, v2) = insertEdge (Edge v1 v2 ())
+    incidentEdgeTriples g v = toTriple <$> incidentEdges g v
+    insertEdgeTriple (v1, v2, e) = insertEdge (Edge v1 v2 e)
 
     removeEdgePair (v1, v2) graph@(UGraph s g)
         | containsEdgePair graph (v1, v2) =

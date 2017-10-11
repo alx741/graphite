@@ -30,7 +30,11 @@ class Graph g where
     vertices :: g v e -> [v]
 
     -- | Retrieve the edges of a graph
+    edgeTriples :: (Hashable v, Eq v) => g v e -> [(v, v, e)]
+
+    -- | Retrieve the edges of a graph, ignoring its attributes
     edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
+    edgePairs g = tripleToPair <$> edgeTriples g
 
     -- | Tell if a vertex exists in the graph
     containsVertex :: (Hashable v, Eq v) => g v e -> v -> Bool
@@ -101,14 +105,27 @@ class Graph g where
     containsEdgePair :: (Hashable v, Eq v) => g v e -> (v, v) -> Bool
 
     -- | Retrieve the incident edges of a vertex
+    incidentEdgeTriples :: (Hashable v, Eq v) => g v e -> v -> [(v, v, e)]
+
+    -- | Retrieve the incident edges of a vertex, ignoring its attributes
     incidentEdgePairs :: (Hashable v, Eq v) => g v e -> v -> [(v, v)]
+    incidentEdgePairs g v = tripleToPair <$> incidentEdgeTriples g v
 
     -- | Insert an edge into a graph
     -- | The involved vertices are inserted if don't exist. If the graph already
     -- | contains the edge, its attribute is updated
-    insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
+    insertEdgeTriple :: (Hashable v, Eq v) => (v, v, e) -> g v e -> g v e
 
-    -- | Same as 'insertEdgePair' but for multiple edges
+    -- | Same as 'insertEdgeTriple' but for multiple edges
+    insertEdgeTriples :: (Hashable v, Eq v) => [(v, v, e)] -> g v e -> g v e
+    insertEdgeTriples es g = foldl' (flip insertEdgeTriple) g es
+
+    -- | Same as 'insertEdgeTriple' but insert edge pairs in graphs with
+    -- | attributeless edges
+    insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
+    insertEdgePair (v1, v2) = insertEdgeTriple (v1, v2, ())
+
+    -- | Same as 'insertEdgePair' for multiple edges
     insertEdgePairs :: (Hashable v, Eq v) => [(v, v)] -> g v () -> g v ()
     insertEdgePairs es g = foldl' (flip insertEdgePair) g es
 
@@ -165,7 +182,7 @@ class IsEdge e where
     -- | Convert an edge to a pair discargind its attribute
     toPair :: e v a -> (v, v)
 
-    -- | Convert an edge to a triple, where the 3rd element its the edge
+    -- | Convert an edge to a triple, where the 3rd element it's the edge
     -- | attribute
     toTriple :: e v a -> (v, v, a)
 
@@ -232,6 +249,10 @@ instance (Eq v, Eq a) => Eq (Edge v a) where
 -- | is the same
 instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
+
+-- | Convert a triple to a pair by ignoring the third element
+tripleToPair :: (a, b, c) -> (a, b)
+tripleToPair (a, b, _) = (a, b)
 
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)

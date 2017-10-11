@@ -75,7 +75,7 @@ instance Graph DGraph where
 
 
     incidentEdgePairs g v = toPair <$> incidentArcs g v
-    insertEdgePair (v1, v2) = insertArc (Arc v1 v2 ())
+    insertEdgeTriple (v1, v2, e) = insertArc (Arc v1 v2 e)
 
     removeEdgePair (v1, v2) graph@(DGraph s g)
         | containsEdgePair graph (v1, v2) =
