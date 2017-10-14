@@ -44,7 +44,7 @@ class Graph g where
 
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
-    adjacentVertices g v = (\(_, v', _) -> v') <$> adjacentVertices' g v
+    adjacentVertices g v = tripleDestVertex <$> adjacentVertices' g v
 
     -- | Same as 'adjacentVertices' but gives back the connecting edges
     adjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, v, e)]
@@ -56,7 +56,7 @@ class Graph g where
     -- | for the case of a directed graph, the directed arcs will constrain the
     -- | reachability of the adjacent vertices.
     reachableAdjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
-    reachableAdjacentVertices g v = (\(_, v', _) -> v') <$> reachableAdjacentVertices' g v
+    reachableAdjacentVertices g v = tripleDestVertex <$> reachableAdjacentVertices' g v
 
     -- | Same as 'reachableAdjacentVertices' but gives back the connecting edges
     reachableAdjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, v, e)]
@@ -265,6 +265,12 @@ instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
 instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
     arbitrary = arbitraryEdge Arc
 
+-- | Edges generator
+arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
+ => (v -> v -> e -> edge) -> Gen edge
+arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
+    where vert = getPositive <$> arbitrary
+
 -- | To 'Edge's are equal if they point to the same vertices, regardless of the
 -- | direction
 instance (Eq v, Eq a) => Eq (Edge v a) where
@@ -278,16 +284,28 @@ instance (Eq v, Eq a) => Eq (Edge v a) where
 instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
 
+
+-- * Triples convenience functions
+
 -- | Convert a triple to a pair by ignoring the third element
 tripleToPair :: (a, b, c) -> (a, b)
 tripleToPair (a, b, _) = (a, b)
 
--- | Edges generator
-arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
- => (v -> v -> e -> edge) -> Gen edge
-arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
-    where vert = getPositive <$> arbitrary
+-- | Convert a pair to a triple where the 3rd element is unit
+pairToTriple :: (a, b) -> (a, b, ())
+pairToTriple (a, b) = (a, b, ())
 
+-- | Get the origin vertex from an edge triple
+tripleOriginVertex :: (v, v, e) -> v
+tripleOriginVertex (v, _, _) = v
+
+-- | Get the destination vertex from an edge triple
+tripleDestVertex :: (v, v, e) -> v
+tripleDestVertex (_, v, _) = v
+
+-- | Get the attribute from an edge triple
+tripleAttribute :: (v, v, e) -> e
+tripleAttribute (_, _, e) = e
 
 
 
