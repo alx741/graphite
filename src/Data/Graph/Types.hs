@@ -36,6 +36,9 @@ class Graph g where
     edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
     edgePairs g = tripleToPair <$> edgeTriples g
 
+    -- | Get the edge betwee to vertices if it exists
+    edgeTriple :: g v e -> v -> v -> Maybe (v, v, e)
+
     -- | Tell if a vertex exists in the graph
     containsVertex :: (Hashable v, Eq v) => g v e -> v -> Bool
 
