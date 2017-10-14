@@ -177,12 +177,18 @@ data Arc v e = Arc v v e
 (-->) v1 v2 = Arc v1 v2 ()
 
 class IsEdge e where
-    -- | Convert an edge to a pair discargind its attribute
+    -- | Convert an edge to a pair discarding its attribute
     toPair :: e v a -> (v, v)
+
+    -- | Convert a pair to an edge, where it's attribute is unit
+    fromPair :: (v, v) -> e v ()
 
     -- | Convert an edge to a triple, where the 3rd element it's the edge
     -- | attribute
     toTriple :: e v a -> (v, v, a)
+
+    -- | Convert a triple to an edge
+    fromTriple :: (v, v, a) -> e v a
 
     -- | Tell if an edge is a loop
     -- | An edge forms a @loop@ if both of its ends point to the same vertex
@@ -193,12 +199,16 @@ instance (NFData v, NFData e) => NFData (Arc v e)
 
 instance IsEdge Edge where
     toPair (Edge v1 v2 _) = (v1, v2)
+    fromPair (v1, v2) = Edge v1 v2 ()
     toTriple (Edge v1 v2 e) = (v1, v2, e)
+    fromTriple (v1, v2, e) = Edge v1 v2 e
     isLoop (Edge v1 v2 _) = v1 == v2
 
 instance IsEdge Arc where
     toPair (Arc fromV toV _) = (fromV, toV)
+    fromPair (fromV, toV) = Arc fromV toV ()
     toTriple (Arc fromV toV e) = (fromV, toV, e)
+    fromTriple (fromV, toV, e) = Arc fromV toV e
     isLoop (Arc v1 v2 _) = v1 == v2
 
 -- | Weighted Edge attributes
