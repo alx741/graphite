@@ -168,11 +168,11 @@ data Edge v e = Edge v v e
 data Arc v e = Arc v v e
     deriving (Show, Read, Ord, Generic)
 
--- | Construct an undirected 'Edge' between two vertices
+-- | Construct an attributeless undirected 'Edge' between two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
 (<->) v1 v2 = Edge v1 v2 ()
 
--- | Construct a directed 'Arc' between two vertices
+-- | Construct an attributeless directed 'Arc' between two vertices
 (-->) :: (Hashable v) => v -> v -> Arc v ()
 (-->) v1 v2 = Arc v1 v2 ()
 

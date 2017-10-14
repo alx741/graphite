@@ -51,11 +51,9 @@ instance Graph DGraph where
         (\v' -> containsEdgePair g (v, v') || containsEdgePair g (v', v))
         (vertices g)
 
-    adjacentVertices' g v = fmap
-        (\(fromV, toV, e) -> if fromV == v then (fromV, toV, e) else (toV, fromV, e)) $
-        filter
-            (\(fromV, toV, _) -> fromV == v || toV == v)
-            (toTriple <$> toList g)
+    adjacentVertices' g v = filter
+        (\(fromV, toV, _) -> fromV == v || toV == v)
+        (toTriple <$> toList g)
 
     reachableAdjacentVertices (DGraph _ g) v = HM.keys (getLinks v g)
 
