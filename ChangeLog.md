@@ -1,3 +1,7 @@
+## 0.8.0.0
+
+- adjacentVertices' and reachableAdjacentVertices' return edge triples
+
 ## 0.7.0.0
 
 - Deprecate directlyReachableVertices in favor of reachableAdjacentVertices
