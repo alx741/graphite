@@ -6,6 +6,8 @@ module Data.Graph.Visualize
     , plotDGraphPng
     ) where
 
+import Control.Concurrent
+
 import Data.GraphViz
 import Data.GraphViz.Attributes.Complete
 import Data.Hashable
@@ -15,16 +17,16 @@ import Data.Graph.Types
 import Data.Graph.UGraph
 
 -- | Plot an undirected 'UGraph'
-plotUGraph :: (Show e) => UGraph Int e -> IO ()
-plotUGraph g = runGraphvizCanvas Sfdp (toUndirectedDot g) Xlib
+plotUGraph :: (Show e) => UGraph Int e -> IO ThreadId
+plotUGraph g = forkIO $ runGraphvizCanvas Sfdp (toUndirectedDot g) Xlib
 
 -- | Plot an undirected 'UGraph' to a PNG image file
 plotUGraphPng :: (Show e) => UGraph Int e -> FilePath -> IO FilePath
 plotUGraphPng g = addExtension (runGraphvizCommand Sfdp $ toUndirectedDot g) Png
 
 -- | Plot a directed 'DGraph'
-plotDGraph :: (Show e) => DGraph Int e -> IO ()
-plotDGraph g = runGraphvizCanvas Sfdp (toDirectedDot g) Xlib
+plotDGraph :: (Show e) => DGraph Int e -> IO ThreadId
+plotDGraph g = forkIO $ runGraphvizCanvas Sfdp (toDirectedDot g) Xlib
 
 -- | Plot a directed 'DGraph' to a PNG image file
 plotDGraphPng :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
