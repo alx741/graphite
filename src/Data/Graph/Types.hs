@@ -177,6 +177,17 @@ data Arc v e = Arc v v e
 (-->) v1 v2 = Arc v1 v2 ()
 
 class IsEdge e where
+    -- | Retrieve the origin vertex of the edge
+    originVertex :: e v a -> v
+
+    -- | Retrieve the destination vertex of the edge
+    destinationVertex :: e v a -> v
+
+    -- | Retrieve the attribute of the edge
+    attribute :: e v a -> a
+
+    -- * Conversion
+
     -- | Convert an edge to a pair discarding its attribute
     toPair :: e v a -> (v, v)
 
@@ -190,6 +201,9 @@ class IsEdge e where
     -- | Convert a triple to an edge
     fromTriple :: (v, v, a) -> e v a
 
+
+    -- * Properties
+
     -- | Tell if an edge is a loop
     -- | An edge forms a @loop@ if both of its ends point to the same vertex
     isLoop :: (Eq v) => e v a -> Bool
@@ -198,6 +212,9 @@ instance (NFData v, NFData e) => NFData (Edge v e)
 instance (NFData v, NFData e) => NFData (Arc v e)
 
 instance IsEdge Edge where
+    originVertex (Edge v _ _) = v
+    destinationVertex (Edge _ v _) = v
+    attribute (Edge _ _ e) = e
     toPair (Edge v1 v2 _) = (v1, v2)
     fromPair (v1, v2) = Edge v1 v2 ()
     toTriple (Edge v1 v2 e) = (v1, v2, e)
@@ -205,6 +222,9 @@ instance IsEdge Edge where
     isLoop (Edge v1 v2 _) = v1 == v2
 
 instance IsEdge Arc where
+    originVertex (Arc v _ _) = v
+    destinationVertex (Arc _ v _) = v
+    attribute (Arc _ _ e) = e
     toPair (Arc fromV toV _) = (fromV, toV)
     fromPair (fromV, toV) = Arc fromV toV ()
     toTriple (Arc fromV toV e) = (fromV, toV, e)
