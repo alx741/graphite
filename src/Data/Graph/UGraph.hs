@@ -47,11 +47,18 @@ instance Graph UGraph where
     vertices (UGraph _ g) = HM.keys g
     edgeTriples g = toTriple <$> edges g
 
+    edgeTriple (UGraph _ g) v1 v2 =
+        let mAttr = HM.lookup v2 $ getLinks v1 g
+        in case mAttr of
+            Just attr -> Just (v1, v2, attr)
+            Nothing   -> Nothing
+
     containsVertex (UGraph _ g) = flip HM.member g
     areAdjacent (UGraph _ g) v1 v2 = HM.member v2 $ getLinks v1 g
     adjacentVertices (UGraph _ g) v = HM.keys $ getLinks v g
     adjacentVertices' (UGraph _ g) v = fmap (\(toV, e) -> (v, toV, e)) $
         HM.toList $ getLinks v g
+
     reachableAdjacentVertices = adjacentVertices
     reachableAdjacentVertices' = adjacentVertices'
     vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g

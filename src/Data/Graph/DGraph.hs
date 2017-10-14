@@ -41,6 +41,11 @@ instance Graph DGraph where
     vertices (DGraph _ g) = HM.keys g
     edgeTriples g = toTriple <$> arcs g
 
+    edgeTriple (DGraph _ g) v1 v2 =
+        let mAttr = HM.lookup v2 $ getLinks v1 g
+        in case mAttr of
+            Just attr -> Just (v1, v2, attr)
+            Nothing   -> Nothing
 
     containsVertex (DGraph _ g) = flip HM.member g
 

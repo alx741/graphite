@@ -36,9 +36,6 @@ class Graph g where
     edgePairs :: (Hashable v, Eq v) => g v e -> [(v, v)]
     edgePairs g = tripleToPair <$> edgeTriples g
 
-    -- | Get the edge betwee to vertices if it exists
-    edgeTriple :: g v e -> v -> v -> Maybe (v, v, e)
-
     -- | Tell if a vertex exists in the graph
     containsVertex :: (Hashable v, Eq v) => g v e -> v -> Bool
 
@@ -111,6 +108,9 @@ class Graph g where
     -- | Retrieve the incident edges of a vertex, ignoring its attributes
     incidentEdgePairs :: (Hashable v, Eq v) => g v e -> v -> [(v, v)]
     incidentEdgePairs g v = tripleToPair <$> incidentEdgeTriples g v
+
+    -- | Get the edge between to vertices if it exists
+    edgeTriple :: (Hashable v, Eq v) => g v e -> v -> v -> Maybe (v, v, e)
 
     -- | Insert an edge into a graph
     -- | The involved vertices are inserted if don't exist. If the graph already
