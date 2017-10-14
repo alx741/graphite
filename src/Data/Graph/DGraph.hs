@@ -39,7 +39,7 @@ instance Graph DGraph where
     order (DGraph _ g) = HM.size g
     size (DGraph s _) = s
     vertices (DGraph _ g) = HM.keys g
-    edgePairs g = toPair <$> arcs g
+    edgeTriples g = toTriple <$> arcs g
 
 
     containsVertex (DGraph _ g) = flip HM.member g
@@ -52,17 +52,16 @@ instance Graph DGraph where
         (vertices g)
 
     adjacentVertices' g v = fmap
-        (\(fromV, toV, e) -> if fromV == v then (toV, e) else (fromV, e)) $
+        (\(fromV, toV, e) -> if fromV == v then (fromV, toV, e) else (toV, fromV, e)) $
         filter
             (\(fromV, toV, _) -> fromV == v || toV == v)
             (toTriple <$> toList g)
 
     reachableAdjacentVertices (DGraph _ g) v = HM.keys (getLinks v g)
 
-    reachableAdjacentVertices' g v = fmap (\(_, toV, e) -> (toV, e)) $
-        filter
-            (\(fromV, _, _) -> fromV == v)
-            (toTriple <$> toList g)
+    reachableAdjacentVertices' g v = filter
+        (\(fromV, _, _) -> fromV == v)
+        (toTriple <$> toList g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
@@ -74,7 +73,7 @@ instance Graph DGraph where
         where v1Links = getLinks v1 g
 
 
-    incidentEdgePairs g v = toPair <$> incidentArcs g v
+    incidentEdgeTriples g v = toTriple <$> incidentArcs g v
     insertEdgeTriple (v1, v2, e) = insertArc (Arc v1 v2 e)
 
     removeEdgePair (v1, v2) graph@(DGraph s g)

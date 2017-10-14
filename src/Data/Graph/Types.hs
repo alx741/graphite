@@ -44,11 +44,10 @@ class Graph g where
 
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
-    adjacentVertices g v = fst <$> adjacentVertices' g v
+    adjacentVertices g v = (\(_, v', _) -> v') <$> adjacentVertices' g v
 
-    -- | Same as 'adjacentVertices' but pairs the vertex with the connecting
-    -- | edge's attribute
-    adjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, e)]
+    -- | Same as 'adjacentVertices' but gives back the connecting edges
+    adjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, v, e)]
 
     -- | Same as 'adjacentVertices' but gives back only those vertices for which
     -- | the connecting edge allows the vertex to be reached.
@@ -57,11 +56,10 @@ class Graph g where
     -- | for the case of a directed graph, the directed arcs will constrain the
     -- | reachability of the adjacent vertices.
     reachableAdjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
-    reachableAdjacentVertices g v = fst <$> reachableAdjacentVertices' g v
+    reachableAdjacentVertices g v = (\(_, v', _) -> v') <$> reachableAdjacentVertices' g v
 
-    -- | Same as 'reachableAdjacentVertices' but pairs the vertex with the
-    -- | connecting edge's attribute
-    reachableAdjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, e)]
+    -- | Same as 'reachableAdjacentVertices' but gives back the connecting edges
+    reachableAdjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, v, e)]
 
     -- | Total number of incident edges of a vertex
     vertexDegree :: (Hashable v, Eq v) => g v e -> v -> Int
