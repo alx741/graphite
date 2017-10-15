@@ -1,10 +1,10 @@
-![Graphite Logo](./logo/logo.png)
+# graphite - A Haskell graphs and networks library
 
 [![](https://img.shields.io/hackage/v/graphite.svg)](https://hackage.haskell.org/package/graphite)
 ![Hackage-Deps](https://img.shields.io/hackage-deps/v/graphite.svg)
 [![CircleCI](https://circleci.com/gh/alx741/graphite.svg?style=svg)](https://circleci.com/gh/alx741/graphite)
 
-# graphite
+![Graphite Logo](./logo/logo.png)
 
 Represent, analyze and visualize graphs & networks.
 
