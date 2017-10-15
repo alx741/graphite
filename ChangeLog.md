@@ -1,3 +1,9 @@
+## 0.8.1.0
+
+- fork plot functions to ease use in GHCI
+- adjacentVertices' bugfix
+- Data.Graph.Traversal module initial version
+
 ## 0.8.0.0
 
 - adjacentVertices' and reachableAdjacentVertices' return edge triples

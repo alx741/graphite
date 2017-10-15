@@ -1,5 +1,5 @@
 name:                graphite
-version:             0.8.0.0
+version:             0.8.1.0
 synopsis:            Graphs and networks library
 description:         Represent, analyze and visualize graphs
 homepage:            https://github.com/alx741/graphite#readme
@@ -18,11 +18,12 @@ library
   exposed-modules:     Data.Graph.Types
                      , Data.Graph.Connectivity
                      , Data.Graph.DGraph
+                     , Data.Graph.DGraph.DegreeSequence
                      , Data.Graph.Generation
                      , Data.Graph.Morphisms
                      , Data.Graph.Read
+                     , Data.Graph.Traversal
                      , Data.Graph.UGraph
-                     , Data.Graph.DGraph.DegreeSequence
                      , Data.Graph.UGraph.DegreeSequence
                      , Data.Graph.Visualize
   build-depends:       base >= 4.7 && < 5
@@ -31,7 +32,6 @@ library
                      , cassava
                      , containers
                      , deepseq
-                     , dequeue
                      , graphviz
                      , hashable
                      , process
@@ -63,7 +63,7 @@ benchmark graphite-benchmark
                      , graphite
                      , deepseq
                      , criterion
-  ghc-options:         -O2
+  ghc-options:         -O
   default-language:    Haskell2010
 
 source-repository head
