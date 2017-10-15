@@ -10,9 +10,7 @@
 Represent, analyze and visualize graphs & networks.
 
 
-# Current state
+## Documentation
 
-Most of what you'll find here are *undefined* functions, sort of like a wish
-list to be eventually fulfilled.
-
-The basic graph types `UGraph` and `DGraph` could already be used if desired.
+* Tutorial (under construction): http://haskell-graphite.readthedocs.io/
+* Haddock: https://hackage.haskell.org/package/graphite#modules
