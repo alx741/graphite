@@ -4,8 +4,9 @@
 
 module Data.Graph.DGraph where
 
-import Data.List    (foldl')
-import GHC.Generics (Generic)
+import Data.List      (foldl')
+import Data.Semigroup
+import GHC.Generics   (Generic)
 
 import           Control.DeepSeq
 import           Data.Hashable
@@ -31,6 +32,13 @@ instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
         Ident "fromList" <- lexP
         xs <- readPrec
         return (fromList xs)
+
+instance (Hashable v) => Monoid (DGraph v e) where
+    mempty = empty
+    mappend = union
+
+instance (Hashable v) => Semigroup (DGraph v e) where
+    (<>) = mappend
 
 instance (NFData v, NFData e) => NFData (DGraph v e)
 
@@ -92,6 +100,12 @@ instance Graph DGraph where
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && not (HM.member v $ getLinks v $ unDGraph g)
+
+
+    union = undefined
+    intersection = undefined
+    join = undefined
+
 
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
