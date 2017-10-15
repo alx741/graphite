@@ -14,6 +14,9 @@ import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
 
 class Graph g where
+
+    -- * Properties
+
     -- | The Empty (order-zero) graph with no vertices and no edges
     empty :: (Hashable v) => g v e
 
@@ -25,6 +28,18 @@ class Graph g where
     -- | The @size@ of a graph is its number of edges
     size :: (Hashable v, Eq v) => g v e -> Int
     size = length . edgePairs
+
+    -- | Density of a graph
+    -- | The ratio of the number of existing edges in the graph to the number of
+    -- | posible edges
+    density :: (Hashable v, Eq v) => g v e -> Double
+    density g = (2 * (e - n + 1)) / (n * (n - 3) + 2)
+        where
+            n = fromIntegral $ order g
+            e = fromIntegral $ size g
+
+
+    -- * Operations
 
     -- | Retrieve the vertices of a graph
     vertices :: g v e -> [v]
@@ -79,15 +94,6 @@ class Graph g where
     -- | Average degree of a graph
     avgDegree :: (Hashable v, Eq v) => g v e -> Double
     avgDegree g = fromIntegral (2 * size g) / fromIntegral (order g)
-
-    -- | Density of a graph
-    -- | The ratio of the number of existing edges in the graph to the number of
-    -- | posible edges
-    density :: (Hashable v, Eq v) => g v e -> Double
-    density g = (2 * (e - n + 1)) / (n * (n - 3) + 2)
-        where
-            n = fromIntegral $ order g
-            e = fromIntegral $ size g
 
     -- | Insert a vertex into a graph
     -- | If the graph already contains the vertex leave the graph untouched
@@ -156,12 +162,31 @@ class Graph g where
     -- | A graph is @simple@ if it has no loops
     isSimple :: (Hashable v, Eq v) => g v e -> Bool
 
+
+    -- * Binary operations
+
+    -- | Union of two graphs
+    union :: g v e -> g v e -> g v e
+
+    -- | Intersection of two graphs
+    intersection :: g v e -> g v e -> g v e
+
+    -- | Join two graphs
+    -- |
+    -- | The @join@ of two graphs G1 and G2 is a new graph where each vertex of
+    -- | G1 has an edge to all the vertices of G2
+    join :: g v e -> g v e -> g v e
+
+
+    -- * Transformations
+
     -- | Generate a graph of Int vertices from an adjacency
     -- | square matrix
     fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())
 
     -- | Get the adjacency matrix representation of a grah
     toAdjacencyMatrix :: g v e -> [[Int]]
+
 
 -- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
 data Edge v e = Edge v v e
