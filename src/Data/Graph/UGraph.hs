@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Data.Graph.UGraph where
 
@@ -41,6 +42,9 @@ instance (Hashable v) => Monoid (UGraph v e) where
 
 instance (Hashable v) => Semigroup (UGraph v e) where
     (<>) = mappend
+
+instance (Hashable v, Eq v) => Functor (UGraph v) where
+    fmap f g = fromList $ fmap (\(Edge v1 v2 e) -> Edge v1 v2 (f e)) $ toList g
 
 instance (NFData v, NFData e) => NFData (UGraph v e)
 
