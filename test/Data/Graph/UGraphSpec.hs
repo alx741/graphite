@@ -3,8 +3,8 @@ module Data.Graph.UGraphSpec where
 import Test.Hspec
 import Test.QuickCheck
 
-import Data.Graph.UGraph
 import Data.Graph.Types
+import Data.Graph.UGraph
 
 spec :: Spec
 spec = do
@@ -65,3 +65,6 @@ spec = do
             \g v -> (not $ g `containsVertex` v)
                 ==> (removeVertex v $ insertVertex v g)
                     == (g :: UGraph Int ())
+
+        it "Can be represented as a list" $ property $
+            \g -> (fromList . toList) g == (g :: UGraph Int ())
