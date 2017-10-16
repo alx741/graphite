@@ -1,3 +1,10 @@
+## 0.9.0.0
+
+- toList and fromList use adjacency list representation
+- Pretty Printing for graphs
+- Add Binary operations in Graph type class
+- Functor and Foldable instances removed
+
 ## 0.8.1.0
 
 - fork plot functions to ease use in GHCI
