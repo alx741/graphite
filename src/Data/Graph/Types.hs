@@ -180,13 +180,19 @@ class Graph g where
 
     -- * Transformations
 
-    -- | Generate a graph of Int vertices from an adjacency
-    -- | square matrix
-    fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())
+    -- | Convert a graph to an adjacency list with edge attributes in /e/
+    toList :: (Hashable v, Eq v) => g v e -> [(v, [(v, e)])]
 
-    -- | Get the adjacency matrix representation of a grah
+    -- | Construct a graph from an adjacency list with edge attributes in /e/
+    fromList :: (Hashable v, Eq v) => [(v, [(v, e)])] -> g v e
+
+    -- TODO: make this [[Bool]]
+    -- | Get the adjacency binary matrix representation of a grah
     toAdjacencyMatrix :: g v e -> [[Int]]
 
+    -- | Generate a graph of Int vertices from an adjacency
+    -- | square binary matrix
+    fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())
 
 -- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
 data Edge v e = Edge v v e

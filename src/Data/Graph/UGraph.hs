@@ -1,8 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE DeriveGeneric       #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE ViewPatterns         #-}
 
 module Data.Graph.UGraph where
 
@@ -43,12 +43,12 @@ instance (Hashable v) => Monoid (UGraph v e) where
 instance (Hashable v) => Semigroup (UGraph v e) where
     (<>) = mappend
 
-instance (Hashable v, Eq v) => Functor (UGraph v) where
-    fmap f g = fromList $ fmap (\(Edge v1 v2 e) -> Edge v1 v2 (f e)) $ toList g
+-- instance (Hashable v, Eq v) => Functor (UGraph v) where
+--     fmap f g = fromList $ fmap (\(Edge v1 v2 e) -> Edge v1 v2 (f e)) $ toList g
 
-instance (Hashable v, Eq v) => Foldable (UGraph v) where
-    foldMap f g = foldMap f (fmap attribute $ toList g)
-    foldr f acc g = foldr f acc (fmap attribute $ toList g)
+-- instance (Hashable v, Eq v) => Foldable (UGraph v) where
+--     foldMap f g = foldMap f (fmap attribute $ toList g)
+--     foldr f acc g = foldr f acc (fmap attribute $ toList g)
 
 instance (NFData v, NFData e) => NFData (UGraph v e)
 
@@ -107,6 +107,19 @@ instance Graph UGraph where
     union = undefined
     intersection = undefined
     join = undefined
+
+    toList (UGraph _ g) = zip vs $ fmap (\v -> HM.toList $ getLinks v g) vs
+        where vs = HM.keys g
+
+    fromList links = go links empty
+        where
+            go [] g = g
+            go ((v, es):rest) g = go
+                rest $
+                foldr
+                    (\(v', e) g' -> insertEdgeTriple (v, v', e) g')
+                    (insertVertex v g)
+                    es
 
 
     fromAdjacencyMatrix m
@@ -175,11 +188,25 @@ incidentEdges (UGraph _ g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g)
 
 -- * Lists
 
--- | Convert a 'UGraph' to a list of 'Edge's
--- | Same as 'edges'
-toList :: (Hashable v, Eq v) => UGraph v e -> [Edge v e]
-toList = edges
+-- | Convert a 'UGraph' to a list of 'Edge's ignoring isolated vertices
+-- |
+-- | Note that: fromEdgesList . toEdgesList /= id
+toEdgesList :: (Hashable v, Eq v) => UGraph v e -> [Edge v e]
+toEdgesList = edges
 
 -- | Construct a 'UGraph' from a list of 'Edge's
-fromList :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e
-fromList es = insertEdges es empty
+fromEdgesList :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e
+fromEdgesList es = insertEdges es empty
+
+
+-- Show/Read representation
+data UGraph_ v e = UGraph_
+    { _edges :: [Edge v e]
+    , _isolatedVertices :: [v]
+    } deriving (Show, Read)
+
+toRep :: (Hashable v, Eq v) => UGraph v e -> UGraph_ v e
+toRep g = UGraph_ (edges g) $ filter (\v -> vertexDegree g v == 0) $ vertices g
+
+fromRep :: (Hashable v, Eq v) => UGraph_ v e -> UGraph v e
+fromRep (UGraph_ es vs) = insertVertices vs $ insertEdges es empty

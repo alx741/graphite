@@ -23,15 +23,15 @@ data DGraph v e = DGraph
     , unDGraph :: HM.HashMap v (Links v e)
     } deriving (Eq, Generic)
 
-instance (Hashable v, Eq v, Show v, Show e) => Show (DGraph v e) where
-    showsPrec d m = showParen (d > 10) $
-        showString "fromList " . shows (toList m)
+-- instance (Hashable v, Eq v, Show v, Show e) => Show (DGraph v e) where
+--     showsPrec d m = showParen (d > 10) $
+--         showString "fromList " . shows (toList m)
 
-instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
-    readPrec = parens $ prec 10 $ do
-        Ident "fromList" <- lexP
-        xs <- readPrec
-        return (fromList xs)
+-- instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
+--     readPrec = parens $ prec 10 $ do
+--         Ident "fromList" <- lexP
+--         xs <- readPrec
+--         return (fromList xs)
 
 instance (Hashable v) => Monoid (DGraph v e) where
     mempty = empty
@@ -40,12 +40,12 @@ instance (Hashable v) => Monoid (DGraph v e) where
 instance (Hashable v) => Semigroup (DGraph v e) where
     (<>) = mappend
 
-instance (Hashable v, Eq v) => Functor (DGraph v) where
-    fmap f g = fromList $ fmap (\(Arc v1 v2 e) -> Arc v1 v2 (f e)) $ toList g
+-- instance (Hashable v, Eq v) => Functor (DGraph v) where
+--     fmap f g = fromList $ fmap (\(Arc v1 v2 e) -> Arc v1 v2 (f e)) $ toList g
 
-instance (Hashable v, Eq v) => Foldable (DGraph v) where
-    foldMap f g = foldMap f (fmap attribute $ toList g)
-    foldr f acc g = foldr f acc (fmap attribute $ toList g)
+-- instance (Hashable v, Eq v) => Foldable (DGraph v) where
+--     foldMap f g = foldMap f (fmap attribute $ toList g)
+--     foldr f acc g = foldr f acc (fmap attribute $ toList g)
 
 instance (NFData v, NFData e) => NFData (DGraph v e)
 
@@ -71,15 +71,15 @@ instance Graph DGraph where
         (\v' -> containsEdgePair g (v, v') || containsEdgePair g (v', v))
         (vertices g)
 
-    adjacentVertices' g v = filter
-        (\(fromV, toV, _) -> fromV == v || toV == v)
-        (toTriple <$> toList g)
+    -- adjacentVertices' g v = filter
+    --     (\(fromV, toV, _) -> fromV == v || toV == v)
+    --     (toTriple <$> toList g)
 
     reachableAdjacentVertices (DGraph _ g) v = HM.keys (getLinks v g)
 
-    reachableAdjacentVertices' g v = filter
-        (\(fromV, _, _) -> fromV == v)
-        (toTriple <$> toList g)
+    -- reachableAdjacentVertices' g v = filter
+    --     (\(fromV, _, _) -> fromV == v)
+    --     (toTriple <$> toList g)
 
     -- | The total number of inbounding and outbounding 'Arc's of a vertex
     vertexDegree g v = vertexIndegree g v + vertexOutdegree g v
@@ -256,13 +256,13 @@ toUndirected g = UG.insertEdges (arcToEdge <$> arcs g) empty
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
 
 
--- * Lists
+-- -- * Lists
 
--- | Convert a 'DGraph' to a list of 'Arc's
--- | Same as 'arcs'
-toList :: (Hashable v, Eq v) => DGraph v e -> [Arc v e]
-toList = arcs
+-- -- | Convert a 'DGraph' to a list of 'Arc's
+-- -- | Same as 'arcs'
+-- toList :: (Hashable v, Eq v) => DGraph v e -> [Arc v e]
+-- toList = arcs
 
--- | Construct a 'DGraph' from a list of 'Arc's
-fromList :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e
-fromList as = insertArcs as empty
+-- -- | Construct a 'DGraph' from a list of 'Arc's
+-- fromList :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e
+-- fromList as = insertArcs as empty
