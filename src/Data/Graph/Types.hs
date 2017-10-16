@@ -185,6 +185,15 @@ class Graph g where
 
     -- | Construct a graph from an adjacency list with edge attributes in /e/
     fromList :: (Hashable v, Eq v) => [(v, [(v, e)])] -> g v e
+    fromList links = go links empty
+        where
+            go [] g = g
+            go ((v, es):rest) g = go
+                rest $
+                foldr
+                    (\(v', e) g' -> insertEdgeTriple (v, v', e) g')
+                    (insertVertex v g)
+                    es
 
     -- TODO: make this [[Bool]]
     -- | Get the adjacency binary matrix representation of a grah

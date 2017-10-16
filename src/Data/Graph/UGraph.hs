@@ -111,17 +111,6 @@ instance Graph UGraph where
     toList (UGraph _ g) = zip vs $ fmap (\v -> HM.toList $ getLinks v g) vs
         where vs = HM.keys g
 
-    fromList links = go links empty
-        where
-            go [] g = g
-            go ((v, es):rest) g = go
-                rest $
-                foldr
-                    (\(v', e) g' -> insertEdgeTriple (v, v', e) g')
-                    (insertVertex v g)
-                    es
-
-
     fromAdjacencyMatrix m
         | length m /= length (head m) = Nothing
         | otherwise = Just $ insertEdges (foldl' genEdges [] labeledM) empty
