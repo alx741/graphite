@@ -269,3 +269,14 @@ toArcsList = arcs
 -- | Construct a 'DGraph' from a list of 'Arc's
 fromArcsList :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e
 fromArcsList as = insertArcs as empty
+
+
+-- * Pretty printing
+
+prettyPrint :: (Hashable v, Eq v, Show v, Show e) => DGraph v e -> String
+prettyPrint g =
+    "Isolated Vertices: "
+    <> show (filter (\v -> vertexDegree g v == 0) $ vertices g)
+    <> "   "
+    <> "Arcs: "
+    <> show (arcs g)

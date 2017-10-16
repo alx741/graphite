@@ -188,14 +188,12 @@ fromEdgesList :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e
 fromEdgesList es = insertEdges es empty
 
 
--- Show/Read representation
-data UGraph_ v e = UGraph_
-    { _edges :: [Edge v e]
-    , _isolatedVertices :: [v]
-    } deriving (Show, Read)
+-- * Pretty printing
 
-toRep :: (Hashable v, Eq v) => UGraph v e -> UGraph_ v e
-toRep g = UGraph_ (edges g) $ filter (\v -> vertexDegree g v == 0) $ vertices g
-
-fromRep :: (Hashable v, Eq v) => UGraph_ v e -> UGraph v e
-fromRep (UGraph_ es vs) = insertVertices vs $ insertEdges es empty
+prettyPrint :: (Hashable v, Eq v, Show v, Show e) => UGraph v e -> String
+prettyPrint g =
+    "Isolated Vertices: "
+    <> show (filter (\v -> vertexDegree g v == 0) $ vertices g)
+    <> "   "
+    <> "Edges: "
+    <> show (edges g)
