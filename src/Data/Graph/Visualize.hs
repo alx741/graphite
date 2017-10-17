@@ -17,19 +17,29 @@ import Data.Graph.Types
 import Data.Graph.UGraph
 
 -- | Plot an undirected 'UGraph'
-plotUGraph :: (Show e) => UGraph Int e -> IO ThreadId
+plotUGraph :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
+ => UGraph v e
+ -> IO ThreadId
 plotUGraph g = forkIO $ runGraphvizCanvas Sfdp (toUndirectedDot g) Xlib
 
 -- | Plot an undirected 'UGraph' to a PNG image file
-plotUGraphPng :: (Show e) => UGraph Int e -> FilePath -> IO FilePath
+plotUGraphPng :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
+ => UGraph v e
+ -> FilePath
+ -> IO FilePath
 plotUGraphPng g = addExtension (runGraphvizCommand Sfdp $ toUndirectedDot g) Png
 
 -- | Plot a directed 'DGraph'
-plotDGraph :: (Show e) => DGraph Int e -> IO ThreadId
+plotDGraph :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
+ => DGraph v e
+ -> IO ThreadId
 plotDGraph g = forkIO $ runGraphvizCanvas Sfdp (toDirectedDot g) Xlib
 
 -- | Plot a directed 'DGraph' to a PNG image file
-plotDGraphPng :: (Show e) => DGraph Int e -> FilePath -> IO FilePath
+plotDGraphPng :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
+ => DGraph v e
+ -> FilePath
+ -> IO FilePath
 plotDGraphPng g = addExtension (runGraphvizCommand Sfdp $ toDirectedDot g) Png
 
 labeledNodes :: (Graph g, Show v) => g v e -> [(v, String)]
@@ -41,14 +51,16 @@ labeledEdges g = (\(Edge v1 v2 attr) -> (v1, v2, show attr)) <$> edges g
 labeledArcs :: (Hashable v, Eq v, Show e) => DGraph v e -> [(v, v, String)]
 labeledArcs g = (\(Arc v1 v2 attr) -> (v1, v2, show attr)) <$> arcs g
 
-toUndirectedDot :: (Show e) => UGraph Int e -> DotGraph Int
+toUndirectedDot :: (Hashable v, Ord v, Show v, Show e)
+ => UGraph v e
+ -> DotGraph v
 toUndirectedDot g = graphElemsToDot params (labeledNodes g) (labeledEdges g)
     where params = nonClusteredParams
             { isDirected = False
             , globalAttributes = [GraphAttrs [Overlap ScaleOverlaps]]
             }
 
-toDirectedDot :: (Show e) => DGraph Int e -> DotGraph Int
+toDirectedDot :: (Hashable v, Ord v, Show v, Show e) => DGraph v e -> DotGraph v
 toDirectedDot g = graphElemsToDot params (labeledNodes g) (labeledArcs g)
     where params = nonClusteredParams
             { isDirected = True
