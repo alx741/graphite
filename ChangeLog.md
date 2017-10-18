@@ -1,3 +1,7 @@
+## 0.9.3.0
+
+- Bugfix Functor and Foldable instances
+
 ## 0.9.2.0
 
 - Add plot functions that render edge labels
