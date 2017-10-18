@@ -1,3 +1,7 @@
+## 0.9.2.0
+
+- Add plot functions that render edge labels
+
 ## 0.9.1.0
 
 - Generalize graph visualization types
