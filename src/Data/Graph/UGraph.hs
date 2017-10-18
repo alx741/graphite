@@ -43,12 +43,12 @@ instance (Hashable v) => Monoid (UGraph v e) where
 instance (Hashable v) => Semigroup (UGraph v e) where
     (<>) = mappend
 
--- instance (Hashable v, Eq v) => Functor (UGraph v) where
---     fmap f g = fromList $ fmap (\(Edge v1 v2 e) -> Edge v1 v2 (f e)) $ toList g
+instance (Hashable v, Eq v) => Functor (UGraph v) where
+    fmap f (UGraph s g) = UGraph s $ fmap (fmap f) g
 
--- instance (Hashable v, Eq v) => Foldable (UGraph v) where
---     foldMap f g = foldMap f (fmap attribute $ toList g)
---     foldr f acc g = foldr f acc (fmap attribute $ toList g)
+instance (Hashable v, Eq v) => Foldable (UGraph v) where
+    foldMap f g = foldMap f $ fmap attribute $ edges g
+    foldr f acc g = foldr f acc $ fmap attribute $ edges g
 
 instance (NFData v, NFData e) => NFData (UGraph v e)
 

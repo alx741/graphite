@@ -308,6 +308,12 @@ instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Edge v e) where
 instance (Arbitrary v, Arbitrary e, Num v, Ord v) => Arbitrary (Arc v e) where
     arbitrary = arbitraryEdge Arc
 
+instance Functor (Edge v) where
+    fmap f (Edge v1 v2 e) = Edge v1 v2 $ f e
+
+instance Functor (Arc v) where
+    fmap f (Arc v1 v2 e) = Arc v1 v2 $ f e
+
 -- | Edges generator
 arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
  => (v -> v -> e -> edge) -> Gen edge
