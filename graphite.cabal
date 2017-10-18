@@ -39,6 +39,7 @@ library
                      , random
                      , unordered-containers
                      , vector
+  other-modules:       Data.Graph.Internal
   ghc-options:         -Wall
   default-language:    Haskell2010
 

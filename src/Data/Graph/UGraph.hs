@@ -18,6 +18,7 @@ import qualified Data.Sequence     as S
 import           Test.QuickCheck
 import           Text.Read
 
+import Data.Graph.Internal
 import Data.Graph.Types
 
 -- | Undirected Graph of Vertices in /v/ and Edges with attributes in /e/

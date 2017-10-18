@@ -8,13 +8,16 @@ import Data.List    (foldl')
 import GHC.Float    (float2Double)
 import GHC.Generics (Generic)
 
-import           Control.DeepSeq
-import           Data.Hashable
-import qualified Data.HashMap.Lazy as HM
-import           Test.QuickCheck
+import Control.DeepSeq
+import Data.Hashable
+import Test.QuickCheck
 
+-- | Types that behave like graphs
+-- |
+-- | The main 'Graph' instances are 'UGraph' and 'DGraph'. The functions in this
+-- class should be used for algorithms that are graph-directionality agnostic,
+-- otherwise use the more specific ones in 'UGraph' and 'DGraph'
 class Graph g where
-
     -- * Properties
 
     -- | The Empty (order-zero) graph with no vertices and no edges
@@ -203,22 +206,12 @@ class Graph g where
     -- | square binary matrix
     fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())
 
--- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
-data Edge v e = Edge v v e
-    deriving (Show, Read, Ord, Generic)
 
--- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
-data Arc v e = Arc v v e
-    deriving (Show, Read, Ord, Generic)
 
--- | Construct an attributeless undirected 'Edge' between two vertices
-(<->) :: (Hashable v) => v -> v -> Edge v ()
-(<->) v1 v2 = Edge v1 v2 ()
-
--- | Construct an attributeless directed 'Arc' between two vertices
-(-->) :: (Hashable v) => v -> v -> Arc v ()
-(-->) v1 v2 = Arc v1 v2 ()
-
+-- | Types that represent edges
+-- |
+-- | The main 'IsEdge' instances are 'Edge' for undirected edges and 'Arc' for
+-- directed edges.
 class IsEdge e where
     -- | Retrieve the origin vertex of the edge
     originVertex :: e v a -> v
@@ -251,6 +244,24 @@ class IsEdge e where
     -- | An edge forms a @loop@ if both of its ends point to the same vertex
     isLoop :: (Eq v) => e v a -> Bool
 
+
+
+-- | Undirected Edge with attribute of type /e/ between to Vertices of type /v/
+data Edge v e = Edge v v e
+    deriving (Show, Read, Ord, Generic)
+
+-- | Directed Arc with attribute of type /e/ between to Vertices of type /v/
+data Arc v e = Arc v v e
+    deriving (Show, Read, Ord, Generic)
+
+-- | Construct an attributeless undirected 'Edge' between two vertices
+(<->) :: (Hashable v) => v -> v -> Edge v ()
+(<->) v1 v2 = Edge v1 v2 ()
+
+-- | Construct an attributeless directed 'Arc' between two vertices
+(-->) :: (Hashable v) => v -> v -> Arc v ()
+(-->) v1 v2 = Arc v1 v2 ()
+
 instance (NFData v, NFData e) => NFData (Edge v e)
 instance (NFData v, NFData e) => NFData (Arc v e)
 
@@ -275,14 +286,12 @@ instance IsEdge Arc where
     isLoop (Arc v1 v2 _) = v1 == v2
 
 -- | Weighted Edge attributes
--- | Useful for computing some algorithms on graphs
-class Weighted a where
-    weight :: a -> Double
+class Weighted e where
+    weight :: e -> Double
 
 -- | Labeled Edge attributes
--- | Useful for graph plotting
-class Labeled a where
-    label :: a -> String
+class Labeled e where
+    label :: e -> String
 
 instance Weighted Int where
     weight = fromIntegral
@@ -320,7 +329,7 @@ arbitraryEdge :: (Arbitrary v, Arbitrary e, Ord v, Num v)
 arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
     where vert = getPositive <$> arbitrary
 
--- | To 'Edge's are equal if they point to the same vertices, regardless of the
+-- | Two 'Edge's are equal if they point to the same vertices, regardless of the
 -- | direction
 instance (Eq v, Eq a) => Eq (Edge v a) where
     (Edge v1 v2 a) == (Edge v1' v2' a') =
@@ -328,8 +337,8 @@ instance (Eq v, Eq a) => Eq (Edge v a) where
         && (v1 == v1' && v2 == v2')
         || (v1 == v2' && v2 == v1')
 
--- | To 'Arc's are equal if they point to the same vertices, and the directions
--- | is the same
+-- | Two 'Arc's are equal if they point to the same vertices, and the directions
+-- | are the same
 instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
 
@@ -355,43 +364,3 @@ tripleDestVertex (_, v, _) = v
 -- | Get the attribute from an edge triple
 tripleAttribute :: (v, v, e) -> e
 tripleAttribute (_, _, e) = e
-
-
-
-
-
--- ###########
--- ## Internal
--- ###########
-
--- | Each vertex maps to a 'Links' value so it can poit to other vertices
-type Links v e = HM.HashMap v e
-
--- | Insert a link directed to *v* with attribute *a*
--- | If the connnection already exists, the attribute is replaced
-insertLink :: (Hashable v, Eq v) => v -> a -> Links v a -> Links v a
-insertLink = HM.insert
-
--- | Get the links for a given vertex
-getLinks :: (Hashable v, Eq v) => v -> HM.HashMap v (Links v e) -> Links v e
-getLinks = HM.lookupDefault HM.empty
-
--- | Get 'Arc's from an association list of vertices and their links
-linksToArcs :: [(v, Links v a)] -> [Arc v a]
-linksToArcs = concatMap toArc
-    where
-        toArc :: (v, Links v a) -> [Arc v a]
-        toArc (fromV, links) = fmap (uncurry (Arc fromV)) (HM.toList links)
-
--- | Get 'Edge's from an association list of vertices and their links
-linksToEdges :: [(v, Links v a)] -> [Edge v a]
-linksToEdges = concatMap toEdge
-    where
-        toEdge :: (v, Links v a) -> [Edge v a]
-        toEdge (fromV, links) = fmap (uncurry (Edge fromV)) (HM.toList links)
-
--- | O(log n) Associate the specified value with the specified key in this map.
--- | If this map previously contained a mapping for the key, leave the map
--- | intact.
-hashMapInsert :: (Eq k, Hashable k) => k -> v -> HM.HashMap k v -> HM.HashMap k v
-hashMapInsert k v m = if not (HM.member k m) then HM.insert k v m else m

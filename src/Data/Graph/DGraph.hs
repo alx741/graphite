@@ -14,8 +14,9 @@ import qualified Data.HashMap.Lazy as HM
 import           Test.QuickCheck
 import           Text.Read
 
+import           Data.Graph.Internal
 import           Data.Graph.Types
-import qualified Data.Graph.UGraph as UG
+import qualified Data.Graph.UGraph   as UG
 
 -- | Directed Graph of Vertices in /v/ and Arcs with attributes in /e/
 data DGraph v e = DGraph
