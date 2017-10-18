@@ -40,12 +40,12 @@ instance (Hashable v) => Monoid (DGraph v e) where
 instance (Hashable v) => Semigroup (DGraph v e) where
     (<>) = mappend
 
--- instance (Hashable v, Eq v) => Functor (DGraph v) where
---     fmap f g = fromList $ fmap (\(Arc v1 v2 e) -> Arc v1 v2 (f e)) $ toList g
+instance (Hashable v, Eq v) => Functor (DGraph v) where
+    fmap f (DGraph s g) = DGraph s $ fmap (fmap f) g
 
--- instance (Hashable v, Eq v) => Foldable (DGraph v) where
---     foldMap f g = foldMap f (fmap attribute $ toList g)
---     foldr f acc g = foldr f acc (fmap attribute $ toList g)
+instance (Hashable v, Eq v) => Foldable (DGraph v) where
+    foldMap f g = foldMap f $ fmap attribute $ arcs g
+    foldr f acc g = foldr f acc $ fmap attribute $ arcs g
 
 instance (NFData v, NFData e) => NFData (DGraph v e)
 
