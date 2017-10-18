@@ -32,6 +32,7 @@ library
                      , cassava
                      , containers
                      , deepseq
+                     , text
                      , graphviz
                      , hashable
                      , process
