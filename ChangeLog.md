@@ -1,3 +1,7 @@
+## 0.9.1.0
+
+- Generalize graph visualization types
+
 ## 0.9.0.0
 
 - toList and fromList use adjacency list representation
