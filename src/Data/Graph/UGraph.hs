@@ -7,7 +7,7 @@
 module Data.Graph.UGraph where
 
 import qualified Data.Foldable  as F (toList)
-import           Data.List      (foldl')
+import           Data.List      (foldl', intersect)
 import           Data.Semigroup
 import           GHC.Generics   (Generic)
 
@@ -106,7 +106,11 @@ instance Graph UGraph where
 
 
     union g1 g2 = insertEdges (toEdgesList g1) $ insertVertices (vertices g1) g2
-    intersection = undefined
+
+    intersection g1 g2 =
+        insertVertices (isolatedVertices g1 `intersect` isolatedVertices g2) $
+        fromEdgesList (toEdgesList g1 `intersect` toEdgesList g2)
+
     join = undefined
 
     toList (UGraph _ g) = zip vs $ fmap (\v -> HM.toList $ getLinks v g) vs
@@ -194,7 +198,7 @@ fromEdgesList es = insertEdges es empty
 prettyPrint :: (Hashable v, Eq v, Show v, Show e) => UGraph v e -> String
 prettyPrint g =
     "Isolated Vertices: "
-    <> show (filter (\v -> vertexDegree g v == 0) $ vertices g)
+    <> show (isolatedVertices g)
     <> "   "
     <> "Edges: "
     <> show (edges g)
