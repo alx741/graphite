@@ -168,8 +168,8 @@ class Graph g where
 
     -- * Binary operations
 
-    -- | Union of two graphs
-    union :: g v e -> g v e -> g v e
+    -- | Disjoint union of two graphs
+    union :: (Hashable v, Eq v) => g v e -> g v e -> g v e
 
     -- | Intersection of two graphs
     intersection :: g v e -> g v e -> g v e

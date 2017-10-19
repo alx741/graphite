@@ -34,11 +34,11 @@ instance (Hashable v, Eq v, Read v, Read e) => Read (DGraph v e) where
         xs <- readPrec
         return (fromList xs)
 
-instance (Hashable v) => Monoid (DGraph v e) where
+instance (Hashable v, Eq v) => Monoid (DGraph v e) where
     mempty = empty
     mappend = union
 
-instance (Hashable v) => Semigroup (DGraph v e) where
+instance (Hashable v, Eq v) => Semigroup (DGraph v e) where
     (<>) = mappend
 
 instance (Hashable v, Eq v) => Functor (DGraph v) where

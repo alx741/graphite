@@ -37,11 +37,11 @@ instance (Hashable v, Eq v, Read v, Read e) => Read (UGraph v e) where
         xs <- readPrec
         return (fromList xs)
 
-instance (Hashable v) => Monoid (UGraph v e) where
+instance (Hashable v, Eq v) => Monoid (UGraph v e) where
     mempty = empty
     mappend = union
 
-instance (Hashable v) => Semigroup (UGraph v e) where
+instance (Hashable v, Eq v) => Semigroup (UGraph v e) where
     (<>) = mappend
 
 instance (Hashable v, Eq v) => Functor (UGraph v) where
@@ -105,7 +105,7 @@ instance Graph UGraph where
         where go bool v = bool && not (HM.member v $ getLinks v $ unUGraph g)
 
 
-    union = undefined
+    union g1 g2 = insertEdges (toEdgesList g1) $ insertVertices (vertices g1) g2
     intersection = undefined
     join = undefined
 
