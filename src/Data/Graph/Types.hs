@@ -44,7 +44,7 @@ class Graph g where
 
     -- * Operations
 
-    -- | Retrieve the vertices of a graph
+    -- | Retrieve all the vertices of a graph
     vertices :: g v e -> [v]
 
     -- | Retrieve the edges of a graph
@@ -161,6 +161,10 @@ class Graph g where
     removeEdgePairAndVertices (v1, v2) g =
         removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
 
+    -- | Retrieve the isolated vertices of a graph, if any
+    isolatedVertices :: (Hashable v, Eq v) => g v e -> [v]
+    isolatedVertices g = filter (\v -> vertexDegree g v == 0) $ vertices g
+
     -- | Tell if a graph is simple
     -- | A graph is @simple@ if it has no loops
     isSimple :: (Hashable v, Eq v) => g v e -> Bool
@@ -172,7 +176,7 @@ class Graph g where
     union :: (Hashable v, Eq v) => g v e -> g v e -> g v e
 
     -- | Intersection of two graphs
-    intersection :: g v e -> g v e -> g v e
+    intersection :: (Hashable v, Eq v, Eq e) => g v e -> g v e -> g v e
 
     -- | Join two graphs
     -- |
