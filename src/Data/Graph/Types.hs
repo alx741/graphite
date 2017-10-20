@@ -172,17 +172,11 @@ class Graph g where
 
     -- * Binary operations
 
-    -- | Disjoint union of two graphs
+    -- | Union of two graphs
     union :: (Hashable v, Eq v) => g v e -> g v e -> g v e
 
     -- | Intersection of two graphs
     intersection :: (Hashable v, Eq v, Eq e) => g v e -> g v e -> g v e
-
-    -- | Join two graphs
-    -- |
-    -- | The @join@ of two graphs G1 and G2 is a new graph where each vertex of
-    -- | G1 has an edge to all the vertices of G2
-    join :: g v e -> g v e -> g v e
 
 
     -- * Transformations

@@ -4,7 +4,7 @@
 
 module Data.Graph.DGraph where
 
-import Data.List      (foldl')
+import Data.List      (foldl', intersect)
 import Data.Semigroup
 import GHC.Generics   (Generic)
 
@@ -110,9 +110,12 @@ instance Graph DGraph where
         where go bool v = bool && not (HM.member v $ getLinks v $ unDGraph g)
 
 
-    union = undefined
-    intersection = undefined
-    join = undefined
+    union g1 g2 = insertArcs (toArcsList g1) $ insertVertices (vertices g1) g2
+
+    intersection g1 g2 =
+        insertVertices (isolatedVertices g1 `intersect` isolatedVertices g2) $
+        fromArcsList (toArcsList g1 `intersect` toArcsList g2)
+
 
 
     toList (DGraph _ g) = zip vs $ fmap (\v -> HM.toList $ getLinks v g) vs

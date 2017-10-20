@@ -111,8 +111,6 @@ instance Graph UGraph where
         insertVertices (isolatedVertices g1 `intersect` isolatedVertices g2) $
         fromEdgesList (toEdgesList g1 `intersect` toEdgesList g2)
 
-    join = undefined
-
     toList (UGraph _ g) = zip vs $ fmap (\v -> HM.toList $ getLinks v g) vs
         where vs = HM.keys g
 
