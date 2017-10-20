@@ -1,3 +1,9 @@
+## 0.9.4.0
+
+- Add isolatedVertices function to Graph type class
+- Define binary operations
+- GHC 7.10 compatibility
+
 ## 0.9.3.0
 
 - Bugfix Functor and Foldable instances
