@@ -28,6 +28,7 @@ library
                      , Data.Graph.Visualize
   build-depends:       base >= 4.7 && < 5
                      , QuickCheck
+                     , semigroups
                      , bytestring
                      , cassava
                      , containers
