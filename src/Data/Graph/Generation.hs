@@ -4,8 +4,8 @@ module Data.Graph.Generation
     ( erdosRenyi
     , erdosRenyiU
     , erdosRenyiD
-    , rndBoundedGraph
-    , rndWeightedGraph
+    , rndGraph'
+    , rndGraph
     , rndAdjacencyMatrix
     ) where
 
@@ -21,7 +21,7 @@ import Data.Graph.UGraph
 
 -- | Generate a random Erdős–Rényi G(n, p) model graph
 erdosRenyi :: Graph g => Int -> Float -> IO (g Int ())
-erdosRenyi n = rndBoundedGraph (1, n)
+erdosRenyi n = rndGraph' (1, n)
 
 -- | 'erdosRenyi' convinience 'UGraph' generation function
 erdosRenyiU :: Int -> Float -> IO (UGraph Int ())
@@ -32,30 +32,15 @@ erdosRenyiD :: Int -> Float -> IO (DGraph Int ())
 erdosRenyiD = erdosRenyi
 
 
--- | Generate a random graph with vertices in /v/ within given bounds
-rndBoundedGraph :: forall g v . (Graph g, Hashable v, Eq v, Enum v)
- => (v, v)
- -> Float
- -> IO (g v ())
-rndBoundedGraph (n1, n2) p = go [n1..n2] (probability p) empty
-    where
-        go :: [v] -> Float -> g v () -> IO (g v ())
-        go [] _ g = return g
-        go (v:vs) pv g = do
-            rnds <- replicateM (length vs + 1) $ randomRIO (0.0, 1.0)
-            flipDir <- randomRIO (True, False)
-            let vs' = zip rnds vs
-            let g' = insertVertex v g
-            go vs pv $! foldl' (insertFlippedEdge pv v () flipDir) g' vs'
-
--- | Same as 'rndBoundedGraph' but generates random edge attributes in /e/
--- within given bounds
-rndWeightedGraph :: forall g v e . (Graph g, Hashable v, Eq v, Enum v, Random e)
+-- | Generate a random graph with vertices in /v/ across range of given bounds,
+-- random edge attributes in /e/ within given bounds, and some existing
+-- probability for each possible edge as per the Erdős–Rényi model
+rndGraph :: forall g v e . (Graph g, Hashable v, Eq v, Enum v, Random e)
  => (v, v)
  -> (e, e)
  -> Float
  -> IO (g v e)
-rndWeightedGraph (n1, n2) edgeBounds p = go [n1..n2] (probability p) empty
+rndGraph (n1, n2) edgeBounds p = go [n1..n2] (probability p) empty
     where
         go :: [v] -> Float -> g v e -> IO (g v e)
         go [] _ g = return g
@@ -66,6 +51,24 @@ rndWeightedGraph (n1, n2) edgeBounds p = go [n1..n2] (probability p) empty
             let vs' = zip rnds vs
             let g' = insertVertex v g
             go vs pv $! foldl' (insertFlippedEdge pv v edgeAttr flipDir) g' vs'
+
+
+-- | Same as 'rndGraph' but uses attributeless edges
+rndGraph' :: forall g v . (Graph g, Hashable v, Eq v, Enum v)
+ => (v, v)
+ -> Float
+ -> IO (g v ())
+rndGraph' (n1, n2) p = go [n1..n2] (probability p) empty
+    where
+        go :: [v] -> Float -> g v () -> IO (g v ())
+        go [] _ g = return g
+        go (v:vs) pv g = do
+            rnds <- replicateM (length vs + 1) $ randomRIO (0.0, 1.0)
+            flipDir <- randomRIO (True, False)
+            let vs' = zip rnds vs
+            let g' = insertVertex v g
+            go vs pv $! foldl' (insertFlippedEdge pv v () flipDir) g' vs'
+
 
 -- | Generate a random adjacency matrix
 -- | Useful for use with 'fromAdjacencyMatrix'
