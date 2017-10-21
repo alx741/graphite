@@ -130,8 +130,9 @@ instance Graph UGraph where
 
 
 -- | Insert an undirected 'Edge' into a 'UGraph'
--- | The involved vertices are inserted if they don't exist. If the graph
--- | already contains the Edge, its attribute is updated
+--
+-- The involved vertices are inserted if they don't exist. If the graph already
+-- contains the Edge, its attribute gets updated
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 insertEdge (Edge v1 v2 edgeAttr) g@(UGraph s _)
     | containsEdgePair g (v1, v2) = g
@@ -144,8 +145,8 @@ insertEdge (Edge v1 v2 edgeAttr) g@(UGraph s _)
 insertEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
 insertEdges es g = foldl' (flip insertEdge) g es
 
--- | Remove the undirected 'Edge' from a 'UGraph' if present
--- | The involved vertices are left untouched
+-- | Remove the undirected 'Edge' from a 'UGraph' if present. The involved
+-- vertices are left untouched
 removeEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 removeEdge = removeEdgePair . toPair
 
@@ -153,8 +154,8 @@ removeEdge = removeEdgePair . toPair
 removeEdges :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e -> UGraph v e
 removeEdges es g = foldl' (flip removeEdge) g es
 
--- | Remove the undirected 'Edge' from a 'UGraph' if present
--- | The involved vertices are also removed
+-- | Remove the undirected 'Edge' from a 'UGraph' if present. The involved
+-- vertices also get removed
 removeEdgeAndVertices :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 removeEdgeAndVertices = removeEdgePairAndVertices . toPair
 
@@ -180,9 +181,10 @@ incidentEdges (UGraph _ g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g)
 
 -- * Lists
 
--- | Convert a 'UGraph' to a list of 'Edge's ignoring isolated vertices
--- |
--- | Note that: fromEdgesList . toEdgesList /= id
+-- | Convert a 'UGraph' to a list of 'Edge's discarding isolated vertices
+--
+-- Note that because 'toEdgesList' discards isolated vertices:
+-- > fromEdgesList . toEdgesList /= id
 toEdgesList :: (Hashable v, Eq v) => UGraph v e -> [Edge v e]
 toEdgesList = edges
 
@@ -193,6 +195,7 @@ fromEdgesList es = insertEdges es empty
 
 -- * Pretty printing
 
+-- | Pretty print a 'UGraph'
 prettyPrint :: (Hashable v, Eq v, Show v, Show e) => UGraph v e -> String
 prettyPrint g =
     "Isolated Vertices: "
