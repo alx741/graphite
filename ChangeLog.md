@@ -1,3 +1,7 @@
+## 0.9.5.0
+
+- More general random graph generators
+
 ## 0.9.4.0
 
 - Add isolatedVertices function to Graph type class
