@@ -2,7 +2,29 @@
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.Graph.Types where
+module Data.Graph.Types
+    (
+    -- * Main Graph type class
+    Graph(..)
+
+    -- * Edges type class
+    , IsEdge(..)
+    -- ** Main IsEdge instances
+    , Edge(..)
+    , Arc(..)
+    -- ** Edges and Arcs constructors
+    , (<->)
+    , (-->)
+    -- ** Edge attributes type clases
+    , Weighted(..)
+    , Labeled(..)
+    -- ** Triple-Edges convenience functions
+    , tripleToPair
+    , pairToTriple
+    , tripleOriginVertex
+    , tripleDestVertex
+    , tripleAttribute
+    ) where
 
 import Data.List    (foldl')
 import GHC.Float    (float2Double)
@@ -13,8 +35,8 @@ import Data.Hashable
 import Test.QuickCheck
 
 -- | Types that behave like graphs
--- |
--- | The main 'Graph' instances are 'UGraph' and 'DGraph'. The functions in this
+--
+-- The main 'Graph' instances are 'UGraph' and 'DGraph'. The functions in this
 -- class should be used for algorithms that are graph-directionality agnostic,
 -- otherwise use the more specific ones in 'UGraph' and 'DGraph'
 class Graph g where
@@ -24,17 +46,20 @@ class Graph g where
     empty :: (Hashable v) => g v e
 
     -- | Retrieve the order of a graph
-    -- | The @order@ of a graph is its number of vertices
+    --
+    -- The @order@ of a graph is its number of vertices
     order :: g v e -> Int
 
     -- | Retrieve the size of a graph
-    -- | The @size@ of a graph is its number of edges
+    --
+    -- The @size@ of a graph is its number of edges
     size :: (Hashable v, Eq v) => g v e -> Int
     size = length . edgePairs
 
     -- | Density of a graph
-    -- | The ratio of the number of existing edges in the graph to the number of
-    -- | posible edges
+    --
+    -- The @density@ of a graph is the ratio of the number of existing edges to
+    -- the number of posible edges
     density :: (Hashable v, Eq v) => g v e -> Double
     density g = (2 * (e - n + 1)) / (n * (n - 3) + 2)
         where
@@ -68,11 +93,11 @@ class Graph g where
     adjacentVertices' :: (Hashable v, Eq v) => g v e -> v -> [(v, v, e)]
 
     -- | Same as 'adjacentVertices' but gives back only those vertices for which
-    -- | the connecting edge allows the vertex to be reached.
-    -- |
-    -- | For an undirected graph this is equivalent to 'adjacentVertices', but
-    -- | for the case of a directed graph, the directed arcs will constrain the
-    -- | reachability of the adjacent vertices.
+    -- the connecting edge allows the vertex to be reached.
+    --
+    -- For an undirected graph this is equivalent to 'adjacentVertices', but
+    -- for the case of a directed graph, the directed arcs will constrain the
+    -- reachability of the adjacent vertices.
     reachableAdjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]
     reachableAdjacentVertices g v = tripleDestVertex <$> reachableAdjacentVertices' g v
 
@@ -98,13 +123,12 @@ class Graph g where
     avgDegree :: (Hashable v, Eq v) => g v e -> Double
     avgDegree g = fromIntegral (2 * size g) / fromIntegral (order g)
 
-    -- | Insert a vertex into a graph
-    -- | If the graph already contains the vertex leave the graph untouched
+    -- | Insert a vertex into a graph. If the graph already contains the vertex
+    -- leave it untouched
     insertVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
 
-    -- | Insert a many vertices into a graph
-    -- | New vertices are inserted and already contained vertices are left
-    -- | untouched
+    -- | Insert many vertices into a graph. New vertices are inserted and
+    -- already contained vertices are left untouched
     insertVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
     insertVertices vs g = foldl' (flip insertVertex) g vs
 
@@ -121,9 +145,9 @@ class Graph g where
     -- | Get the edge between to vertices if it exists
     edgeTriple :: (Hashable v, Eq v) => g v e -> v -> v -> Maybe (v, v, e)
 
-    -- | Insert an edge into a graph
-    -- | The involved vertices are inserted if don't exist. If the graph already
-    -- | contains the edge, its attribute is updated
+    -- | Insert an edge into a graph. The involved vertices are inserted if
+    -- don't exist. If the graph already contains the edge, its attribute gets
+    -- updated
     insertEdgeTriple :: (Hashable v, Eq v) => (v, v, e) -> g v e -> g v e
 
     -- | Same as 'insertEdgeTriple' but for multiple edges
@@ -131,7 +155,7 @@ class Graph g where
     insertEdgeTriples es g = foldl' (flip insertEdgeTriple) g es
 
     -- | Same as 'insertEdgeTriple' but insert edge pairs in graphs with
-    -- | attributeless edges
+    -- attribute less edges
     insertEdgePair :: (Hashable v, Eq v) => (v, v) -> g v () -> g v ()
     insertEdgePair (v1, v2) = insertEdgeTriple (v1, v2, ())
 
@@ -139,24 +163,24 @@ class Graph g where
     insertEdgePairs :: (Hashable v, Eq v) => [(v, v)] -> g v () -> g v ()
     insertEdgePairs es g = foldl' (flip insertEdgePair) g es
 
-    -- | Remove a vertex from a graph if present
-    -- | Every edge incident to this vertex is also removed
+    -- | Remove a vertex from a graph if present. Every edge incident to this
+    -- vertex also gets removed
     removeVertex :: (Hashable v, Eq v) => v -> g v e -> g v e
 
     -- | Same as 'removeVertex' but for multiple vertices
     removeVertices :: (Hashable v, Eq v) => [v] -> g v e -> g v e
     removeVertices vs g = foldl' (flip removeVertex) g vs
 
-    -- | Remove an edge from a graph if present
-    -- | The involved vertices are left untouched
+    -- | Remove an edge from a graph if present. The involved vertices are left
+    -- untouched
     removeEdgePair :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
 
-    -- | Same as 'removeEdgePair' but for multple edges
+    -- | Same as 'removeEdgePair' but for multiple edges
     removeEdgePairs :: (Hashable v, Eq v) => [(v, v)] -> g v e -> g v e
     removeEdgePairs es g = foldl' (flip removeEdgePair) g es
 
-    -- | Remove the edge from a graph if present
-    -- | The involved vertices are also removed
+    -- | Remove the edge from a graph if present. The involved vertices also get
+    -- removed
     removeEdgePairAndVertices :: (Hashable v, Eq v) => (v, v) -> g v e -> g v e
     removeEdgePairAndVertices (v1, v2) g =
         removeVertex v2 $ removeVertex v1 $ removeEdgePair (v1, v2) g
@@ -166,7 +190,8 @@ class Graph g where
     isolatedVertices g = filter (\v -> vertexDegree g v == 0) $ vertices g
 
     -- | Tell if a graph is simple
-    -- | A graph is @simple@ if it has no loops
+    --
+    -- A graph is @simple@ if it has no loops
     isSimple :: (Hashable v, Eq v) => g v e -> Bool
 
 
@@ -181,10 +206,12 @@ class Graph g where
 
     -- * Transformations
 
-    -- | Convert a graph to an adjacency list with edge attributes in /e/
+    -- | Convert a graph to an adjacency list with vertices in type /v/ and edge
+    -- attributes in /e/
     toList :: (Hashable v, Eq v) => g v e -> [(v, [(v, e)])]
 
-    -- | Construct a graph from an adjacency list with edge attributes in /e/
+    -- | Construct a graph from an adjacency list with vertices in type /v and
+    -- edge attributes in /e/
     fromList :: (Hashable v, Eq v) => [(v, [(v, e)])] -> g v e
     fromList links = go links empty
         where
@@ -197,18 +224,17 @@ class Graph g where
                     es
 
     -- TODO: make this [[Bool]]
-    -- | Get the adjacency binary matrix representation of a grah
+    -- | Get the adjacency binary matrix representation of a graph
     toAdjacencyMatrix :: g v e -> [[Int]]
 
-    -- | Generate a graph of Int vertices from an adjacency
-    -- | square binary matrix
+    -- | Generate a graph of Int vertices from an adjacency square binary matrix
     fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())
 
 
 
 -- | Types that represent edges
--- |
--- | The main 'IsEdge' instances are 'Edge' for undirected edges and 'Arc' for
+--
+-- The main 'IsEdge' instances are 'Edge' for undirected edges and 'Arc' for
 -- directed edges.
 class IsEdge e where
     -- | Retrieve the origin vertex of the edge
@@ -229,7 +255,7 @@ class IsEdge e where
     fromPair :: (v, v) -> e v ()
 
     -- | Convert an edge to a triple, where the 3rd element it's the edge
-    -- | attribute
+    -- attribute
     toTriple :: e v a -> (v, v, a)
 
     -- | Convert a triple to an edge
@@ -239,7 +265,8 @@ class IsEdge e where
     -- * Properties
 
     -- | Tell if an edge is a loop
-    -- | An edge forms a @loop@ if both of its ends point to the same vertex
+    --
+    -- An edge forms a @loop@ if both of its ends point to the same vertex
     isLoop :: (Eq v) => e v a -> Bool
 
 
@@ -252,11 +279,11 @@ data Edge v e = Edge v v e
 data Arc v e = Arc v v e
     deriving (Show, Read, Ord, Generic)
 
--- | Construct an attributeless undirected 'Edge' between two vertices
+-- | Construct an attribute less undirected 'Edge' between two vertices
 (<->) :: (Hashable v) => v -> v -> Edge v ()
 (<->) v1 v2 = Edge v1 v2 ()
 
--- | Construct an attributeless directed 'Arc' between two vertices
+-- | Construct an attribute less directed 'Arc' between two vertices
 (-->) :: (Hashable v) => v -> v -> Arc v ()
 (-->) v1 v2 = Arc v1 v2 ()
 
@@ -328,7 +355,7 @@ arbitraryEdge edgeType = edgeType <$> vert <*> vert <*> arbitrary
     where vert = getPositive <$> arbitrary
 
 -- | Two 'Edge's are equal if they point to the same vertices, regardless of the
--- | direction
+-- direction
 instance (Eq v, Eq a) => Eq (Edge v a) where
     (Edge v1 v2 a) == (Edge v1' v2' a') =
         (a == a')
@@ -336,12 +363,10 @@ instance (Eq v, Eq a) => Eq (Edge v a) where
         || (v1 == v2' && v2 == v1')
 
 -- | Two 'Arc's are equal if they point to the same vertices, and the directions
--- | are the same
+-- are the same
 instance (Eq v, Eq a) => Eq (Arc v a) where
     (Arc v1 v2 a) == (Arc v1' v2' a') = (a == a') && (v1 == v1' && v2 == v2')
 
-
--- * Triples convenience functions
 
 -- | Convert a triple to a pair by ignoring the third element
 tripleToPair :: (a, b, c) -> (a, b)
