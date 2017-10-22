@@ -1,11 +1,17 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Graph.Generation
-    ( erdosRenyi
+    (
+    -- * Erdős–Rényi model
+      erdosRenyi
     , erdosRenyiU
     , erdosRenyiD
+
+    -- * General Random graphs
     , rndGraph'
     , rndGraph
+
+    -- * Random adjacency matrix
     , rndAdjacencyMatrix
     ) where
 
@@ -71,7 +77,8 @@ rndGraph' (n1, n2) p = go [n1..n2] (probability p) empty
 
 
 -- | Generate a random adjacency matrix
--- | Useful for use with 'fromAdjacencyMatrix'
+--
+-- Useful for use with 'fromAdjacencyMatrix'
 rndAdjacencyMatrix :: Int -> IO [[Int]]
 rndAdjacencyMatrix n = replicateM n randRow
     where randRow = replicateM n (randomRIO (0,1)) :: IO [Int]
