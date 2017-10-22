@@ -308,7 +308,7 @@ transpose g = insertArcs (reverseArc <$> arcs g) empty
     where reverseArc (Arc fromV toV attr) = Arc toV fromV attr
 
 -- | Convert a directed 'DGraph' to an undirected 'UGraph' by converting all of
--- | its 'Arc's into 'Edge's
+-- its 'Arc's into 'Edge's
 toUndirected :: (Hashable v, Eq v) => DGraph v e -> UG.UGraph v e
 toUndirected g = UG.insertEdges (arcToEdge <$> arcs g) empty
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
@@ -317,6 +317,7 @@ toUndirected g = UG.insertEdges (arcToEdge <$> arcs g) empty
 -- | Convert a 'DGraph' to a list of 'Arc's discarding isolated vertices
 --
 -- Note that because 'toArcsList' discards isolated vertices:
+--
 -- > fromArcsList . toArcsList /= id
 toArcsList :: (Hashable v, Eq v) => DGraph v e -> [Arc v e]
 toArcsList = arcs

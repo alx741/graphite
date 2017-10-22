@@ -1,6 +1,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.Graph.Read where
+module Data.Graph.Read
+    (
+    -- * CSV
+      fromCsv
+    , fromCsv'
+    ) where
 
 import Data.ByteString.Lazy as BS hiding (empty)
 import Data.Csv             as CSV
@@ -9,9 +14,16 @@ import Data.Vector          as V hiding (empty, fromList)
 
 import Data.Graph.Types
 
--- | Read a 'UGraph' from a CSV file
--- | The line "1,2,3,4" translates to the list of edges
--- | "(1 <-> 2), (1 <-> 3), (1 <-> 4)"
+-- | Read a graph from a CSV file of adjacency lists
+--
+-- The CSV lines:
+--
+-- > "1,2,3,4"
+-- > "2,1,4,5"
+--
+-- produce the graph with this list of edge pairs:
+--
+-- > [(1, 2), (1, 3), (1, 4), (2, 1), (2, 4), (2, 5)]
 fromCsv :: Graph g => (Hashable v, Eq v, FromField v)
  => FilePath
  -> IO (Either String (g v ()))
