@@ -1,4 +1,4 @@
-module Data.Graph.UGraph.DegreeSequence where
+module Data.Graph.UGraph.DegreeSequence
     (
     DegreeSequence
 
