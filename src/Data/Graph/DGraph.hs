@@ -15,7 +15,24 @@ module Data.Graph.DGraph
     , removeArcAndVertices
     , arcs
     , containsArc
+    , inboundingArcs
+    , outboundingArcs
     , incidentArcs
+    , vertexIndegree
+    , vertexOutdegree
+    , indegrees
+    , outdegrees
+    -- ** Query graph properties and characteristics
+    , isSymmetric
+    , isOriented
+    , isBalanced
+    , isRegular
+    , isSource
+    , isSink
+    , isInternal
+    -- ** Transformations
+    , transpose
+    , toUndirected
 
     -- * List conversions
     , toArcsList
@@ -215,20 +232,6 @@ outboundingArcs g v = filter (\(Arc fromV _ _) -> v == fromV) $ arcs g
 incidentArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 incidentArcs g v = inboundingArcs g v ++ outboundingArcs g v
 
--- | Tell if a 'DGraph' is symmetric
---
--- A directed graph is @symmetric@ if all of its 'Arc's are bi-directed
-isSymmetric :: DGraph v e -> Bool
-isSymmetric = undefined
-
--- | Tell if a 'DGraph' is oriented
---
--- A directed graph is @oriented@ if there are none bi-directed 'Arc's
---
--- Note: This is /not/ the opposite of 'isSymmetric'
-isOriented :: DGraph v e -> Bool
-isOriented = undefined
-
 -- | Indegree of a vertex
 --
 -- The @indegree@ of a vertex is the number of inbounding 'Arc's to a vertex
@@ -248,6 +251,20 @@ indegrees g = vertexIndegree g <$> vertices g
 -- | Outdegree of all the vertices in a 'DGraph'
 outdegrees :: (Hashable v, Eq v) => DGraph v e -> [Int]
 outdegrees g = vertexOutdegree g <$> vertices g
+
+-- | Tell if a 'DGraph' is symmetric
+--
+-- A directed graph is @symmetric@ if all of its 'Arc's are bi-directed
+isSymmetric :: DGraph v e -> Bool
+isSymmetric = undefined
+
+-- | Tell if a 'DGraph' is oriented
+--
+-- A directed graph is @oriented@ if there are none bi-directed 'Arc's
+--
+-- Note: This is /not/ the opposite of 'isSymmetric'
+isOriented :: DGraph v e -> Bool
+isOriented = undefined
 
 -- | Tell if a 'DGraph' is balanced
 --
@@ -281,7 +298,6 @@ isSink g v = vertexOutdegree g v == 0
 isInternal :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
 
--- * Transformations
 
 -- | Get the transpose of a 'DGraph'
 --
