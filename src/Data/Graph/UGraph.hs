@@ -4,7 +4,28 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE ViewPatterns         #-}
 
-module Data.Graph.UGraph where
+module Data.Graph.UGraph
+    (
+    -- * UGraph data type
+    UGraph
+
+    -- * Functions on UGraph
+    , insertEdge
+    , insertEdges
+    , removeEdge
+    , removeEdges
+    , removeEdgeAndVertices
+    , edges
+    , containsEdge
+    , incidentEdges
+
+    -- * List conversions
+    , toEdgesList
+    , fromEdgesList
+
+    -- * Pretty printing
+    , prettyPrint
+    ) where
 
 import qualified Data.Foldable  as F (toList)
 import           Data.List      (foldl', intersect)
@@ -179,8 +200,6 @@ incidentEdges :: (Hashable v, Eq v) => UGraph v e -> v -> [Edge v e]
 incidentEdges (UGraph _ g) v = fmap (uncurry (Edge v)) (HM.toList (getLinks v g))
 
 
--- * Lists
-
 -- | Convert a 'UGraph' to a list of 'Edge's discarding isolated vertices
 --
 -- Note that because 'toEdgesList' discards isolated vertices:
@@ -192,8 +211,6 @@ toEdgesList = edges
 fromEdgesList :: (Hashable v, Eq v) => [Edge v e] -> UGraph v e
 fromEdgesList es = insertEdges es empty
 
-
--- * Pretty printing
 
 -- | Pretty print a 'UGraph'
 prettyPrint :: (Hashable v, Eq v, Show v, Show e) => UGraph v e -> String
