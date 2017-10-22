@@ -1,13 +1,15 @@
 module Data.Graph.Visualize
-    ( plotUGraph
-    , plotUGraphPng
+    (
+    -- * Visualize graphs
+      plotUGraph
     , plotDGraph
-    , plotDGraphPng
-    , plotUGraphEdgeLabeled
-    , plotDGraphEdgeLabeled
+    -- ** Render edge attributes
+    , plotUGraphEdged
+    , plotDGraphEdged
 
-    , labeledNodes
-    , labeledEdges
+    -- * Render to PNG
+    , plotUGraphPng
+    , plotDGraphPng
     ) where
 
 import Control.Concurrent
@@ -27,11 +29,11 @@ plotUGraph :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
  -> IO ThreadId
 plotUGraph g = forkIO $ runGraphvizCanvas Sfdp (toUndirectedDot False g) Xlib
 
--- | Same as 'plotUGraph' but render edge labels
-plotUGraphEdgeLabeled :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
+-- | Same as 'plotUGraph' but render edge attributes
+plotUGraphEdged :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
  => UGraph v e
  -> IO ThreadId
-plotUGraphEdgeLabeled g = forkIO $ runGraphvizCanvas Sfdp (toUndirectedDot True g) Xlib
+plotUGraphEdged g = forkIO $ runGraphvizCanvas Sfdp (toUndirectedDot True g) Xlib
 
 -- | Plot an undirected 'UGraph' to a PNG image file
 plotUGraphPng :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
@@ -46,11 +48,11 @@ plotDGraph :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
  -> IO ThreadId
 plotDGraph g = forkIO $ runGraphvizCanvas Sfdp (toDirectedDot False g) Xlib
 
--- | Same as 'plotDGraph' but render edge labels
-plotDGraphEdgeLabeled :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
+-- | Same as 'plotDGraph' but render edge attributes
+plotDGraphEdged :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
  => DGraph v e
  -> IO ThreadId
-plotDGraphEdgeLabeled g = forkIO $ runGraphvizCanvas Sfdp (toDirectedDot True g) Xlib
+plotDGraphEdged g = forkIO $ runGraphvizCanvas Sfdp (toDirectedDot True g) Xlib
 
 -- | Plot a directed 'DGraph' to a PNG image file
 plotDGraphPng :: (Hashable v, Ord v, PrintDot v, Show v, Show e)
