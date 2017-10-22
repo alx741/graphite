@@ -2,7 +2,28 @@
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.Graph.DGraph where
+module Data.Graph.DGraph
+    (
+    -- * DGraph data type
+    DGraph
+
+    -- * Functions on DGraph
+    , insertArc
+    , insertArcs
+    , removeArc
+    , removeArcs
+    , removeArcAndVertices
+    , arcs
+    , containsArc
+    , incidentArcs
+
+    -- * List conversions
+    , toArcsList
+    , fromArcsList
+
+    -- * Pretty printing
+    , prettyPrint
+    ) where
 
 import Data.List      (foldl', intersect)
 import Data.Semigroup
@@ -139,8 +160,9 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
     arbitrary = insertArcs <$> arbitrary <*> pure empty
 
 -- | Insert a directed 'Arc' into a 'DGraph'
--- | The involved vertices are inserted if they don't exist. If the graph
--- | already contains the Arc, its attribute is updated
+--
+-- The involved vertices are inserted if they don't exist. If the graph
+-- already contains the Arc, its attribute gets updated
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g@(DGraph s _)
     | containsEdgePair g (fromV, toV) = g
@@ -151,8 +173,8 @@ insertArc (Arc fromV toV edgeAttr) g@(DGraph s _)
 insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
 insertArcs as g = foldl' (flip insertArc) g as
 
--- | Remove the directed 'Arc' from a 'DGraph' if present
--- | The involved vertices are left untouched
+-- | Remove the directed 'Arc' from a 'DGraph' if present. The involved vertices
+-- are left untouched
 removeArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArc = removeEdgePair . toPair
 
@@ -160,8 +182,8 @@ removeArc = removeEdgePair . toPair
 removeArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
 removeArcs as g = foldl' (flip removeArc) g as
 
--- | Remove the directed 'Arc' from a 'DGraph' if present
--- | The involved vertices are also removed
+-- | Remove the directed 'Arc' from a 'DGraph' if present. The involved vertices
+-- also get removed
 removeArcAndVertices :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 removeArcAndVertices = removeEdgePairAndVertices . toPair
 
@@ -187,28 +209,35 @@ outboundingArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 outboundingArcs g v = filter (\(Arc fromV _ _) -> v == fromV) $ arcs g
 
 -- | Retrieve the incident 'Arc's of a Vertex
--- | Both inbounding and outbounding arcs
+--
+-- The @incident@ arcs of a vertex are all the inbounding and outbounding arcs
+-- of the vertex
 incidentArcs :: (Hashable v, Eq v) => DGraph v e -> v -> [Arc v e]
 incidentArcs g v = inboundingArcs g v ++ outboundingArcs g v
 
 -- | Tell if a 'DGraph' is symmetric
--- | All of its 'Arc's are bidirected
+--
+-- A directed graph is @symmetric@ if all of its 'Arc's are bi-directed
 isSymmetric :: DGraph v e -> Bool
 isSymmetric = undefined
 
 -- | Tell if a 'DGraph' is oriented
--- | There are none bidirected 'Arc's
--- | Note: This is /not/ the opposite of 'isSymmetric'
+--
+-- A directed graph is @oriented@ if there are none bi-directed 'Arc's
+--
+-- Note: This is /not/ the opposite of 'isSymmetric'
 isOriented :: DGraph v e -> Bool
 isOriented = undefined
 
 -- | Indegree of a vertex
--- | The number of inbounding 'Arc's to a vertex
+--
+-- The @indegree@ of a vertex is the number of inbounding 'Arc's to a vertex
 vertexIndegree :: (Hashable v, Eq v) => DGraph v e -> v -> Int
 vertexIndegree g v = length $ filter (\(_, v') -> v == v' ) $ edgePairs g
 
 -- | Outdegree of a vertex
--- | The number of outbounding 'Arc's from a vertex
+--
+-- The @outdegree@ of a vertex is the number of outbounding 'Arc's from a vertex
 vertexOutdegree :: (Hashable v, Eq v) => DGraph v e -> v -> Int
 vertexOutdegree g v = length $ filter (\(v', _) -> v == v' ) $ edgePairs g
 
@@ -221,37 +250,43 @@ outdegrees :: (Hashable v, Eq v) => DGraph v e -> [Int]
 outdegrees g = vertexOutdegree g <$> vertices g
 
 -- | Tell if a 'DGraph' is balanced
--- | A Directed Graph is @balanced@ when its @indegree = outdegree@
+--
+-- A directed graph is @balanced@ when its @indegree = outdegree@
 isBalanced :: (Hashable v, Eq v) => DGraph v e -> Bool
 isBalanced g = sum (indegrees g) == sum (outdegrees g)
 
 -- | Tell if a 'DGraph' is regular
--- | A Directed Graph is @regular@ when all of its vertices have the same number
--- | of adjacent vertices AND when the @indegree@ and @outdegree@ of each vertex
--- | are equal to each other.
+--
+-- A directed graph is @regular@ when all of its vertices have the same number
+-- of adjacent vertices /AND/ when the @indegree@ and @outdegree@ of each vertex
+-- are equal to each other.
 isRegular :: DGraph v e -> Bool
 isRegular _ = undefined
 
 -- | Tell if a vertex is a source
--- | A vertex is a @source@ when its @indegree = 0@
+--
+-- A vertex is a @source@ when its @indegree = 0@
 isSource :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isSource g v = vertexIndegree g v == 0
 
 -- | Tell if a vertex is a sink
--- | A vertex is a @sink@ when its @outdegree = 0@
+--
+-- A vertex is a @sink@ when its @outdegree = 0@
 isSink :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isSink g v = vertexOutdegree g v == 0
 
 -- | Tell if a vertex is internal
--- | A vertex is a @internal@ when its neither a @source@ nor a @sink@
+--
+-- A vertex is @internal@ when its neither a @source@ nor a @sink@
 isInternal :: (Hashable v, Eq v) => DGraph v e -> v -> Bool
 isInternal g v = not $ isSource g v || isSink g v
 
 -- * Transformations
 
 -- | Get the transpose of a 'DGraph'
--- | The @transpose@ of a directed graph is another directed graph where all of
--- | its arcs are reversed
+--
+-- The @transpose@ of a directed graph is another directed graph where all of
+-- its arcs are reversed
 transpose :: (Hashable v, Eq v) => DGraph v e -> DGraph v e
 transpose g = insertArcs (reverseArc <$> arcs g) empty
     where reverseArc (Arc fromV toV attr) = Arc toV fromV attr
@@ -263,10 +298,10 @@ toUndirected g = UG.insertEdges (arcToEdge <$> arcs g) empty
     where arcToEdge (Arc fromV toV attr) = Edge fromV toV attr
 
 
--- * Lists
-
--- | Convert a 'DGraph' to a list of 'Arc's
--- | Same as 'arcs'
+-- | Convert a 'DGraph' to a list of 'Arc's discarding isolated vertices
+--
+-- Note that because 'toArcsList' discards isolated vertices:
+-- > fromArcsList . toArcsList /= id
 toArcsList :: (Hashable v, Eq v) => DGraph v e -> [Arc v e]
 toArcsList = arcs
 
@@ -275,8 +310,7 @@ fromArcsList :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e
 fromArcsList as = insertArcs as empty
 
 
--- * Pretty printing
-
+-- | Pretty print a 'DGraph'
 prettyPrint :: (Hashable v, Eq v, Show v, Show e) => DGraph v e -> String
 prettyPrint g =
     "Isolated Vertices: "
