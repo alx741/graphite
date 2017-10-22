@@ -93,19 +93,19 @@ isStronglyConnected :: (Hashable v, Eq v, Ord v) => DGraph v e -> Bool
 isStronglyConnected = isConnected
 
 -- TODO
--- * connected component
--- * strong components
--- * vertex cut
--- * vertex connectivity
---     * biconnectivity
---     * triconnectivity
---     * separable
--- * bridge
--- * edge-connectivity
--- * maximally connected
--- * maximally edge-connected
--- * super-connectivity
--- * hyper-connectivity
--- * Menger's theorem
+-- connected component
+-- strong components
+-- vertex cut
+-- vertex connectivity
+--   biconnectivity
+--   triconnectivity
+--   separable
+-- bridge
+-- edge-connectivity
+-- maximally connected
+-- maximally edge-connected
+-- super-connectivity
+-- hyper-connectivity
+-- Menger's theorem
 
 -- Robin's Theorem: a graph is orientable if it is connected and has no bridges

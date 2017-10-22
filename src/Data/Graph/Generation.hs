@@ -8,8 +8,8 @@ module Data.Graph.Generation
     , erdosRenyiD
 
     -- * General Random graphs
-    , rndGraph'
     , rndGraph
+    , rndGraph'
 
     -- * Random adjacency matrix
     , rndAdjacencyMatrix
