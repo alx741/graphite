@@ -1,3 +1,7 @@
+## 0.9.5.1
+
+- Fix haddock documentation
+
 ## 0.9.5.0
 
 - More general random graph generators
