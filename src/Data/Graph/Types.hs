@@ -40,8 +40,6 @@ import Test.QuickCheck
 -- class should be used for algorithms that are graph-directionality agnostic,
 -- otherwise use the more specific ones in 'UGraph' and 'DGraph'
 class Graph g where
-    -- * Properties
-
     -- | The Empty (order-zero) graph with no vertices and no edges
     empty :: (Hashable v) => g v e
 
