@@ -82,6 +82,7 @@ class Graph g where
 
     -- | Tell if two vertices are adjacent
     areAdjacent :: (Hashable v, Eq v) => g v e -> v -> v -> Bool
+    areAdjacent g v1 v2 = containsEdgePair g (v1, v2) || containsEdgePair g (v2, v1)
 
     -- | Retrieve the adjacent vertices of a vertex
     adjacentVertices :: (Hashable v, Eq v) => g v e -> v -> [v]

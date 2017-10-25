@@ -125,7 +125,7 @@ instance Graph DGraph where
 
     insertVertex v (DGraph s g) = DGraph s $ hashMapInsert v HM.empty g
 
-    containsEdgePair graph@(DGraph _ g) (v1, v2) = v2 `HM.member` (getLinks v1 g)
+    containsEdgePair (DGraph _ g) (v1, v2) = v2 `HM.member` (getLinks v1 g)
 
     incidentEdgeTriples g v = toTriple <$> incidentArcs g v
     insertEdgeTriple (v1, v2, e) = insertArc (Arc v1 v2 e)

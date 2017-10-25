@@ -102,7 +102,7 @@ instance Graph UGraph where
     vertexDegree (UGraph _ g) v = length $ HM.keys $ getLinks v g
     insertVertex v (UGraph s g) = UGraph s $ hashMapInsert v HM.empty g
 
-    containsEdgePair graph@(UGraph _ g) (v1, v2) = v2 `HM.member` (getLinks v1 g)
+    containsEdgePair (UGraph _ g) (v1, v2) = v2 `HM.member` (getLinks v1 g)
 
     incidentEdgeTriples g v = toTriple <$> incidentEdges g v
     insertEdgeTriple (v1, v2, e) = insertEdge (Edge v1 v2 e)
