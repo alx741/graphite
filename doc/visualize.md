@@ -30,7 +30,7 @@ main :: IO ()
 main = plotDGraph foundationUniverse
 ```
 
-![Foundation Universe (Directed)](.graphs/dfoundation.png)
+![Foundation Universe (Directed)](./graphs/dfoundation.png)
 
 We could now convert this graph to an undirected one using `toUndirected` and
 then visualize it with `plotUGraph`:
@@ -40,7 +40,7 @@ main :: IO ()
 main = plotUGraph $ toUndirected foundationUniverse
 ```
 
-![Foundation Universe (Undirected)](.graphs/ufoundation.png)
+![Foundation Universe (Undirected)](./graphs/ufoundation.png)
 
 
 
