@@ -1,11 +1,11 @@
 # Visualizing graphs
 
 Graphite provides separate functions for visualizing undirected and directed
-graphs: `plotUGraph` and `plotDGraph`.
+graphs: `plotUGraph` and `plotDGraph` respectively.
 
 Lets define a directed graph:
 
-```Haswell
+```haskell
 foundationUniverse :: DGraph String ()
 foundationUniverse = fromArcsList
     [ "Helicon" --> "Nishaya"
