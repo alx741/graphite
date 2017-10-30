@@ -1,0 +1,10 @@
+graph
+{
+    "Paper Town" -- "Springfield" [label = 30];
+    "Springfield" -- "Lazy Town" [label = 120];
+    "Paper Town" -- "Vice City" [label = 85];
+    "Vice City" -- "Atlantis" [label = 145];
+    "Atlantis" -- "Springfield" [label = 73];
+    "Lazy Town" -- "Vice City" [label = 122];
+    "Lazy Town" -- "Paper Town" [label = 24];
+}

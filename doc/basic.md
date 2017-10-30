@@ -80,7 +80,7 @@ clarity):
 
 ```haskell
 myGraph :: UGraph Float ()
-myGraph = fromEdgesList [(1.3 <-> 2.5), (3.4 <-> 6.8), (7.4 <-> 4.4)]
+myGraph = fromEdgesList [(1.3 <-> 2.5), (3.4 <-> 6.8), (2.5 <-> 4.4)]
 ```
 
 Or this directed graph with `String` vertices:
@@ -90,12 +90,75 @@ myGraph :: DGraph String ()
 myGraph = fromArcsList ["Paper" --> "Rock", "Rock" --> "Scissors", "Scissors" -> "Paper"]
 ```
 
+## Edges with attributes
 
+By using the `<->` and `-->` constructors, the resulting `Edge`s and `Arc`s have
+attributes of type `()`. If we need edges with some attributes like weights or
+labels for example, we could use the `Edge` and `Arc` data constructors
+directly.
+
+Lets build a graph of cities and the distances in kilometers between them:
+
+![Cities](./graphs/cities.png)
+
+```haskell
+cities :: UGraph String Int
+cities = fromEdgesList
+    [ Edge "Paper Town" "Springfield" 30
+    , Edge "Springfield" "Lazy Town" 120
+    , Edge "Paper Town" "Vice City" 85
+    , Edge "Vice City" "Atlantis" 145
+    , Edge "Atlantis" "Springfield" 73
+    , Edge "Lazy Town" "Vice City" 122
+    , Edge "Lazy Town" "Paper Town" 24
+    ]
+```
+
+If the roads between those cities are one way only, we should use *Arcs* instead
+of *Edges* and form a directed graph like so:
+
+```haskell
+cities :: DGraph String Int
+cities = fromArcsList
+    [ Arc "Paper Town" "Springfield" 30
+    , Arc "Springfield" "Lazy Town" 120
+    , Arc "Paper Town" "Vice City" 85
+    , Arc "Vice City" "Atlantis" 145
+    , Arc "Atlantis" "Springfield" 73
+    , Arc "Lazy Town" "Vice City" 122
+    , Arc "Lazy Town" "Paper Town" 24
+    ]
+```
+
+
+The edge's attributes can be of any type, so we could for instance label them
+by using `String`:
+
+![Paper-Rock-Scissors](./graphs/prs.png)
+
+```haskell
+myGraph :: DGraph String String
+myGraph = fromArcsList
+    [ Arc "Paper" "Rock" "Covers"
+    , Arc "Rock" "Scissors" "Crushes"
+    , Arc "Scissors" "Paper" "Cuts"
+    ]
+```
 
 
 # Visualizing graphs
 
 # Complex graphs - complex vertices, complex edges
+
+... we could define some data types:
+
+```haskell
+data Element = Paper | Rock | Scissors deriving (Show, Hashable, Ord, Eq)
+data Action = Cover | Crush | Cut deriving (Show, Hashable, Ord, Eq)
+
+myGraph :: DGraph Element Action
+myGraph = ...
+```
 
 ## Visualizing edged graphs
 
