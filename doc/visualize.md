@@ -1,10 +1,7 @@
 # Visualizing graphs
 
 Graphite provides separate functions for visualizing undirected and directed
-graphs:
-
-* plotUGraph
-* plotDGraph
+graphs: `plotUGraph` and `plotDGraph`.
 
 Lets define a directed graph:
 
