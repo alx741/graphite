@@ -1,0 +1,15 @@
+digraph
+{
+    "Helicon" -> "Nishaya";
+    "Helicon" -> "Wencory";
+    "Nishaya" -> "Wencory";
+    "Wencory" -> "Getorin";
+    "Wencory" -> "Cinna";
+    "Wencory" -> "Lystena";
+    "Lystena" -> "Helicon";
+    "Cinna"   -> "Florina";
+    "Florina" -> "Nishaya";
+    "Florina" -> "Derowd";
+    "Derowd"  -> "Cinna";
+    "Derowd"  -> "Lystena";
+}

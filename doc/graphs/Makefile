@@ -1,10 +1,11 @@
-OUTPUTS_FDP = basic_ugraph.png \
+OUTPUTS = basic_ugraph.png \
 			  basic_dgraph.png \
-
-OUTPUTS_DOT = cities.png \
+              cities.png \
 			  prs.png \
+			  ufoundation.png \
+			  dfoundation.png \
 
-phony: $(OUTPUTS_FDP) $(OUTPUTS_DOT)
+phony: $(OUTPUTS)
 
 %.png: %.dot
 	fdp -Tpng $< -o $@

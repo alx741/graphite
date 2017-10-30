@@ -1,6 +1,6 @@
 # Basic Graphs
 
-*Graphite* provides two types for graphs: `UGraph` for undirected graphs and
+Graphite provides two types for graphs: `UGraph` for undirected graphs and
 `DGraph` for directed graphs.
 
 Lets represent some graphs.
@@ -71,7 +71,7 @@ The `fromArcsList` function constructs a `DGraph` from a list of `Arc`s.
 
 ## Other vertex types
 
-*Graphite* can use any `Hashable` type as the vertices of a graph, this way we
+Graphite can use any `Hashable` type as the vertices of a graph, this way we
 could have a graph of `Int`s, `Float`s, `Bool`s, `Char`s, `String`s,
 `ByteString`s, `Text` and more.
 
@@ -145,9 +145,6 @@ myGraph = fromArcsList
     ]
 ```
 
-
-# Visualizing graphs
-
 # Complex graphs - complex vertices, complex edges
 
 ... we could define some data types:
@@ -159,7 +156,4 @@ data Action = Cover | Crush | Cut deriving (Show, Hashable, Ord, Eq)
 myGraph :: DGraph Element Action
 myGraph = ...
 ```
-
-## Visualizing edged graphs
-
 # Working with graph-type independence
