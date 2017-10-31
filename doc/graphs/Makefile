@@ -2,8 +2,10 @@ OUTPUTS = basic_ugraph.png \
 			  basic_dgraph.png \
               cities.png \
 			  prs.png \
-			  ufoundation.png \
 			  dfoundation.png \
+			  ufoundation.png \
+			  dwfoundation.png \
+			  uwfoundation.png \
 
 phony: $(OUTPUTS)
 

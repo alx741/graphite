@@ -1,0 +1,15 @@
+graph
+{
+    "Helicon" -- "Nishaya" [label = "200.00"];
+    "Helicon" -- "Wencory" [label = "382.20"];
+    "Nishaya" -- "Wencory" [label = "820.32"];
+    "Wencory" -- "Getorin" [label = "200.40"];
+    "Wencory" -- "Cinna"   [label = "190.90"];
+    "Wencory" -- "Lystena" [label = "302.08"];
+    "Lystena" -- "Helicon" [label = "500.00"];
+    "Cinna"   -- "Florina" [label = "630.80"];
+    "Florina" -- "Nishaya" [label = "090.00"];
+    "Florina" -- "Derowd"  [label = "160.11"];
+    "Derowd"  -- "Cinna"   [label = "807.30"];
+    "Derowd"  -- "Lystena" [label = "200.89"];
+}
