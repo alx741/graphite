@@ -145,15 +145,51 @@ myGraph = fromArcsList
     ]
 ```
 
+
 # Complex graphs - complex vertices, complex edges
 
-... we could define some data types:
+Remember that graphite can use any `Hashable` data type as vertices, so we could
+define our own data types, make them instances of `Hashable` and use it as
+vertices.
+
+Lets try this out. First define some data types:
 
 ```haskell
-data Element = Paper | Rock | Scissors deriving (Show, Hashable, Ord, Eq)
-data Action = Cover | Crush | Cut deriving (Show, Hashable, Ord, Eq)
+{-# LANGUAGE DeriveGeneric #-}
 
-myGraph :: DGraph Element Action
-myGraph = ...
+import GHC.Generics (Generic)
+import Data.Hashable
+
+data Element
+    = Paper
+    | Rock
+    | Scissors
+    deriving (Show, Ord, Eq, Generic)
+
+instance Hashable Element
+
+data Action
+    = Cover
+    | Crush
+    | Cut
+    deriving (Show, Ord, Eq, Generic)
+
+instance Hashable Action
 ```
+
+Although we could define `Hashable` instances manually, here we go for the
+automatic generation of default instances.
+
+Now define a graph with vertices of type *Element* and edge attributes of type
+*Action*:
+
+```haskell
+myGraph :: DGraph Element Action
+myGraph = fromArcsList
+    [ Arc Paper     Rock        Cover
+    , Arc Rock      Scissors    Crush
+    , Arc Scissors  Paper       Cut
+    ]
+```
+
 # Working with graph-type independence
