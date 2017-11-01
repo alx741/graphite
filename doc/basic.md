@@ -201,4 +201,48 @@ myGraph = fromArcsList
 ![Paper-Rock-Scissors](./graphs/prs.png)
 
 
+## Record vertices
+
+By using the same approach it's possible to define data types with record syntax
+like so:
+
+```haskell
+{-# LANGUAGE DeriveGeneric #-}
+
+import GHC.Generics (Generic)
+import Data.Hashable
+
+data City = City
+    { name :: String
+    , major :: String
+    , population :: Int
+    } deriving (Show, Ord, Eq, Generic)
+
+instance Hashable City
+```
+
+Write a couple instances:
+
+```haskell
+lazyTown, springfield, southPark :: City
+
+lazyTown = City "Lazy Town" "Milford Meanswell" 12
+springfield = City "Springfield" "Joe Quimby" 30720
+southPark = City "South Park, Colorado" "McDaniels" 2540
+```
+
+And finally use them in a graph:
+
+```haskell
+cities :: UGraph City ()
+cities = fromEdgesList
+    [ lazyTown <-> springfield
+    , springfield <-> southPark
+    , southPark <-> lazyTown
+    ]
+```
+
+![Cities](./graphs/cities2.png)
+
+
 # Working with graph-type independence

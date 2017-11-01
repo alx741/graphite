@@ -1,0 +1,6 @@
+graph
+{
+    "Lazy Town" -- "Springfield";
+    "Springfield" -- "South Park";
+    "South Park" -- "Lazy Town";
+}

@@ -6,6 +6,7 @@ OUTPUTS = basic_ugraph.png \
 			  ufoundation.png \
 			  dwfoundation.png \
 			  uwfoundation.png \
+			  cities2.png \
 
 phony: $(OUTPUTS)
 
