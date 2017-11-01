@@ -1,6 +1,6 @@
 digraph
 {
-    "Paper" -> "Rock" [label = "Covers"];
-    "Rock" -> "Scissors" [label = "Crushes"];
-    "Scissors" -> "Paper" [label = "Cuts"];
+    "Paper" -> "Rock" [label = "Cover"];
+    "Rock" -> "Scissors" [label = "Crush"];
+    "Scissors" -> "Paper" [label = "Cut"];
 }

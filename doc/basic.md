@@ -139,9 +139,9 @@ by using `String`:
 ```haskell
 myGraph :: DGraph String String
 myGraph = fromArcsList
-    [ Arc "Paper" "Rock" "Covers"
-    , Arc "Rock" "Scissors" "Crushes"
-    , Arc "Scissors" "Paper" "Cuts"
+    [ Arc "Paper" "Rock" "Cover"
+    , Arc "Rock" "Scissors" "Crush"
+    , Arc "Scissors" "Paper" "Cut"
     ]
 ```
 
@@ -152,6 +152,11 @@ Remember that graphite can use any `Hashable` data type as vertices, so we could
 define our own data types, make them instances of `Hashable` and use it as
 vertices.
 
+Edge attributes on the other hand have no restriction and can be of any type.
+Though some functions will require the attributes to be `Weighted` or `Labeled`
+(type classes defined in Data.Graph.Types) if the nature of the algorithm
+requires it (like when computing shortest paths).
+
 Lets try this out. First define some data types:
 
 ```haskell
@@ -160,6 +165,7 @@ Lets try this out. First define some data types:
 import GHC.Generics (Generic)
 import Data.Hashable
 
+-- Data type for vertices
 data Element
     = Paper
     | Rock
@@ -168,13 +174,13 @@ data Element
 
 instance Hashable Element
 
+
+-- Data type for edge attributes
 data Action
     = Cover
     | Crush
     | Cut
-    deriving (Show, Ord, Eq, Generic)
-
-instance Hashable Action
+    deriving (Show, Ord, Eq)
 ```
 
 Although we could define `Hashable` instances manually, here we go for the
@@ -191,5 +197,8 @@ myGraph = fromArcsList
     , Arc Scissors  Paper       Cut
     ]
 ```
+
+![Paper-Rock-Scissors](./graphs/prs.png)
+
 
 # Working with graph-type independence
