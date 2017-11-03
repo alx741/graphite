@@ -247,17 +247,18 @@ cities = fromEdgesList
 
 # Working with graph-type independence
 
-When the type of the graph (directed/undirected) is irrelevant the `Graph` type
+When the type of the graph (directed/undirected) is irrelevant, the `Graph` type
 class provides a graph-type polymorphic API to work with.
 
 In the graph-type generic interface you work with *tuples* and *triples* to
-represent edges as opposed to the `Edge` and `Arc` types of the graph-type
+represent edges, as opposed to the `Edge` and `Arc` types of the graph-type
 specific interfaces.
 
 **Tuples** represent edges (directed or undirected, depending on the concrete
 graph type) with attributes of type *unit* `()`.
 
-The following are graphs with edge attributes of type `()`:
+The following are graphs with edges defined as tuples and with attributes of
+type `()`:
 
 ```haskell
 someUndirectedGraph :: UGraph Int ()
@@ -280,7 +281,9 @@ someDirectedGraph = insertEdgePairs [(1, 2), (2, 3), (3, 1)] empty
 **Triples** represent edges (directed or undirected, depending on the concrete
 graph type) where the third element is the edge attribute.
 
-The following are graphs with edge attributes of type `String`:
+The following are graphs with edges defined as triples and with attributes of
+type `String`:
+
 
 ```haskell
 someUndirectedGraph :: UGraph Int String
