@@ -262,12 +262,16 @@ The following are graphs with edge attributes of type `()`:
 ```haskell
 someUndirectedGraph :: UGraph Int ()
 someUndirectedGraph = insertEdgePairs [(1, 2), (2, 3), (3, 1)] empty
-
-someDirectedGraph :: DGraph Int ()
-someDirectedGraph = insertEdgePairs [(1, 2), (2, 3), (3, 1)] empty
 ```
 
 ![someUndirectedGraph](./graphs/upairs.png)
+
+
+
+```haskell
+someDirectedGraph :: DGraph Int ()
+someDirectedGraph = insertEdgePairs [(1, 2), (2, 3), (3, 1)] empty
+```
 
 ![someDirectedGraph](./graphs/dpairs.png)
 
@@ -281,11 +285,15 @@ The following are graphs with edge attributes of type `String`:
 ```haskell
 someUndirectedGraph :: UGraph Int String
 someUndirectedGraph = insertEdgeTriples [(1, 2, "A"), (2, 3, "B"), (3, 1, "C")] empty
-
-someDirectedGraph :: DGraph Int String
-someDirectedGraph = insertEdgeTriples [(1, 2, "A"), (2, 3, "B"), (3, 1, "C")] empty
 ```
 
 ![someUndirectedGraph](./graphs/utriples.png)
+
+
+
+```haskell
+someDirectedGraph :: DGraph Int String
+someDirectedGraph = insertEdgeTriples [(1, 2, "A"), (2, 3, "B"), (3, 1, "C")] empty
+```
 
 ![someDirectedGraph](./graphs/dtriples.png)
