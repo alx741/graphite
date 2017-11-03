@@ -267,9 +267,9 @@ someDirectedGraph :: DGraph Int ()
 someDirectedGraph = insertEdgePairs [(1, 2), (2, 3), (3, 1)] empty
 ```
 
-![someUndirectedGraph](./graphs/upair.png)
+![someUndirectedGraph](./graphs/upairs.png)
 
-![someDirectedGraph](./graphs/dpair.png)
+![someDirectedGraph](./graphs/dpairs.png)
 
 
 
@@ -286,6 +286,6 @@ someDirectedGraph :: DGraph Int String
 someDirectedGraph = insertEdgeTriples [(1, 2, "A"), (2, 3, "B"), (3, 1, "C")] empty
 ```
 
-![someUndirectedGraph](./graphs/utriple.png)
+![someUndirectedGraph](./graphs/utriples.png)
 
-![someDirectedGraph](./graphs/dtriple.png)
+![someDirectedGraph](./graphs/dtriples.png)
