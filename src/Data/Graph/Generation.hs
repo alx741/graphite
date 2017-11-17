@@ -27,7 +27,7 @@ import Data.Graph.UGraph
 
 -- | Generate a random Erdős–Rényi G(n, p) model graph
 erdosRenyi :: Graph g => Int -> Float -> IO (g Int ())
-erdosRenyi n = rndGraph' (1, n)
+erdosRenyi n p = rndGraph' p [1..n]
 
 -- | 'erdosRenyi' convinience 'UGraph' generation function
 erdosRenyiU :: Int -> Float -> IO (UGraph Int ())
@@ -38,15 +38,15 @@ erdosRenyiD :: Int -> Float -> IO (DGraph Int ())
 erdosRenyiD = erdosRenyi
 
 
--- | Generate a random graph with vertices in /v/ across range of given bounds,
+-- | Generate a random graph for all the vertices of type /v/ in the list,
 -- random edge attributes in /e/ within given bounds, and some existing
 -- probability for each possible edge as per the Erdős–Rényi model
-rndGraph :: forall g v e . (Graph g, Hashable v, Eq v, Enum v, Random e)
- => (v, v)
- -> (e, e)
+rndGraph :: forall g v e . (Graph g, Hashable v, Eq v, Random e)
+ => (e, e)
  -> Float
+ -> [v]
  -> IO (g v e)
-rndGraph (n1, n2) edgeBounds p = go [n1..n2] (probability p) empty
+rndGraph edgeBounds p verts = go verts (probability p) empty
     where
         go :: [v] -> Float -> g v e -> IO (g v e)
         go [] _ g = return g
@@ -60,11 +60,11 @@ rndGraph (n1, n2) edgeBounds p = go [n1..n2] (probability p) empty
 
 
 -- | Same as 'rndGraph' but uses attributeless edges
-rndGraph' :: forall g v . (Graph g, Hashable v, Eq v, Enum v)
- => (v, v)
- -> Float
+rndGraph' :: forall g v . (Graph g, Hashable v, Eq v)
+ => Float
+ -> [v]
  -> IO (g v ())
-rndGraph' (n1, n2) p = go [n1..n2] (probability p) empty
+rndGraph' p verts = go verts (probability p) empty
     where
         go :: [v] -> Float -> g v () -> IO (g v ())
         go [] _ g = return g
