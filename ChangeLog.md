@@ -1,3 +1,7 @@
+## 0.9.6.0
+
+- New API for rndGraph and rndGraph'
+
 ## 0.9.5.1
 
 - Fix haddock documentation
