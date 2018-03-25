@@ -155,10 +155,13 @@ Remember that graphite can use any `Hashable` data type as vertices, so we could
 define our own data types, make them instances of `Hashable` and use them as
 vertices.
 
-Edge attributes on the other hand have no restriction and can be of any type.
-Though some functions will require the attributes to be `Weighted` or `Labeled`
-(type classes defined in Data.Graph.Types) if the nature of the algorithm
-requires it (like when computing shortest paths).
+Edge attributes on the other hand have no restriction and can be of any type;
+Though some functions will require the attributes to be instances of the
+[Weighted](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-Types.html#t:Weighted)
+or
+[Labeled](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-Types.html#t:Labeled)
+type classes if the nature of the algorithm requires it (like when computing
+shortest paths).
 
 Lets try this out. First define some data types:
 
