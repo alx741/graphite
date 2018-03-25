@@ -29,11 +29,14 @@ myGraph = fromEdgesList
     ]
 ```
 
-The type `UGraph Int ()` here means that this is an undirected graph `UGraph`,
+The type `UGraph Int ()` here means that this is an undirected graph
+[UGraph](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-UGraph.html#t:UGraph),
 with vertices of type `Int` and edges with attributes of type `()`, that is,
 edges with no attributes on them.
 
-The `<->` operator constructs an *Undirected* `Edge` between to vertices.
+The `<->` operator constructs an *Undirected*
+[Edge](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-Types.html#t:Edge)
+between to vertices.
 
 The `fromEdgesList` function constructs an `UGraph` from a list of `Edge`s.
 
@@ -62,21 +65,24 @@ myGraph = fromArcsList
     ]
 ```
 
-The type `DGraph Int ()` here means that this is a directed graph `DGraph`,
+The type `DGraph Int ()` here means that this is a directed graph
+[DGraph](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-DGraph.html#t:DGraph),
 with vertices of type `Int` and edges with attributes of type `()`, that is,
 edges with no attributes on them.
 
-The `-->` operator constructs a *Directed* edge (a.k.a. an `Arc`) between to
-vertices.
+The `-->` operator constructs a *Directed* edge (a.k.a. an
+[Arc](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-Types.html#t:Arc))
+between to vertices.
 
 The `fromArcsList` function constructs a `DGraph` from a list of `Arc`s.
 
 
 ## Other vertex types
 
-Graphite can use any `Hashable` type as the vertices of a graph, this way we
-could have a graph of `Int`s, `Float`s, `Bool`s, `Char`s, `String`s,
-`ByteString`s, `Text` and more.
+Graphite can use any
+[Hashable](http://hackage.haskell.org/package/hashable-1.2.7.0/docs/Data-Hashable.html#t:Hashable)
+type as the vertices of a graph, this way we could have a graph of `Int`s,
+`Float`s, `Bool`s, `Char`s, `String`s, `ByteString`s, `Text` and more.
 
 Take for instance this undirected graph with `Float` vertices (parenthesis for
 clarity):
@@ -190,7 +196,7 @@ data Action
 ```
 
 Although we could define `Hashable` instances manually, here we go for the
-automatic generation of default instances.
+automatic generation of instances by leveraging `Generic`.
 
 Now define a graph with vertices of type *Element* and edge attributes of type
 *Action*:
@@ -253,8 +259,9 @@ cities = fromEdgesList
 
 # Working with graph-type independence
 
-When the type of the graph (directed/undirected) is irrelevant, the `Graph` type
-class provides a graph-type polymorphic API to work with.
+When the type of the graph (directed/undirected) is irrelevant, the
+[Graph](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-Types.html#t:Graph)
+type class provides a graph-type polymorphic API to work with.
 
 In the graph-type generic interface you work with *tuples* and *triples* to
 represent edges, as opposed to the `Edge` and `Arc` types of the graph-type
@@ -264,7 +271,8 @@ specific interfaces.
 graph type) with attributes of type *unit* `()`.
 
 The following are graphs with edges defined as tuples and with attributes of
-type `()`:
+type `()` (note how we insert edges described as the vertices they connect to
+the `empty` graph) :
 
 ```haskell
 someUndirectedGraph :: UGraph Int ()
