@@ -30,7 +30,8 @@ myGraph = fromEdgesList
 ```
 
 The type `UGraph Int ()` here means that this is an undirected graph `UGraph`,
-with vertices of type `Int` and edges with attributes of type `()`.
+with vertices of type `Int` and edges with attributes of type `()`, that is,
+edges with no attributes on them.
 
 The `<->` operator constructs an *Undirected* `Edge` between to vertices.
 
@@ -62,9 +63,11 @@ myGraph = fromArcsList
 ```
 
 The type `DGraph Int ()` here means that this is a directed graph `DGraph`,
-with vertices of type `Int` and edges with attributes of type `()`.
+with vertices of type `Int` and edges with attributes of type `()`, that is,
+edges with no attributes on them.
 
-The `-->` operator constructs a *Directed* `Arc` between to vertices.
+The `-->` operator constructs a *Directed* edge (a.k.a. an `Arc`) between to
+vertices.
 
 The `fromArcsList` function constructs a `DGraph` from a list of `Arc`s.
 
