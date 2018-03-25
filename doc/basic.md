@@ -152,7 +152,7 @@ myGraph = fromArcsList
 # Complex graphs - complex vertices, complex edges
 
 Remember that graphite can use any `Hashable` data type as vertices, so we could
-define our own data types, make them instances of `Hashable` and use it as
+define our own data types, make them instances of `Hashable` and use them as
 vertices.
 
 Edge attributes on the other hand have no restriction and can be of any type.
