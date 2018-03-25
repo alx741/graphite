@@ -309,11 +309,11 @@ instance IsEdge Arc where
     fromTriple (fromV, toV, e) = Arc fromV toV e
     isLoop (Arc v1 v2 _) = v1 == v2
 
--- | Weighted Edge attributes
+-- | Edge attributes that represent weights
 class Weighted e where
     weight :: e -> Double
 
--- | Labeled Edge attributes
+-- | Edge attributes that represent labels
 class Labeled e where
     label :: e -> String
 
