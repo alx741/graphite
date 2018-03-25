@@ -32,8 +32,9 @@ main = plotDGraph foundationUniverse
 
 ![Foundation Universe (Directed)](./graphs/dfoundation.png)
 
-We could now convert this graph to an undirected one using `toUndirected` and
-then visualize it with `plotUGraph`:
+We could now convert this graph to an undirected one using the
+[toUndirected](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-DGraph.html#v:toUndirected)
+function and then visualize it with `plotUGraph`:
 
 ```haskell
 main :: IO ()
@@ -45,7 +46,7 @@ main = plotUGraph $ toUndirected foundationUniverse
 
 ## Visualizing edged graphs
 
-When rendering the edge attributes is needed use the `plotUGraphEdged` and
+When rendering the edge attributes is needed, use the `plotUGraphEdged` and
 `plotDGraphEdged` functions instead.
 
 Lets define a directed graph with `Double` edge attributes as the distances
