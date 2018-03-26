@@ -26,9 +26,11 @@ module Data.Graph.Types
     , tripleAttribute
     ) where
 
-import Data.List    (foldl')
-import GHC.Float    (float2Double)
-import GHC.Generics (Generic)
+import Control.Applicative ((<*>))
+import Data.Functor        ((<$>))
+import Data.List           (foldl')
+import GHC.Float           (float2Double)
+import GHC.Generics        (Generic)
 
 import Control.DeepSeq
 import Data.Hashable
