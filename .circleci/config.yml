@@ -17,6 +17,8 @@ jobs:
                     - "~/.stack"
 
     test:
+        docker:
+            - image: haskell:8.2
         steps:
             - checkout
             - run: stack test --fast
