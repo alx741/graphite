@@ -1,7 +1,6 @@
 version: 2
 jobs:
-
-    build:
+    test:
         docker:
             - image: haskell:8.2
         steps:
@@ -11,25 +10,9 @@ jobs:
                     - stack-cache-v1
             - run: stack setup
             - run: stack build --fast --test --no-run-tests
+            - run: stack test
             - save_cache:
                 key: stack-cache-v1
                 paths:
                     - ".stack-work"
                     - "~/.stack"
-
-    test:
-        docker:
-            - image: haskell:8.2
-        steps:
-            - checkout
-            - run: stack test --fast
-
-
-workflows:
-  version: 2
-  build-and-test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
