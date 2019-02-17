@@ -8,11 +8,11 @@ module Data.Graph.UGraph.DegreeSequence
 
     -- * Queries
     , isGraphicalSequence
-    , isDirectedGraphic
+    -- , isDirectedGraphic
     , holdsHandshakingLemma
 
     -- * Graph generation
-    , fromGraphicalSequence
+    -- , fromGraphicalSequence
     ) where
 
 import Data.List (reverse, sort)

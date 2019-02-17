@@ -226,7 +226,7 @@ class Graph g where
 
     -- TODO: make this [[Bool]]
     -- | Get the adjacency binary matrix representation of a graph
-    toAdjacencyMatrix :: g v e -> [[Int]]
+    -- toAdjacencyMatrix :: g v e -> [[Int]]
 
     -- | Generate a graph of Int vertices from an adjacency square binary matrix
     fromAdjacencyMatrix :: [[Int]] -> Maybe (g Int ())

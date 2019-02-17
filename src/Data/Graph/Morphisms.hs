@@ -1,4 +1,6 @@
-module Data.Graph.Morphisms where
+module Data.Graph.Morphisms
+    ()
+    where
 
 import Data.Graph.DGraph
 import Data.Graph.Types

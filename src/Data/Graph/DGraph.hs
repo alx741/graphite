@@ -23,10 +23,10 @@ module Data.Graph.DGraph
     , indegrees
     , outdegrees
     -- ** Query graph properties and characteristics
-    , isSymmetric
-    , isOriented
+    -- , isSymmetric
+    -- , isOriented
     , isBalanced
-    , isRegular
+    -- , isRegular
     , isSource
     , isSink
     , isInternal
@@ -167,7 +167,7 @@ instance Graph DGraph where
                 genArcs as (i, vs) = as ++ fmap (\v -> Arc i v ()) connected
                     where connected = fst <$> filter (\(_, v) -> v /= 0) vs
 
-    toAdjacencyMatrix = undefined
+    -- toAdjacencyMatrix = undefined
 
 instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
  => Arbitrary (DGraph v e) where

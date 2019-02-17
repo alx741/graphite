@@ -144,7 +144,7 @@ instance Graph UGraph where
                 genEdges es (i, vs) = es ++ fmap (\v -> Edge i v ()) connected
                     where connected = fst <$> filter (\(_, v) -> v /= 0) vs
 
-    toAdjacencyMatrix = undefined
+    -- toAdjacencyMatrix = undefined
 
 
 
