@@ -36,7 +36,7 @@ edges with no attributes on them.
 
 The `<->` operator constructs an *Undirected*
 [Edge](https://hackage.haskell.org/package/graphite-0.9.6.0/docs/Data-Graph-Types.html#t:Edge)
-between to vertices.
+between two vertices.
 
 The `fromEdgesList` function constructs an `UGraph` from a list of `Edge`s.
 
