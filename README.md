@@ -31,7 +31,6 @@ Pull requests are very welcome.
 - `isomorphism`           (Data.Graph.Morphisms)
 - `isURegular`            (Data.Graph.Morphisms)
 - `isDRegular`            (Data.Graph.Morphisms)
-- `isDRegular`            (Data.Graph.Morphisms)
 
 
 ## Known bugs
