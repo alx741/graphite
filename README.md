@@ -35,6 +35,6 @@ Pull requests are very welcome.
 
 ## Known bugs
 
-### >= 0.10.0.1
+### <= 0.10.0.1
 
 - `insertEdgeTriple` does not update the attribute in DGraph [#2](https://github.com/alx741/graphite/issues/2)
