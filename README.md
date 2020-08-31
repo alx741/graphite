@@ -32,3 +32,10 @@ Pull requests are very welcome.
 - `isURegular`            (Data.Graph.Morphisms)
 - `isDRegular`            (Data.Graph.Morphisms)
 - `isDRegular`            (Data.Graph.Morphisms)
+
+
+## Known bugs
+
+### >= 0.10.0.1
+
+- `insertEdgeTriple` does not update the attribute in DGraph [#2](https://github.com/alx741/graphite/issues/2)
