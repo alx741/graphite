@@ -61,3 +61,20 @@ spec = do
             \g v -> (not $ g `containsVertex` v)
                 ==> (removeVertex v $ insertVertex v g)
                     == (g :: DGraph Int ())
+
+
+        -- Regression issue #2
+        it "Updates attribute on edge insertion" $ property $ do
+            let g = insertArc (Arc 1 2 'b') $ insertArc (Arc 1 2 'a') empty :: DGraph Int Char
+            edgeTriples g `shouldBe` [(1, 2, 'b')]
+            length (arcs g) `shouldBe` 1
+
+        it "Mantains different attributes for different edges" $ property $ do
+            let g1 = insertArc (Arc 3 4 'b') $ insertArc (Arc 1 2 'a') empty :: DGraph Int Char
+            edgeTriples g1 `shouldBe` [(1, 2, 'a'), (3, 4, 'b')]
+            length (arcs g1) `shouldBe` 2
+
+            let g2 = insertArc (Arc 2 1 'b') $ insertArc (Arc 1 2 'a') empty :: DGraph Int Char
+            edgeTriples g2 `shouldBe` [(1, 2, 'a'), (2, 1, 'b')]
+            length (arcs g2) `shouldBe` 2
+

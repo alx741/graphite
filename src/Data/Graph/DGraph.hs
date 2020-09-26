@@ -179,9 +179,9 @@ instance (Arbitrary v, Arbitrary e, Hashable v, Num v, Ord v)
 -- already contains the Arc, its attribute gets updated
 insertArc :: (Hashable v, Eq v) => Arc v e -> DGraph v e -> DGraph v e
 insertArc (Arc fromV toV edgeAttr) g@(DGraph s _)
-    | containsEdgePair g (fromV, toV) = g
-    | otherwise = DGraph (s + 1) $ HM.adjust (insertLink toV edgeAttr) fromV g'
-    where g' = unDGraph $ insertVertices [fromV, toV] g
+    | containsEdgePair g (fromV, toV) =  DGraph s $ HM.adjust (insertLink toV edgeAttr) fromV $ unDGraph g
+    | otherwise = DGraph (s + 1) $ HM.adjust (insertLink toV edgeAttr) fromV $ unDGraph g'
+    where g' = insertVertices [fromV, toV] g
 
 -- | Same as 'insertArc' but for a list of 'Arc's
 insertArcs :: (Hashable v, Eq v) => [Arc v e] -> DGraph v e -> DGraph v e
