@@ -1,0 +1,3 @@
+mkdocs:
+  configuration: doc/mkdocs.yml
+  fail_on_warning: false
