@@ -68,3 +68,20 @@ spec = do
 
         it "Can be represented as a list" $ property $
             \g -> (fromList . toList) g == (g :: UGraph Int ())
+
+
+        -- Regression issue #2
+        it "Updates attribute on edge insertion" $ property $ do
+            let g = insertEdge (Edge 1 2 'b') $ insertEdge (Edge 1 2 'a') empty :: UGraph Int Char
+            edgeTriples g `shouldBe` [(1, 2, 'b')]
+            length (edges g) `shouldBe` 1
+
+        it "Updates attribute on edge insertion with vertex order inverted" $ property $ do
+            let g = insertEdge (Edge 2 1 'b') $ insertEdge (Edge 1 2 'a') empty :: UGraph Int Char
+            edgeTriples g `shouldBe` [(1, 2, 'b')]
+            length (edges g) `shouldBe` 1
+
+        it "Mantains different attributes for different edges" $ property $ do
+            let g = insertEdge (Edge 3 4 'b') $ insertEdge (Edge 1 2 'a') empty :: UGraph Int Char
+            edgeTriples g `shouldBe` [(1, 2, 'a'), (3, 4, 'b')]
+            length (edges g) `shouldBe` 2

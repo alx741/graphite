@@ -154,10 +154,11 @@ instance Graph UGraph where
 -- contains the Edge, its attribute gets updated
 insertEdge :: (Hashable v, Eq v) => Edge v e -> UGraph v e -> UGraph v e
 insertEdge (Edge v1 v2 edgeAttr) g@(UGraph s _)
-    | containsEdgePair g (v1, v2) = g
-    | otherwise = UGraph (s + 1) $ link v2 v1 $ link v1 v2 g'
+    -- | containsEdgePair g (v1, v2) = g
+    | containsEdgePair g (v1, v2) = UGraph s $ link v2 v1 $ link v1 v2 $ unUGraph g
+    | otherwise = UGraph (s + 1) $ link v2 v1 $ link v1 v2 $ unUGraph g'
     where
-        g' = unUGraph $ insertVertices [v1, v2] g
+        g' = insertVertices [v1, v2] g
         link fromV toV = HM.adjust (insertLink toV edgeAttr) fromV
 
 -- | Same as 'insertEdge' but for a list of 'Edge's
