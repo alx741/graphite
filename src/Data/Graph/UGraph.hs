@@ -116,9 +116,8 @@ instance Graph UGraph where
             v2Links = HM.delete v1 $ getLinks v2 g
             update = HM.adjust . const
 
-    removeVertex v g@(UGraph s _) = UGraph s
-        $ (\(UGraph _ g') -> HM.delete v g')
-        $ foldl' (flip removeEdge) g $ incidentEdges g v
+    removeVertex v g = UGraph s $ HM.delete v g'
+        where (UGraph s g') = foldl' (flip removeEdge) g $ incidentEdges g v
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && not (HM.member v $ getLinks v $ unUGraph g)
