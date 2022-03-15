@@ -78,3 +78,6 @@ spec = do
             edgeTriples g2 `shouldBe` [(1, 2, 'a'), (2, 1, 'b')]
             length (arcs g2) `shouldBe` 2
 
+        it "Decrements its size when vertices incident to an arc are removed" $ property $
+            \g v -> (g `containsVertex` v) && (vertexDegree g v > 0) && (size g > 0)
+                ==> let g1 = removeVertex v (g :: DGraph Int ()) in size g1 == length (arcs g1)
