@@ -1,7 +1,6 @@
 # graphite - A Haskell graphs and networks library
 
 [![Hackage](https://img.shields.io/hackage/v/graphite.svg)](https://hackage.haskell.org/package/graphite)
-![Hackage-Deps](https://img.shields.io/hackage-deps/v/graphite.svg)
 [![Docs](https://readthedocs.org/projects/haskell-graphite/badge/?version=latest)](http://haskell-graphite.readthedocs.io/)
 
 ![Graphite Logo](./logo/logo.png)
