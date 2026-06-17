@@ -136,10 +136,8 @@ instance Graph DGraph where
         | otherwise = graph
             where v1Links' = HM.delete v2 $ getLinks v1 g
 
-
-    removeVertex v g@(DGraph s _) = DGraph s
-        $ (\(DGraph _ g') -> HM.delete v g')
-        $ foldl' (flip removeArc) g $ incidentArcs g v
+    removeVertex v g = DGraph s $ HM.delete v g'
+        where (DGraph s g') = foldl' (flip removeArc) g $ incidentArcs g v
 
     isSimple g = foldl' go True $ vertices g
         where go bool v = bool && not (HM.member v $ getLinks v $ unDGraph g)

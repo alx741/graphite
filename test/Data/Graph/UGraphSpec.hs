@@ -85,3 +85,7 @@ spec = do
             let g = insertEdge (Edge 3 4 'b') $ insertEdge (Edge 1 2 'a') empty :: UGraph Int Char
             edgeTriples g `shouldBe` [(1, 2, 'a'), (3, 4, 'b')]
             length (edges g) `shouldBe` 2
+
+        it "Decrements its size when vertices incident to an edge are removed" $ property $
+            \g v -> (g `containsVertex` v) && (vertexDegree g v > 0) && (size g > 0)
+                ==> let g1 = removeVertex v (g :: UGraph Int ()) in size g1 == length (edges g1)
